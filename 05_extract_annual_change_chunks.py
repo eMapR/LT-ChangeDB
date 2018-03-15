@@ -525,6 +525,7 @@ info = get_info(bname)
 indexID = info['indexID']
 startYear = info['startYear']
 endYear = info['endYear']
+startYearChng = startYear+1
 
 ##############################################################################
 # figure out if we did to flip the data over
@@ -641,25 +642,33 @@ for y in xrange(0, ySize, blockSize):
         if flipper == -1:
           pre = pre * flipper
         
-        for i, thisYear in enumerate(yod):
-          thisBand = thisYear-(startYear+1)
-          npOutYrs[:, subY, subX] = fill_blank(yod[i], thisBand, nBands)   
-          npOutMag[:, subY, subX] = fill_blank(mag[i], thisBand, nBands)
-          npOutDur[:, subY, subX] = fill_blank(dur[i], thisBand, nBands)
-          npOutPre[:, subY, subX] = fill_blank(pre[i], thisBand, nBands)
+        
 
+        
+        
+        #for i, thisYear in enumerate(yod):
+        theseBands = [thisYear-startYearChng for thisYear in yod]
+        npOutYrs[theseBands, subY, subX] = yod
+        npOutMag[theseBands, subY, subX] = mag
+        npOutDur[theseBands, subY, subX] = dur
+        npOutPre[theseBands, subY, subX] = pre
+        '''
+        thisBand = thisYear-(startYear+1)
+        npOutYrs[:, subY, subX] = fill_blank(yod[i], thisBand, nBands)   
+        npOutMag[:, subY, subX] = fill_blank(mag[i], thisBand, nBands)
+        npOutDur[:, subY, subX] = fill_blank(dur[i], thisBand, nBands)
+        npOutPre[:, subY, subX] = fill_blank(pre[i], thisBand, nBands)
+        '''
     for b in range(nBands):
-      print(b)
+      '''
       dataBand = dstYrs.GetRasterBand(b+1)
       data = npOutYrs[b, :, :]
       dataBand.WriteArray(data, x, y)
-      
-      
-      
-      #write_array(dstYrs, b, npOutYrs, x, y)
-      #write_array(dstMag, b, npOutMag, x, y)
-      #write_array(dstDur, b, npOutDur, x, y)
-      #write_array(dstPre, b, npOutPre, x, y)
+      '''
+      write_array(dstYrs, b, npOutYrs, x, y)
+      write_array(dstMag, b, npOutMag, x, y)
+      write_array(dstDur, b, npOutDur, x, y)
+      write_array(dstPre, b, npOutPre, x, y)
     
     
 # close the output files
