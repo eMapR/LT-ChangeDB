@@ -5,6 +5,7 @@ Created on Mon Dec  4 16:16:42 2017
 @author: braatenj
 """
 
+import ltcdb
 import os
 import sys   #sys.exit() - if numpy and gdal are not found print to use script 01 and exit
 import subprocess
@@ -16,15 +17,13 @@ from glob import glob
 from shutil import copyfile
 
 
+# change working directory to this script's dir
+scriptAbsPath = os.path.abspath(__file__)
+scriptDname = os.path.dirname(scriptAbsPath)
+os.chdir(scriptDname)
 
-def get_info(name):
-  pieces = name.split('-')[0:6]
-  return {'key': pieces[0],
-          'value': pieces[1],
-          'indexID': pieces[2],
-          'nVert': int(pieces[3]),
-          'startYear':int(pieces[4][0:4]),
-          'endYear':int(pieces[4][4:8])}
+
+
 
 def write_raster(data, filename, prj, origin, driver, dtype=gdal.GDT_Int16, pixel_size=30):
   # origin = [X, Y] offset
@@ -363,67 +362,14 @@ def update_progress(progress):
   sys.stdout.flush()
 
 
-def get_dir(message):
-  root = Tkinter.Tk()
-  root.withdraw()
-  root.overrideredirect(1)
-  root.attributes('-alpha', 0.0)
-  root.deiconify()
-  root.lift()
-  root.focus_force()
-  thisDir = str(tkFileDialog.askdirectory(initialdir = "/",title = message))
-  root.destroy()
-  return thisDir
 
-
-
-def make_output_blanks(inputFtv, outPuts):
-  #inputFtv = vertYrsFile
-  src_ds = gdal.Open(inputFtv)
-  tx = src_ds.GetGeoTransform()
-  prj = src_ds.GetProjection()
-  driver = src_ds.GetDriver()
-  band = src_ds.GetRasterBand(1)
-  xsize = band.XSize
-  ysize = band.YSize
-  nBands = src_ds.RasterCount
-  src_ds = None
-  
-  nBands -= 1
-  for i, thisOut in enumerate(outPuts):
-    if i == 0:
-      # make a new file
-      copyThis = thisOut
-      dst_ds = driver.Create(thisOut, xsize, ysize, nBands, band.DataType)
-      dst_ds.SetGeoTransform(tx)
-      dst_ds.SetProjection(prj)
-      dst_ds = None
-    else:
-      copyfile(copyThis, thisOut)
-  print(nBands)
-  return nBands
-
-
-
-def fill_blank(value, band, nBlank):
-  blank = np.zeros(nBlank, np.int16)
-  blank[band] = value
-  return blank
-
-
-
-def write_array(dsOut, band, data, x, y):
-  dataBand = dsOut.GetRasterBand(band+1)
-  data = data[band, :, :]
-  dataBand.WriteArray(data, x, y)
-  
   
 #################################################################################################################
 #################################################################################################################
 
 
 
-segDir = get_dir("Select a folder that contains LT segmentation files\n\n(*\\raster\\landtrendr\\segmentation\\*)")
+segDir = ltcdb.get_dir("Select a folder that contains LT segmentation files\n\n(*\\raster\\landtrendr\\segmentation\\*)")
 if segDir == '':
   sys.exit('ERROR: No folder containing LT segmentation files was selected.\nPlease re-run the script and select a folder.')
 
@@ -515,13 +461,13 @@ distInfoOutPre = os.path.join(outDir, bname+'-change_pre.tif')
 outPuts = [distInfoOutYrs, distInfoOutMag, distInfoOutDur, distInfoOutPre]
 
 # create the blanks
-nBands = make_output_blanks(ftvFile, outPuts)
+nBands = ltcdb.make_output_blanks(ftvFile, outPuts, -1)
 
 
 ###################################################################################
 
 # get run info
-info = get_info(bname)
+info = ltcdb.get_info(bname)
 indexID = info['indexID']
 startYear = info['startYear']
 endYear = info['endYear']
@@ -652,23 +598,18 @@ for y in xrange(0, ySize, blockSize):
         npOutMag[theseBands, subY, subX] = mag
         npOutDur[theseBands, subY, subX] = dur
         npOutPre[theseBands, subY, subX] = pre
-        '''
-        thisBand = thisYear-(startYear+1)
-        npOutYrs[:, subY, subX] = fill_blank(yod[i], thisBand, nBands)   
-        npOutMag[:, subY, subX] = fill_blank(mag[i], thisBand, nBands)
-        npOutDur[:, subY, subX] = fill_blank(dur[i], thisBand, nBands)
-        npOutPre[:, subY, subX] = fill_blank(pre[i], thisBand, nBands)
-        '''
+
+
     for b in range(nBands):
       '''
       dataBand = dstYrs.GetRasterBand(b+1)
       data = npOutYrs[b, :, :]
       dataBand.WriteArray(data, x, y)
       '''
-      write_array(dstYrs, b, npOutYrs, x, y)
-      write_array(dstMag, b, npOutMag, x, y)
-      write_array(dstDur, b, npOutDur, x, y)
-      write_array(dstPre, b, npOutPre, x, y)
+      ltcdb.write_array(dstYrs, b, npOutYrs, x, y)
+      ltcdb.write_array(dstMag, b, npOutMag, x, y)
+      ltcdb.write_array(dstDur, b, npOutDur, x, y)
+      ltcdb.write_array(dstPre, b, npOutPre, x, y)
     
     
 # close the output files

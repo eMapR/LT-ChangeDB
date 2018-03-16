@@ -50,3 +50,17 @@ def write_array(dsOut, band, data, x, y):
   dataBand = dsOut.GetRasterBand(band+1)
   data = data[band, :, :]
   dataBand.WriteArray(data, x, y)
+  
+  
+  
+def get_dir(message):
+  root = Tkinter.Tk()
+  root.withdraw()
+  root.overrideredirect(1)
+  root.attributes('-alpha', 0.0)
+  root.deiconify()
+  root.lift()
+  root.focus_force()
+  thisDir = str(tkFileDialog.askdirectory(initialdir = "/",title = message))
+  root.destroy()
+  return thisDir
