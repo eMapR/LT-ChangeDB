@@ -7,6 +7,7 @@ Created on Thu Mar 15 12:04:05 2018
 
 from osgeo import gdal
 from shutil import copyfile
+import Tkinter, tkFileDialog
 
 
 def make_output_blanks(inputFtv, outPuts, adj):
@@ -64,3 +65,10 @@ def get_dir(message):
   thisDir = str(tkFileDialog.askdirectory(initialdir = "/",title = message))
   root.destroy()
   return thisDir
+
+
+def get_delta(vertVals):
+  segStartVal = vertVals[:-1]
+  segEndVal = vertVals[1:]
+  segDelta = segEndVal - segStartVal
+  return segDelta
