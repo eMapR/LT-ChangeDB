@@ -403,8 +403,13 @@ minMag = -50
 
 # get the vert fit file
 vertYrsFile = vertYrsFile[0]
-vertFitFile = vertYrsFile.replace('yrs.tif', 'fit.tif')
-if not os.path.exists(vertFitFile):
+vertFitIDXFile = vertYrsFile.replace('yrs.tif', 'fit.tif')
+vertFitTCBFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcb.tif')
+vertFitTCGFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcg.tif')
+vertFitTCWFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcw.tif')
+
+#TODO need to error check for existence of TC vert files
+if not os.path.exists(vertFitIDXFile):
   sys.exit('ERROR: There was no *vert_fit.tif file in the folder selected.\nPlease fix this.') 
 
 #segDir = r"D:\work\proj\al\gee_test\test\raster\landtrendr\segmentation\PARK_CODE-MORA-NBR-7-19842017-06010930"
@@ -412,7 +417,7 @@ if not os.path.exists(vertFitFile):
 #vertFitFile = r"D:\work\proj\al\gee_test\test\raster\landtrendr\segmentation\PARK_CODE-MORA-NBR-7-19842017-06010930\PARK_CODE-MORA-NBR-7-19842017-06010930-vert_fit.tif"
 #info = get_info('PARK_CODE-MORA-NBR-7-19842017-06010930')
 
-
+"""
 # get the mmu
 mmuGood = 0
 while mmuGood is 0:
@@ -425,7 +430,7 @@ while mmuGood is 0:
     print('\n')
     print('ERROR: The selected value cannot be converted to an integer.')
     print('       Please try again and make sure to enter a number.')
-
+"""
 
 # get the min mag
 minMagGood = 0
@@ -446,19 +451,41 @@ while minMagGood is 0:
 
 
 ###################################################################################
+# get run info
+info = ltcdb.get_info(bname)
+indexID = info['indexID']
+startYear = info['startYear']
+endYear = info['endYear']
+startYearChng = startYear+1
+
+
+
+###################################################################################
 
 # create ouput file - needs to be a copy of an ftv minus 1 band
 # find an ftv file
-ftvFiles = glob(os.path.dirname(vertFitFile)+'/*ftv_idx.tif')
+ftvFiles = glob(os.path.dirname(vertFitIDXFile)+'/*ftv_idx.tif')
 # TODO - deal with not finding an ftv file
 ftvFile = ftvFiles[0]
 
 # make new file names
-distInfoOutYrs = os.path.join(outDir, bname+'-change_yrs.tif')
-distInfoOutMag = os.path.join(outDir, bname+'-change_mag.tif')
-distInfoOutDur = os.path.join(outDir, bname+'-change_dur.tif')
-distInfoOutPre = os.path.join(outDir, bname+'-change_pre.tif')
-outPuts = [distInfoOutYrs, distInfoOutMag, distInfoOutDur, distInfoOutPre]
+distInfoOutYrs = os.path.join(outDir, bname+'-change_'+indexID.lower()+'_yrs.tif')
+distInfoOutDur = os.path.join(outDir, bname+'-change_'+indexID.lower()+'_dur.tif')
+distInfoOutMagIDX = os.path.join(outDir, bname+'-change_'+indexID.lower()+'_mag.tif')
+distInfoOutPreIDX = os.path.join(outDir, bname+'-change_'+indexID.lower()+'_pre.tif')
+distInfoOutMagTCB = os.path.join(outDir, bname+'-change_tcb_mag.tif')
+distInfoOutPreTCB = os.path.join(outDir, bname+'-change_tcb_pre.tif')
+distInfoOutMagTCG = os.path.join(outDir, bname+'-change_tcg_mag.tif')
+distInfoOutPreTCG = os.path.join(outDir, bname+'-change_tcg_pre.tif')
+distInfoOutMagTCW = os.path.join(outDir, bname+'-change_tcw_mag.tif')
+distInfoOutPreTCW = os.path.join(outDir, bname+'-change_tcw_pre.tif')
+
+
+outPuts = [distInfoOutYrs, distInfoOutDur, 
+           distInfoOutMagIDX, distInfoOutPreIDX,
+           distInfoOutMagTCB, distInfoOutPreTCB,
+           distInfoOutMagTCG, distInfoOutPreTCG,
+           distInfoOutMagTCW, distInfoOutPreTCW]
 
 # create the blanks
 nBands = ltcdb.make_output_blanks(ftvFile, outPuts, -1)
@@ -489,14 +516,27 @@ flipper = flippers[indexID]*-1
 
 ##############################################################################
 # open inputs
-srcFit = gdal.Open(vertFitFile)
 srcYrs = gdal.Open(vertYrsFile)
+srcFitIDX = gdal.Open(vertFitIDXFile)
+srcFitTCB = gdal.Open(vertFitTCBFile)
+srcFitTCG = gdal.Open(vertFitTCGFile)
+srcFitTCW = gdal.Open(vertFitTCWFile)
+
 
 # open the output files
 dstYrs = gdal.Open(distInfoOutYrs, gdal.GA_Update)
-dstMag = gdal.Open(distInfoOutMag, gdal.GA_Update)
 dstDur = gdal.Open(distInfoOutDur, gdal.GA_Update)
-dstPre = gdal.Open(distInfoOutPre, gdal.GA_Update)
+dstMagIDX = gdal.Open(distInfoOutMagIDX, gdal.GA_Update)
+dstPreIDX = gdal.Open(distInfoOutPreIDX, gdal.GA_Update)
+dstMagTCB = gdal.Open(distInfoOutMagTCB, gdal.GA_Update)
+dstPreTCB = gdal.Open(distInfoOutPreTCB, gdal.GA_Update)
+dstMagTCG = gdal.Open(distInfoOutMagTCG, gdal.GA_Update)
+dstPreTCG = gdal.Open(distInfoOutPreTCG, gdal.GA_Update)
+dstMagTCW = gdal.Open(distInfoOutMagTCW, gdal.GA_Update)
+dstPreTCW = gdal.Open(distInfoOutPreTCW, gdal.GA_Update)
+
+
+
 
 ##############################################################################
 
@@ -523,16 +563,30 @@ for y in xrange(0, ySize, blockSize):
     else:
       cols = xSize - x
     
+    # load the SRC vert data for yrs, idx, and tc 
     npYrs = srcYrs.ReadAsArray(x, y, cols, rows)
-    npFit = srcFit.ReadAsArray(x, y, cols, rows)
-    
+    npFitIDX = srcFitIDX.ReadAsArray(x, y, cols, rows)    
+    npFitTCB = srcFitTCB.ReadAsArray(x, y, cols, rows)
+    npFitTCG = srcFitTCG.ReadAsArray(x, y, cols, rows)
+    npFitTCW = srcFitTCW.ReadAsArray(x, y, cols, rows)
+
+    # load the annual IDX output chunk as an np array
     npOutYrs = dstYrs.ReadAsArray(x, y, cols, rows)
-    npOutMag = dstMag.ReadAsArray(x, y, cols, rows)
     npOutDur = dstDur.ReadAsArray(x, y, cols, rows)
-    npOutPre = dstPre.ReadAsArray(x, y, cols, rows)
+    npOutMagIDX = dstMagIDX.ReadAsArray(x, y, cols, rows)
+    npOutPreIDX = dstPreIDX.ReadAsArray(x, y, cols, rows)
     
+    # load the annual TC output chunk as an np array
+    npOutMagTCB = dstMagTCB.ReadAsArray(x, y, cols, rows)
+    npOutPreTCB = dstPreTCB.ReadAsArray(x, y, cols, rows)
+    npOutMagTCG = dstMagTCG.ReadAsArray(x, y, cols, rows)
+    npOutPreTCG = dstPreTCG.ReadAsArray(x, y, cols, rows)
+    npOutMagTCW = dstMagTCW.ReadAsArray(x, y, cols, rows)
+    npOutPreTCW = dstPreTCW.ReadAsArray(x, y, cols, rows)
+
+    # TODO flip the magnitude if need - is this needed - how best to deal with this 
     if flipper == -1:
-      npFit = npFit * flipper
+      npFitIDX = npFitIDX * flipper
     nVerts, subYsize, subXsize = npYrs.shape
  
     for subY in xrange(subYsize):
@@ -542,62 +596,76 @@ for y in xrange(0, ySize, blockSize):
       for subX in xrange(subXsize):
         #subX = 0
         # read in the vert years for this pixel
-        vertYrsPix = npYrs[:, subY, subX]
+        vertYrs = npYrs[:, subY, subX]
 
         # check to see if this is a NoData pixel    
-        if (vertYrsPix == 0).all():
+        if (vertYrs == 0).all():
           continue
 
         # get indices of the verts
-        vertIndex = np.where(vertYrsPix != 0)[0]
+        vertIndex = np.where(vertYrs != 0)[0]
         
         # extract the vert years
-        vertYrsPix = vertYrsPix[vertIndex]
+        vertYrs = vertYrs[vertIndex]
 
         # extract this pixels vert fit - going to see if there are disturbances
-        vertFitPix = npFit[vertIndex, subY, subX]
+        vertValsIDX = npFitIDX[vertIndex, subY, subX]
 
         # get the fit value delta for each segment
-        segStartFit = vertFitPix[:-1]
-        segEndFit = vertFitPix[1:]
-        segMag = segEndFit - segStartFit
-
+        segMagIDX = ltcdb.get_delta(vertValsIDX)
+        
         # figure out which segs are disturbance
-        distIndex = np.where(segMag < minMag)[0] # why have to index 0?
+        distIndex = np.where(segMagIDX < minMag)[0] # why have to index 0?
         
         # check to see if there are any disturbances
         if len(distIndex) == 0:
           continue
 
-        #  calc the year of segment identification
-        segStartYear = vertYrsPix[:-1]+1
-        #  extract the year of segment identification for the identified disturbances
+        # get vertVals for TC
+        vertValsTCB = npFitTCB[vertIndex, subY, subX]
+        vertValsTCG = npFitTCG[vertIndex, subY, subX]
+        vertValsTCW = npFitTCW[vertIndex, subY, subX]
+
+        #  extract year of detection yod
+        segStartYear = vertYrs[:-1]+1
         yod = segStartYear[distIndex]
         
-        # extract the mag for this disturbance
-        mag = segMag[distIndex]
-        
         # extract the dur for this disturbance
-        segStartYr = vertYrsPix[:-1]
-        segEndYr = vertYrsPix[1:]
+        segStartYr = vertYrs[:-1]
+        segEndYr = vertYrs[1:]
         segDur = segEndYr - segStartYr
         dur = segDur[distIndex]
-
+        
+        # extract the mags for the disturbance(s)
+        magIDX = segMagIDX[distIndex]
+        magTCB = ltcdb.get_delta(vertValsTCB)[distIndex]
+        magTCG = ltcdb.get_delta(vertValsTCG)[distIndex]
+        magTCW = ltcdb.get_delta(vertValsTCW)[distIndex]
+        
         # extract the predist value this disturbance
-        pre = vertFitPix[distIndex]
+        preIDX = vertValsIDX[distIndex]
         if flipper == -1:
-          pre = pre * flipper
+          preIDX = preIDX * flipper
         
-        
+        preTCB = vertValsTCB[distIndex]
+        preTCG = vertValsTCG[distIndex]
+        preTCW = vertValsTCW[distIndex]
 
         
         
-        #for i, thisYear in enumerate(yod):
+        # replace the pixel values of the ouput series 
         theseBands = [thisYear-startYearChng for thisYear in yod]
         npOutYrs[theseBands, subY, subX] = yod
-        npOutMag[theseBands, subY, subX] = mag
         npOutDur[theseBands, subY, subX] = dur
-        npOutPre[theseBands, subY, subX] = pre
+        npOutMagIDX[theseBands, subY, subX] = magIDX
+        npOutMagTCB[theseBands, subY, subX] = magTCB
+        npOutMagTCG[theseBands, subY, subX] = magTCG
+        npOutMagTCW[theseBands, subY, subX] = magTCW        
+        npOutPreIDX[theseBands, subY, subX] = preIDX
+        npOutPreTCB[theseBands, subY, subX] = preTCB
+        npOutPreTCG[theseBands, subY, subX] = preTCG
+        npOutPreTCW[theseBands, subY, subX] = preTCW
+
 
 
     for b in range(nBands):
@@ -607,16 +675,31 @@ for y in xrange(0, ySize, blockSize):
       dataBand.WriteArray(data, x, y)
       '''
       ltcdb.write_array(dstYrs, b, npOutYrs, x, y)
-      ltcdb.write_array(dstMag, b, npOutMag, x, y)
       ltcdb.write_array(dstDur, b, npOutDur, x, y)
-      ltcdb.write_array(dstPre, b, npOutPre, x, y)
-    
-    
+      ltcdb.write_array(dstMagIDX, b, npOutMagIDX, x, y)
+      ltcdb.write_array(dstMagTCB, b, npOutMagTCB, x, y)
+      ltcdb.write_array(dstMagTCG, b, npOutMagTCG, x, y)
+      ltcdb.write_array(dstMagTCW, b, npOutMagTCW, x, y)
+      ltcdb.write_array(dstPreIDX, b, npOutPreIDX, x, y)
+      ltcdb.write_array(dstPreTCB, b, npOutPreTCB, x, y)
+      ltcdb.write_array(dstPreTCG, b, npOutPreTCG, x, y)
+      ltcdb.write_array(dstPreTCW, b, npOutPreTCW, x, y)
+      
+  
 # close the output files
 srcYrs = None
-srcFit = None
-dstYrs = None
-dstMag = None
-dstDur = None
-dstPre = None    
+srcFitIDX = None
+srcFitTCB = None
+srcFitTCG = None
+srcFitTCW = None
 
+dstYrs = None
+dstDur = None
+dstMagIDX = None
+dstMagTCB = None
+dstMagTCG = None
+dstMagTCW = None
+dstPreIDX = None
+dstPreTCB = None
+dstPreTCG = None
+dstPreTCW = None
