@@ -15,6 +15,7 @@ import math
 import Tkinter, tkFileDialog
 from glob import glob
 from shutil import copyfile
+import csv
 
 
 # change working directory to this script's dir
@@ -469,10 +470,10 @@ ftvFiles = glob(os.path.dirname(vertFitIDXFile)+'/*ftv_idx.tif')
 ftvFile = ftvFiles[0]
 
 # make new file names
-distInfoOutYrs = os.path.join(outDir, bname+'-change_'+indexID.lower()+'_yrs.tif')
-distInfoOutDur = os.path.join(outDir, bname+'-change_'+indexID.lower()+'_dur.tif')
-distInfoOutMagIDX = os.path.join(outDir, bname+'-change_'+indexID.lower()+'_mag.tif')
-distInfoOutPreIDX = os.path.join(outDir, bname+'-change_'+indexID.lower()+'_pre.tif')
+distInfoOutYrs = os.path.join(outDir, bname+'-change_yrs.tif')
+distInfoOutDur = os.path.join(outDir, bname+'-change_dur.tif')
+distInfoOutMagIDX = os.path.join(outDir, bname+'-change_idx_mag.tif')
+distInfoOutPreIDX = os.path.join(outDir, bname+'-change_idx_pre.tif')
 distInfoOutMagTCB = os.path.join(outDir, bname+'-change_tcb_mag.tif')
 distInfoOutPreTCB = os.path.join(outDir, bname+'-change_tcb_pre.tif')
 distInfoOutMagTCG = os.path.join(outDir, bname+'-change_tcg_mag.tif')
@@ -480,14 +481,44 @@ distInfoOutPreTCG = os.path.join(outDir, bname+'-change_tcg_pre.tif')
 distInfoOutMagTCW = os.path.join(outDir, bname+'-change_tcw_mag.tif')
 distInfoOutPreTCW = os.path.join(outDir, bname+'-change_tcw_pre.tif')
 
+# make a summary stats file
+summaryInfoFile = os.path.join(outDir, bname+'-change_attributes.csv') 
+summaryInfo = [
+    [distInfoOutDur   , 'yod'       , 'min' , 'ogr.OFTInteger'],
+    [distInfoOutDur   , 'durStdv'   , 'stdv', 'ogr.OFTInteger'],
+    [distInfoOutDur   , 'durMean'   , 'mean', 'ogr.OFTInteger'],
+    [distInfoOutDur   , 'durStdv'   , 'stdv', 'ogr.OFTInteger'],
+    [distInfoOutMagIDX, 'idxMagMean', 'mean', 'ogr.OFTInteger'],
+    [distInfoOutMagIDX, 'idxMagStdv', 'stdv', 'ogr.OFTInteger'],
+    [distInfoOutMagTCB, 'tcbMagMean', 'mean', 'ogr.OFTInteger'],
+    [distInfoOutMagTCB, 'tcbMagStdv', 'stdv', 'ogr.OFTInteger'],  
+    [distInfoOutMagTCG, 'tcgMagMean', 'mean', 'ogr.OFTInteger'],
+    [distInfoOutMagTCG, 'tcgMagStdv', 'stdv', 'ogr.OFTInteger'],
+    [distInfoOutMagTCW, 'tcwMagMean', 'mean', 'ogr.OFTInteger'],
+    [distInfoOutMagTCW, 'tcwMagStdv', 'stdv', 'ogr.OFTInteger'],
+    [distInfoOutPreIDX, 'idxPreMean', 'mean', 'ogr.OFTInteger'],
+    [distInfoOutPreIDX, 'idxPreStdv', 'stdv', 'ogr.OFTInteger'],
+    [distInfoOutPreTCB, 'tcbPreMean', 'mean', 'ogr.OFTInteger'],
+    [distInfoOutPreTCB, 'tcbPreStdv', 'stdv', 'ogr.OFTInteger'],  
+    [distInfoOutPreTCG, 'tcgPreMean', 'mean', 'ogr.OFTInteger'],
+    [distInfoOutPreTCG, 'tcgPreStdv', 'stdv', 'ogr.OFTInteger'],
+    [distInfoOutPreTCW, 'tcwPreMean', 'mean', 'ogr.OFTInteger'],
+    [distInfoOutPreTCW, 'tcwPreStdv', 'stdv', 'ogr.OFTInteger']
+]
 
+with open(summaryInfoFile, 'w') as f:
+    writer = csv.writer(f, lineterminator='\n')
+    writer.writerows(summaryInfo)
+
+
+
+# create the blanks
 outPuts = [distInfoOutYrs, distInfoOutDur, 
            distInfoOutMagIDX, distInfoOutPreIDX,
            distInfoOutMagTCB, distInfoOutPreTCB,
            distInfoOutMagTCG, distInfoOutPreTCG,
            distInfoOutMagTCW, distInfoOutPreTCW]
 
-# create the blanks
 nBands = ltcdb.make_output_blanks(ftvFile, outPuts, -1)
 
 
