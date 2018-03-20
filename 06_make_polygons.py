@@ -8,6 +8,7 @@ Created on Mon Mar 19 16:51:32 2018
 
 import os
 import sys
+from shutil import copyfile
 from glob import glob
 
 # change working directory to this script's dir
@@ -25,6 +26,10 @@ changeDir = ltcdb.get_dir("Select a folder that contains LT change files\n\n(*\\
 if changeDir == '':
   sys.exit('ERROR: No folder containing LT change files was selected.\nPlease re-run the script and select a folder.')
 
+
+threshold = 11
+connectedness = 8 # 8 or 4
+
 changeDir = os.path.normpath(changeDir)
 
 yodFile = glob(changeDir+'/*yrs.tif')
@@ -33,6 +38,29 @@ if len(yodFile) == 0:
 
 # TODO what if multiple were found
 yodFile = yodFile[0]
+
+# make a patch raster file
+patchMaskFile = yodFile.replace('yrs.tif', 'patches.tif')
+copyfile(yodFile, patchMaskFile)
+
+# make patch rasters
+  print('\nSieving to minimum mapping unit...\n')
+srcPatches = gdal.Open(patchMaskFile, gdal.GA_Update)
+nBands = srcPatches.RasterCount
+for band in range(1,nBands+1): 
+  srcBand = srcPatches.GetRasterBand(band)
+  dstBand = srcBand
+  maskBand = None
+  # will also fill gaps that less than threshold
+  gdal.SieveFilter(srcBand, maskBand, dstBand, threshold=threshold, connectedness=connectedness)
+
+srcPatches = None
+
+
+
+print('Making polygons from disturbance pixel patches...\n')
+gdal_polygonize(distMaskOutPath, distMaskOutPath, distPolyOutPath)
+
 
 
   write_raster(mask, distMaskOutPath, prj, origin, 'GTiff')  
