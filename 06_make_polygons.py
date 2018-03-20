@@ -7,9 +7,11 @@ Created on Mon Mar 19 16:51:32 2018
 
 
 import os
+from osgeo import gdal, ogr, osr
 import sys
 from shutil import copyfile
 from glob import glob
+import subprocess
 
 # change working directory to this script's dir
 scriptAbsPath = os.path.abspath(__file__)
@@ -27,8 +29,9 @@ if changeDir == '':
   sys.exit('ERROR: No folder containing LT change files was selected.\nPlease re-run the script and select a folder.')
 
 
-threshold = 11
-connectedness = 8 # 8 or 4
+
+
+
 
 changeDir = os.path.normpath(changeDir)
 
@@ -41,10 +44,14 @@ yodFile = yodFile[0]
 
 # make a patch raster file
 patchMaskFile = yodFile.replace('yrs.tif', 'patches.tif')
+#patchMaskFile = 'D:\\work\\proj\\al\\gee_test\\test\\raster\\landtrendr\\change\\PARK_CODE-MORA-NBR-7-19842017-06010930\\PARK_CODE-MORA-NBR-7-19842017-06010930-change_patches.tif'
 copyfile(yodFile, patchMaskFile)
 
+
 # make patch rasters
-  print('\nSieving to minimum mapping unit...\n')
+print('\nSieving to minimum mapping unit...\n')
+threshold = 11
+connectedness = 8 # 8 or 4
 srcPatches = gdal.Open(patchMaskFile, gdal.GA_Update)
 nBands = srcPatches.RasterCount
 for band in range(1,nBands+1): 
@@ -57,153 +64,62 @@ for band in range(1,nBands+1):
 srcPatches = None
 
 
-
+# make polygons
 print('Making polygons from disturbance pixel patches...\n')
-gdal_polygonize(distMaskOutPath, distMaskOutPath, distPolyOutPath)
 
 
+# set defaults 
+dst_layername = 'out'
+dst_fieldname = 'DN'
 
-  write_raster(mask, distMaskOutPath, prj, origin, 'GTiff')  
+# read in the patch raster
+srcPatches = gdal.Open(patchMaskFile, gdal.GA_ReadOnly)
+
+# make a srs definition from patch raster file
+srs = osr.SpatialReference()
+srs.ImportFromWkt(srcPatches.GetProjectionRef())
+
+# set things needed for each band (year)
+nBands = srcPatches.RasterCount
+outDir = os.path.join(os.path.dirname(patchMaskFile), 'polygon')
+drv = ogr.GetDriverByName('ESRI shapefile')
+
+if not os.path.exists(outDir):
+  os.makedirs(outDir)
+
+
+# loop through bands
+for band in range(1,nBands+1):
+  print('Working on Year: '+str(band)+'/'+str(nBands))
+  polyFile = os.path.join(outDir,'band_'+str(band)+'.shp')
+  srcBand = srcPatches.GetRasterBand(band)
+  maskBand = srcBand
   
+  # create a polygon file
+  dstPoly = drv.CreateDataSource(polyFile)
+  # set the layer name and srs of the poly file
+  dstLayer = dstPoly.CreateLayer(dst_layername, geom_type=ogr.wkbPolygon, srs=srs)
+        
+  # create a field
+  fd = ogr.FieldDefn(dst_fieldname, ogr.OFTInteger)
+  dstLayer.CreateField(fd)
   
+  # perform the operation
+  gdal.Polygonize(srcBand, maskBand, dstLayer, iPixValField=0, options=['8CONNECTED=8'])
   
-  ###################################################################
-  # MMU the raster
-  ###################################################################
-  print('\nSieving to minimum mapping unit...\n')
-  gdal_sieve(distMaskOutPath, mmu)
-  #sieveCmd = 'gdal_sieve.py -of GTiff -st '+str(mmu)+' -8 '+distMaskOutPath  
-  #subprocess.call(sieveCmd, shell=True)
+  dstPoly = None
   
-  
-  
-  ###################################################################
-  # polygonize the raster
-  ###################################################################
-  print('Making polygons from disturbance pixel patches...\n')
-  gdal_polygonize(distMaskOutPath, distMaskOutPath, distPolyOutPath)
-  #polyCmd = 'gdal_polygonize.py -8 -f "ESRI shapefile" -mask ' + distMaskOutPath +' '+ distMaskOutPath +'  '+ distPolyOutPath
-  #subprocess.call(polyCmd, shell=True)
-  
-  
-  
-  ###################################################################
-  # remove the DN column  
-  ###################################################################
-  print('\nAdding disturbance attributes to the shapefile table...\n')
-  
-  polyBname = os.path.splitext(os.path.basename(distPolyOutPath))[0]
-  alterCmd = 'ogrinfo ' + distPolyOutPath + ' ' + '-sql "ALTER TABLE ' + polyBname + ' DROP COLUMN DN"'
+# close the files
+srcPatches = None
+
+# remove the DN column
+polygonFiles = glob(outDir+'/*shp')
+for polygon in polygonFiles:
+  polyBname = os.path.splitext(os.path.basename(polygon))[0]
+  alterCmd = 'ogrinfo ' + polygon + ' ' + '-sql "ALTER TABLE ' + polyBname + ' DROP COLUMN DN"'
   subprocess.call(alterCmd, shell=True)
-  
-  
-  #  convert = 'ogr2ogr -f SQLite -nlt MULTIPOLYGON -dsco "SPATIALITE=YES" ' + distPolyOutPathsql +' '+ distPolyOutPathshp
-  #  subprocess.call(convert, shell=True)
-  
-  
-  # get the shapefile driver - if you don't specify driver, then in the 
-  # next line you can use ogr.Open() and it will try all drivers until it
-  # finds the one that opens the file, by specifying it will only try the
-  # defined driver
-  # reference: https://gis.stackexchange.com/questions/141966/python-gdal-ogr-open-or-driver-open
-  driver = ogr.GetDriverByName('ESRI Shapefile')
-  
-  # open the shapefile as writeable 
-  dataSource = driver.Open(distPolyOutPath, 1) # 0 means read-only. 1 means writeable.
-  
-  # get the layer from the file - a gdal dataset can potentially have many layers
-  # we just want the first layer
-  # reference: http://www.gdal.org/ogr_apitut.html
-  layer = dataSource.GetLayer()
-  
-  
-  
-  # make new fields
-  # reference: http://www.gdal.org/classOGRFieldDefn.html
-  # for list of type see http://www.gdal.org/ogr__core_8h.html#a787194bea637faf12d61643124a7c9fc
-  index = ogr.FieldDefn('index', ogr.OFTString)
-  yodField = ogr.FieldDefn('yod', ogr.OFTInteger)
-  patchID = ogr.FieldDefn('patchID', ogr.OFTInteger)
-  uniqID = ogr.FieldDefn('uniqID', ogr.OFTString)
-  magMeanField = ogr.FieldDefn('magMean', ogr.OFTInteger)
-  magStdvField = ogr.FieldDefn('magStdv', ogr.OFTInteger)
-  durMeanField = ogr.FieldDefn('durMean', ogr.OFTInteger)
-  durStdvField = ogr.FieldDefn('durStdv', ogr.OFTInteger)
-  areaField = ogr.FieldDefn('area', ogr.OFTInteger)
-  perimField = ogr.FieldDefn('perim', ogr.OFTInteger)
-  shapeField = ogr.FieldDefn('shape', ogr.OFTReal)
-  
-  
-  # add the new field to the layer
-  layer.CreateField(index)
-  layer.CreateField(yodField)
-  layer.CreateField(patchID)
-  layer.CreateField(uniqID)
-  layer.CreateField(magMeanField)
-  layer.CreateField(magStdvField)
-  layer.CreateField(durMeanField)
-  layer.CreateField(durStdvField)
-  layer.CreateField(areaField)
-  layer.CreateField(perimField)
-  layer.CreateField(shapeField)
-  
-  # check to see if it was added
-  # get the layer's attribute schema
-  # reference: http://www.gdal.org/classOGRLayer.html#a80473bcfd11341e70dd35bebe94026cf
-  #layerDefn = layer.GetLayerDefn()
-  #fieldNames = [layerDefn.GetFieldDefn(i).GetName() for i in range(layerDefn.GetFieldCount())]
-  
-  # get the number of features in the layer
-  nFeatures = layer.GetFeatureCount()
-  
-  # Add features to the ouput Layer
-  for i in range(nFeatures):
-    # get the ith feature
-    feature = layer.GetFeature(i) 
-    
-    # set the ith feature's fields
-    patchID = i+1
-    feature.SetField('index', indexID)
-    feature.SetField('yod', year)
-    feature.SetField('patchID', patchID)
-    feature.SetField('uniqID', indexID+str(year)+str(patchID))
-    
-    # get zonal stats on disturbance
-    summary = zonal_stats(feature, distPolyOutPath, distInfoOutPath) #, 2
-    #durSummary = zonal_stats(feature, distPolyOutPath, distInfoOutPath, 3)
-  
-    geometry = feature.GetGeometryRef()
-    area = geometry.GetArea()
-    areaCircle = math.sqrt(area/math.pi)*2*math.pi
-    perimeter = geometry.Boundary().Length()
-    pa = round(perimeter/areaCircle, 6)
-  
-    # set the ith features summary stats fields
-    feature.SetField('magMean', int(round(summary[0])))
-    feature.SetField('magStdv', int(round(summary[1])))
-    feature.SetField('durMean', int(round(summary[2])))
-    feature.SetField('durStdv', int(round(summary[3])))
-    feature.SetField('area', int(area))
-    feature.SetField('perim', int(perimeter))
-    feature.SetField('shape', pa)
-    
-    # set the changes to ith feature in the layer
-    layer.SetFeature(feature)
-    
-    #feature = None
-    
-  # Close the Shapefile
-  dataSource = None
-  
-  
-  # merge the polygons
-  if first:
-    mergeCmd = 'ogr2ogr -f "ESRI Shapefile" ' + mergedPolyOutPath + ' ' + distPolyOutPath
-  else:
-    mergeCmd = 'ogr2ogr -f "ESRI Shapefile" -append -update ' + mergedPolyOutPath + ' ' + distPolyOutPath  
-  
-  subprocess.call(mergeCmd, shell=True)
-  
-  first = 0
-  
-print('Done!')
+
+
+
+
+
