@@ -5,7 +5,7 @@ Created on Mon Dec  4 16:16:42 2017
 @author: braatenj
 """
 
-import ltcdb
+
 import os
 import sys   #sys.exit() - if numpy and gdal are not found print to use script 01 and exit
 import subprocess
@@ -23,7 +23,7 @@ scriptAbsPath = os.path.abspath(__file__)
 scriptDname = os.path.dirname(scriptAbsPath)
 os.chdir(scriptDname)
 
-
+import ltcdb
 
 
 def write_raster(data, filename, prj, origin, driver, dtype=gdal.GDT_Int16, pixel_size=30):
