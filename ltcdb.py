@@ -8,6 +8,7 @@ Created on Thu Mar 15 12:04:05 2018
 from osgeo import gdal
 from shutil import copyfile
 import Tkinter, tkFileDialog
+import subprocess
 
 
 def make_output_blanks(inputFtv, outPuts, adj):
@@ -72,3 +73,14 @@ def get_delta(vertVals):
   segEndVal = vertVals[1:]
   segDelta = segEndVal - segStartVal
   return segDelta
+
+
+def make_vrt(chunkFiles, vrtFile):
+  listFile = vrtFile.replace('.vrt', '_filelist.txt')
+  tileList = open(listFile, 'w')
+  for fn in chunkFiles:
+    tileList.write(fn+'\n')
+  tileList.close()
+  
+  cmd = 'gdalbuildvrt -q -input_file_list '+listFile+' '+vrtFile
+  subprocess.call(cmd, shell=True)
