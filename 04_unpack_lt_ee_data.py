@@ -5,7 +5,7 @@ Created on Tue Mar 06 14:09:32 2018
 @author: braatenj
 """
 
-
+import time
 import os
 import fnmatch
 import subprocess
@@ -79,7 +79,7 @@ clipFile = arg[3]
 #startYear = 1984
 #endYear = 2016
 
-
+start_time = time.time()
 ######################################################################
 
 # define the projection
@@ -184,7 +184,10 @@ for name in names:
     cmd = 'gdal_translate -q -of GTiff -a_srs ' + proj + bands +' '+ vrtFile + ' ' + outFile
     subprocess.call(cmd, shell=True)
 
-  
+print('\n')
+print('\n')
+print('Done!')      
+print("Process took {} minutes".format(round((time.time() - start_time)/60, 1)))  
 
     
     
