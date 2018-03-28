@@ -143,7 +143,7 @@ for name in names:
   srcVrt = gdal.Open(masterVrtFile)
   xSize = srcVrt.RasterXSize
   ySize = srcVrt.RasterYSize
-  blockSize = 256
+  blockSize = 512
   srcVrt = None
 
   
