@@ -10,8 +10,6 @@ import os
 import fnmatch
 import subprocess
 import sys
-from osgeo import ogr
-import Tkinter, tkFileDialog
 from osgeo import gdal
 from glob import glob
 
@@ -27,9 +25,7 @@ import ltcdb
 
 
 
-root = Tkinter.Tk()
-chunkDir = str(tkFileDialog.askdirectory(initialdir = "/",title = "Select the folder that contains LT-GEE files\n\n(*\\raster\\prep\\gee_chunks)"))
-root.destroy()
+chunkDir = ltcdb.get_dir("Select the folder that contains LT-GEE files\n\n(*\\raster\\prep\\gee_chunks)")
 if chunkDir == '':
   sys.exit('ERROR: No folder containing LT-GEE files was selected.\nPlease re-run the script and select a folder.')
   
@@ -46,9 +42,8 @@ for root, dirnames, filenames in os.walk(chunkDir):
 if len(tifs) == 0:
   sys.exit('ERROR: There are no TIF files in the folder selected.\nPlease fix this.')
 
-root = Tkinter.Tk()
-outDir = str(tkFileDialog.askdirectory(initialdir = "/",title = "Select folder to place LT segmentation outputs in\n\n(*\\raster\\landtrendr\segmentation)"))
-root.destroy()
+
+outDir = ltcdb.get_dir("Select folder to place LT segmentation outputs in\n\n(*\\raster\\landtrendr\segmentation)")
 if outDir == '':
   sys.exit('ERROR: No folder containing LT-GEE files was selected.\nPlease re-run the script and select a folder.')
   
