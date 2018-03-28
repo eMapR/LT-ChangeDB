@@ -189,10 +189,9 @@ for name in names:
     for this in deleteThese:
       os.remove(this)
 
-print('\n')
-print('\n')
-print('Done!')      
-print("Process took {} minutes".format(round((time.time() - start_time)/60, 1)))
+
+print('\nDone!')      
+print("LT-GEE data unpacking took {} minutes".format(round((time.time() - start_time)/60, 1)))
 
   
     
