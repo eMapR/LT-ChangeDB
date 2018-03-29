@@ -83,7 +83,6 @@ for name in names:
   runName = os.path.splitext(os.path.basename(name))[0]
   
   # make a dir to unpack the data
-  os.pardir
   thisOutDirPrep = os.path.join(os.path.dirname(chunkDir), os.pardir, runName)
   if not os.path.exists(thisOutDirPrep):
     os.mkdir(thisOutDirPrep)
