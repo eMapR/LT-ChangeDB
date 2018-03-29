@@ -5,11 +5,10 @@ Created on Mon Mar 19 16:51:32 2018
 @author: braatenj
 """
 
-
 import os
 from osgeo import gdal, ogr, osr
 import sys
-from shutil import copyfile
+import shutil
 from glob import glob
 import subprocess
 
@@ -24,34 +23,63 @@ import ltcdb
 
 
 
+# get the dir that contains the change raster stacks TODO make this more descriptive about what dir to get
 changeDir = ltcdb.get_dir("Select a folder that contains LT change files\n\n(*\\raster\\landtrendr\\change\\*)")
-if changeDir == '':
-  sys.exit('ERROR: No folder containing LT change files was selected.\nPlease re-run the script and select a folder.')
+if changeDir is '.':
+  sys.exit()
+
+if len(changeDir.split('-')) is not 6:
+  sys.exit('\nERROR: The folder you selected does not seem correct.\n'+
+           'It should look something like this:\n\n'+
+           'PARK_CODE-MORA-NBR-7-19842017-06010930\n\n'+
+           'Please re-run the script and select a different folder.')
 
 
+# get the mmu
+mmuGood = 0
+while mmuGood is 0:
+  mmu = raw_input('\nWhat is the desired minimum mapping unit in pixels per patch: ')
+  try:
+    mmu = int(mmu)
+    mmuGood = 1
+  except ValueError: 
+    print('\nERROR: The selected value cannot be converted to an integer.')
+    print('       Please try again and make sure to enter a number.')
+    
+    
+# get the connected
+connectednessGood = 0
+while connectednessGood is 0:
+  connectedness = raw_input('\nShould diagonal adjacency warrant pixel inclusion in patches? - yes or no: ').lower().strip()
+  if connectedness not in ['yes', 'no']:
+    print('\nERROR: The given entry was not yes or no.')
+    print('       Please type either: yes or no.\n')
+  else:
+    if connectedness == 'yes':
+      connectedness = 8
+    else:
+      connectedness = 4
+    connectednessGood = 1
+    
 
-
-
-
-changeDir = os.path.normpath(changeDir)
-
-yodFile = glob(changeDir+'/*yrs.tif')
+# get the year of detection file - will patchify this
+yodFile = glob(os.path.join(changeDir,'*yrs.tif'))
 if len(yodFile) == 0:
   sys.exit('ERROR: There was no *yrs.tif file in the folder selected.\nPlease fix this.')  
 
-# TODO what if multiple were found
-yodFile = yodFile[0]
+yodFile = yodFile[0] # TODO what if multiple were found
 
-# make a patch raster file
+
+                 
+
+
+                 
+# make a patch raster file from years - event has to occur on the same year
 patchMaskFile = yodFile.replace('yrs.tif', 'patches.tif')
-#patchMaskFile = 'D:\\work\\proj\\al\\gee_test\\test\\raster\\landtrendr\\change\\PARK_CODE-MORA-NBR-7-19842017-06010930\\PARK_CODE-MORA-NBR-7-19842017-06010930-change_patches.tif'
-copyfile(yodFile, patchMaskFile)
+shutil.copyfile(yodFile, patchMaskFile)
 
-
-# make patch rasters
 print('\nSieving to minimum mapping unit...\n')
-threshold = 11
-connectedness = 8 # 8 or 4
+
 srcPatches = gdal.Open(patchMaskFile, gdal.GA_Update)
 nBands = srcPatches.RasterCount
 for band in range(1,nBands+1): 
@@ -59,18 +87,17 @@ for band in range(1,nBands+1):
   dstBand = srcBand
   maskBand = None
   # will also fill gaps that less than threshold
-  gdal.SieveFilter(srcBand, maskBand, dstBand, threshold=threshold, connectedness=connectedness)
+  gdal.SieveFilter(srcBand, maskBand, dstBand, threshold=mmu, connectedness=connectedness)
 
 srcPatches = None
 
 
+
+
+
+
 # make polygons
 print('Making polygons from disturbance pixel patches...\n')
-
-
-# set defaults 
-dst_layername = 'out'
-dst_fieldname = 'DN'
 
 # read in the patch raster
 srcPatches = gdal.Open(patchMaskFile, gdal.GA_ReadOnly)
@@ -81,17 +108,26 @@ srs.ImportFromWkt(srcPatches.GetProjectionRef())
 
 # set things needed for each band (year)
 nBands = srcPatches.RasterCount
-outDir = os.path.join(os.path.dirname(patchMaskFile), 'polygon')
 drv = ogr.GetDriverByName('ESRI shapefile')
 
-if not os.path.exists(outDir):
-  os.makedirs(outDir)
+# set outDir paths
+polyDir = os.path.join(os.path.dirname(patchMaskFile), 'polygon')
+vectorDir = os.path.normpath(os.path.join(changeDir, os.sep.join([os.pardir]*4), 'vector'))
+bname = ltcdb.get_info(os.path.basename(patchMaskFile))['name']
+mergedPolyOutPath = os.path.join(vectorDir, bname+'-dist_info_'+str(mmu)+'mmu.shp') #os.path.join(polyDir, 'ltee_mora_'+str(mmu)+'mmu_annual_dist.shp') # this should be set
+dst_layername = 'out'
+dst_fieldname = 'yod'
 
+if not os.path.exists(polyDir):
+  os.makedirs(polyDir)
+  
+if not os.path.exists(vectorDir):
+  os.makedirs(vectorDir)
 
 # loop through bands
 for band in range(1,nBands+1):
   print('Working on Year: '+str(band)+'/'+str(nBands))
-  polyFile = os.path.join(outDir,'band_'+str(band)+'.shp')
+  polyFile = os.path.join(polyDir,'band_'+str(band)+'.shp')
   srcBand = srcPatches.GetRasterBand(band)
   maskBand = srcBand
   
@@ -108,18 +144,19 @@ for band in range(1,nBands+1):
   gdal.Polygonize(srcBand, maskBand, dstLayer, iPixValField=0, options=['8CONNECTED=8'])
   
   dstPoly = None
+   
+  # merge the polygons
+  if band == 1:
+    mergeCmd = 'ogr2ogr -f "ESRI Shapefile" ' + mergedPolyOutPath + ' ' + polyFile
+  else:
+    mergeCmd = 'ogr2ogr -f "ESRI Shapefile" -append -update ' + mergedPolyOutPath + ' ' + polyFile  
+  subprocess.call(mergeCmd, shell=True)
   
 # close the files
 srcPatches = None
 
-# remove the DN column
-polygonFiles = glob(outDir+'/*shp')
-for polygon in polygonFiles:
-  polyBname = os.path.splitext(os.path.basename(polygon))[0]
-  alterCmd = 'ogrinfo ' + polygon + ' ' + '-sql "ALTER TABLE ' + polyBname + ' DROP COLUMN DN"'
-  subprocess.call(alterCmd, shell=True)
-
-
+# remove the individual year files
+shutil.rmtree(polyDir)
 
 
 
