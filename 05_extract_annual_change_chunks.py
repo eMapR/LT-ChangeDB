@@ -484,8 +484,7 @@ distInfoOutPreTCW = os.path.join(outDir, bname+'-change_tcw_pre.tif')
 # make a summary stats file
 summaryInfoFile = os.path.join(outDir, bname+'-change_attributes.csv') 
 summaryInfo = [
-    [distInfoOutDur   , 'yod'       , 'min' , 'ogr.OFTInteger'],
-    [distInfoOutDur   , 'durStdv'   , 'stdv', 'ogr.OFTInteger'],
+    #[distInfoOutDur   , 'yod'       , 'min' , 'ogr.OFTInteger'],
     [distInfoOutDur   , 'durMean'   , 'mean', 'ogr.OFTInteger'],
     [distInfoOutDur   , 'durStdv'   , 'stdv', 'ogr.OFTInteger'],
     [distInfoOutMagIDX, 'idxMagMean', 'mean', 'ogr.OFTInteger'],
