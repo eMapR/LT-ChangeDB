@@ -23,6 +23,7 @@ dirs = [
   os.path.join(dirName, 'vector'),
   os.path.join(dirName, 'scripts'),
   os.path.join(dirName, 'raster', 'prep'),
+  os.path.join(dirName, 'raster', 'prep', 'gee_chunks'),            
   os.path.join(dirName, 'raster', 'landtrendr'),
   os.path.join(dirName, 'raster', 'landtrendr', 'segmentation'),
   os.path.join(dirName, 'raster', 'landtrendr', 'change')
