@@ -9,6 +9,7 @@ from osgeo import gdal
 from shutil import copyfile
 import Tkinter, tkFileDialog
 import subprocess
+import os
 
 
 def make_output_blanks(inputFtv, outPuts, adj):
@@ -64,7 +65,7 @@ def get_dir(message):
   root.deiconify()
   root.lift()
   root.focus_force()
-  thisDir = str(tkFileDialog.askdirectory(initialdir = "/",title = message))
+  thisDir = os.path.normpath(str(tkFileDialog.askdirectory(initialdir = "/",title = message)))
   root.destroy()
   return thisDir
 
