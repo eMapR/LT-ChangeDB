@@ -45,7 +45,8 @@ def get_info(name):
           'indexID': pieces[2],
           'nVert': int(pieces[3]),
           'startYear':int(pieces[4][0:4]),
-          'endYear':int(pieces[4][4:8])}
+          'endYear':int(pieces[4][4:8]),
+          'name': '-'.join(pieces)}
 
  
 def write_array(dsOut, band, data, x, y):
