@@ -14,6 +14,11 @@ import math
 import Tkinter, tkFileDialog
 from glob import glob
 
+# change working directory to this script's dir
+scriptAbsPath = os.path.abspath(__file__)
+scriptDname = os.path.dirname(scriptAbsPath)
+os.chdir(scriptDname)
+import ltcdb
 
 
 def zonal_stats(feat, input_zone_polygon, input_value_raster): #, raster_band
@@ -116,7 +121,8 @@ def zonal_stats(feat, input_zone_polygon, input_value_raster): #, raster_band
 
 def add_field(layer, fieldName, dtype):
   field = ogr.FieldDefn(fieldName, dtype)
-  return layer.CreateField(field)
+  layer.CreateField(field)
+  return layer
 
 
 
@@ -147,12 +153,89 @@ layer = dataSource.GetLayer()
 # read in the table of attributes to add and append new fields
 attrList = np.genfromtxt(attributeList, delimiter=',', dtype='object')
 
-for attr in range(attrList.shape[0]):
-  layer = add_field(layer, attrList[attr,1], eval(attrList[attr,3]))
-
+layer = add_field(layer, 'annualID', ogr.OFTInteger)
+layer = add_field(layer, 'index', ogr.OFTString)
+layer = add_field(layer, 'uniqueID', ogr.OFTString)
 layer = add_field(layer, 'area', ogr.OFTInteger)
 layer = add_field(layer, 'perim', ogr.OFTInteger)
 layer = add_field(layer, 'shape', ogr.OFTReal)
+
+for attr in range(attrList.shape[0]):
+  layer = add_field(layer, attrList[attr,1], eval(attrList[attr,3]))
+
+
+
+
+# figure out how many years there are and make year to band converter
+info = ltcdb.get_info(os.path.basename(attributeList))
+startYear = info['startYear']+1
+endYear = info['endYear']
+index = info['indexID'].upper().strip()
+yrs = range(startYear, endYear+1)
+
+
+# get the number of features in the layer
+
+
+for year in yrs:
+  #dataSource = None
+  #dataSource = driver.Open(inPolygon, 1)
+  #layer = dataSource.GetLayer()
+  layer.SetAttributeFilter("yod = "+str(year))
+  nFeatures = layer.GetFeatureCount()
+  for i, feature in enumerate(layer): 
+    #feature = layer.GetFeature(i) 
+    annualID = i+1
+    feature.SetField('annualID', annualID)
+    feature.SetField('index', index)
+    feature.SetField('uniqueID', index+str(year)+str(annualID))
+    layer.SetFeature(feature)
+
+
+
+# do one column at a time
+for a in range(0, attrList.shape[0]):
+  a = 0
+  field = attrList[a,1]
+  raster = gdal.Open(attrList[a,0])
+  shp = ogr.Open(input_zone_polygon)
+  lyr = shp.GetLayer()
+  
+  # Get raster georeference info
+  transform = raster.GetGeoTransform()
+  xOrigin = transform[0]
+  yOrigin = transform[3]
+  pixelWidth = transform[1]
+  pixelHeight = transform[5]
+  
+  for y, year in enumerate(range(0, len(yrs))):
+    y = 0
+    year = 1985
+    patchID = 0
+    layer.SetAttributeFilter("yod = "+str(year))
+    nFeatures = layer.GetFeatureCount()
+    for feature in layer:
+      if
+      patchID = i+1
+      feature.SetField('index', indexID)
+
+
+
+
+
+
+for a in 
+
+
+  
+  
+  for 
+  
+
+for feature in layer:
+    print feature.GetField("STATE_NAME")
+  
+
 
 
 # TODO if this is a file resulting from spatial change all the fields except yod need to be deleted
@@ -171,6 +254,8 @@ layer = add_field(layer, 'shape', ogr.OFTReal)
 
 # get the number of features in the layer
 nFeatures = layer.GetFeatureCount()
+help(layer)
+
 
 # Add features to the ouput Layer
 for i in range(nFeatures):
