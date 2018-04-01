@@ -174,9 +174,7 @@ index = info['indexID'].upper().strip()
 yrs = range(startYear, endYear+1)
 
 
-# get the number of features in the layer
-
-
+# set IDs
 for year in yrs:
   #dataSource = None
   #dataSource = driver.Open(inPolygon, 1)
@@ -193,13 +191,14 @@ for year in yrs:
 
 
 
-# do one column at a time
+# summarize one field at a time
 for a in range(0, attrList.shape[0]):
   a = 0
   field = attrList[a,1]
+  stat = attrList[a,2]
   raster = gdal.Open(attrList[a,0])
-  shp = ogr.Open(input_zone_polygon)
-  lyr = shp.GetLayer()
+  #shp = ogr.Open(input_zone_polygon)
+  #lyr = shp.GetLayer()
   
   # Get raster georeference info
   transform = raster.GetGeoTransform()
@@ -208,17 +207,90 @@ for a in range(0, attrList.shape[0]):
   pixelWidth = transform[1]
   pixelHeight = transform[5]
   
-  for y, year in enumerate(range(0, len(yrs))):
-    y = 0
+  for band, year in enumerate(range(0, len(yrs))):
+    band += 1
     year = 1985
-    patchID = 0
     layer.SetAttributeFilter("yod = "+str(year))
-    nFeatures = layer.GetFeatureCount()
     for feature in layer:
-      if
-      patchID = i+1
-      feature.SetField('index', indexID)
+      # Get extent of feat
+      shp = ogr.Open(inPolygon)
+      lyr = shp.GetLayer()
+      
+      
+      feature = layer.GetFeature(0) 
+      geom = feature.GetGeometryRef()
+      if (geom.GetGeometryName() == 'MULTIPOLYGON'):
+        count = 0
+        pointsX = []; pointsY = []
+        for polygon in geom:
+          geomInner = geom.GetGeometryRef(count)
+          ring = geomInner.GetGeometryRef(0)
+          numpoints = ring.GetPointCount()
+          for p in range(numpoints):
+            lon, lat, z = ring.GetPoint(p)
+            pointsX.append(lon)
+            pointsY.append(lat)
+          count += 1
+      elif (geom.GetGeometryName() == 'POLYGON'):
+        ring = geom.GetGeometryRef(0)
+        numpoints = ring.GetPointCount()
+        pointsX = []; pointsY = []
+        for p in range(numpoints):
+          lon, lat, z = ring.GetPoint(p)
+          pointsX.append(lon)
+          pointsY.append(lat)
+    
+      else:
+        sys.exit("ERROR: Geometry needs to be either Polygon or Multipolygon")
+    
+      xmin = min(pointsX)
+      xmax = max(pointsX)
+      ymin = min(pointsY)
+      ymax = max(pointsY)
 
+      # Specify offset and rows and columns to read
+      xoff = int((xmin - xOrigin)/pixelWidth)
+      yoff = int((yOrigin - ymax)/pixelWidth)
+      xcount = int((xmax - xmin)/pixelWidth) #+1 !!!!!!!!!!!!!!!!!!!!! This adds a pixel to the right side
+      ycount = int((ymax - ymin)/pixelWidth) #+1 !!!!!!!!!!!!!!!!!!!!! This adds a pixel to the bottom side
+                  
+      # Create memory target raster
+      target_ds = gdal.GetDriverByName('MEM').Create('', xcount, ycount, 1, gdal.GDT_Byte)
+      target_ds.SetGeoTransform((
+        xmin, pixelWidth, 0,
+        ymax, 0, pixelHeight,
+      ))
+    
+      # Create for target raster the same projection as for the value raster
+      raster_srs = osr.SpatialReference()
+      raster_srs.ImportFromWkt(raster.GetProjectionRef())
+      target_ds.SetProjection(raster_srs.ExportToWkt())
+    
+      # Rasterize zone polygon to raster
+      gdal.RasterizeLayer(target_ds, [1], lyr, burn_values=[1])
+
+target_ds = None
+      # Read raster as arrays
+      dataBandRaster = raster.GetRasterBand(band)
+      data = dataBandRaster.ReadAsArray(xoff, yoff, xcount, ycount).astype(np.float)
+      bandmask = target_ds.GetRasterBand(1)
+    
+      gdal.SieveFilter(dataBandRaster, dataBandRaster, bandmask, threshold=11, connectedness=8)
+    
+    
+      
+      datamask = bandmask.ReadAsArray(0, 0, xcount, ycount).astype(np.float)
+    
+      # data zone of raster
+      dataZone = np.ma.masked_array(data,  np.logical_not(datamask))
+
+      # if mean / if
+      if stat == 'stdv':
+        value = np.std(dataZone)
+      else  
+        value = np.mean(dataZone)
+      
+      feature.SetField(field, int(round(value[0])))
 
 
 

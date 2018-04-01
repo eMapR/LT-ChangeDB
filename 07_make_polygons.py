@@ -146,17 +146,17 @@ for band in range(1,nBands+1):
   dstPoly = None
    
   # merge the polygons
-  if band == 1:
-    mergeCmd = 'ogr2ogr -f "ESRI Shapefile" ' + mergedPolyOutPath + ' ' + polyFile
-  else:
-    mergeCmd = 'ogr2ogr -f "ESRI Shapefile" -append -update ' + mergedPolyOutPath + ' ' + polyFile  
-  subprocess.call(mergeCmd, shell=True)
+  #if band == 1:
+  #  mergeCmd = 'ogr2ogr -f "ESRI Shapefile" ' + mergedPolyOutPath + ' ' + polyFile
+  #else:
+  #  mergeCmd = 'ogr2ogr -f "ESRI Shapefile" -append -update ' + mergedPolyOutPath + ' ' + polyFile  
+  #subprocess.call(mergeCmd, shell=True)
   
 # close the files
 srcPatches = None
 
 # remove the individual year files
-shutil.rmtree(polyDir)
+#shutil.rmtree(polyDir)
 
 
 
