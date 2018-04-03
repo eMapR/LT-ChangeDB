@@ -5,11 +5,12 @@ Created on Thu Mar 15 12:04:05 2018
 @author: braatenj
 """
 
-from osgeo import gdal
+from osgeo import gdal, ogr
 from shutil import copyfile
 import Tkinter, tkFileDialog
 import subprocess
 import os
+import numpy as np
 
 
 def make_output_blanks(inputFtv, outPuts, adj):
@@ -86,3 +87,17 @@ def make_vrt(chunkFiles, vrtFile):
   
   cmd = 'gdalbuildvrt -q -input_file_list '+listFile+' '+vrtFile
   subprocess.call(cmd, shell=True)
+  
+  
+#def add_field(layer, fieldName, dtype):
+#  field = ogr.FieldDefn(fieldName, dtype)
+#  layer.CreateField(field)
+#  return layer
+
+def year_to_band(bname):
+  info = get_info(bname)
+  startYear = info['startYear']
+  endYear = info['endYear']
+  nYears = (endYear - startYear)+1
+  yearIndex = np.array([0]*(startYear)+range(0, nYears))
+  return yearIndex
