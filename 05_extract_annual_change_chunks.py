@@ -74,14 +74,14 @@ minMag = -50
 
 # get the vert fit file
 vertYrsFile = vertYrsFile[0]
-vertFitIDXFile = vertYrsFile.replace('yrs.tif', 'fit.tif')
+vertFitIDXFile = vertYrsFile.replace('yrs.tif', 'fit_idx.tif')
 vertFitTCBFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcb.tif')
 vertFitTCGFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcg.tif')
 vertFitTCWFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcw.tif')
 
 #TODO need to error check for existence of TC vert files
 if not os.path.exists(vertFitIDXFile):
-  sys.exit('ERROR: There was no *vert_fit.tif file in the folder selected.\nPlease fix this.') 
+  sys.exit('ERROR: There was no *vert_fit_idx.tif file in the folder selected.\nPlease fix this.') 
 
 #segDir = r"D:\work\proj\al\gee_test\test\raster\landtrendr\segmentation\PARK_CODE-MORA-NBR-7-19842017-06010930"
 #vertYrsFile = r"D:\work\proj\al\gee_test\test\raster\landtrendr\segmentation\PARK_CODE-MORA-NBR-7-19842017-06010930\PARK_CODE-MORA-NBR-7-19842017-06010930-vert_yrs.tif"
