@@ -140,6 +140,15 @@ distInfoOutPreTCW = os.path.join(outDir, bname+'-change_tcw_pre.tif')
 # make a summary stats file
 summaryInfoFile = os.path.join(outDir, bname+'-change_attributes.csv') 
 summaryInfo = [
+    [distInfoOutDur   , 'dur'   , 'con', 'annual', 'int'],  # con (continuous) or cat (categorical)
+    [distInfoOutMagIDX, 'idxMag', 'con', 'annual', 'int'],
+    [distInfoOutMagTCB, 'tcbMag', 'con', 'annual', 'int'],
+    [distInfoOutMagTCG, 'tcgMag', 'con', 'annual', 'int'],
+    [distInfoOutMagTCW, 'tcwMag', 'con', 'annual', 'int'],
+    [distInfoOutPreIDX, 'idxPre', 'con', 'annual', 'int'],
+    [distInfoOutPreTCB, 'tcbPre', 'con', 'annual', 'int'],
+    [distInfoOutPreTCG, 'tcgPre', 'con', 'annual', 'int'],
+    [distInfoOutPreTCW, 'tcwPre', 'con', 'annual', 'int'],
 ]
 
 with open(summaryInfoFile, 'w') as f:
