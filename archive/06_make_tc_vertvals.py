@@ -5,7 +5,7 @@ Created on Thu Mar 15 11:56:59 2018
 @author: braatenj
 """
 
-import ltcdb
+
 import os
 from osgeo import gdal
 import numpy as np
@@ -15,6 +15,10 @@ import numpy as np
 scriptAbsPath = os.path.abspath(__file__)
 scriptDname = os.path.dirname(scriptAbsPath)
 os.chdir(scriptDname)
+
+import ltcdb
+
+
 
 
 # read in vert vertYr file
@@ -28,13 +32,9 @@ outPuts = [vertTCBfitFile, vertTCGfitFile, vertTCWfitFile]
 
 ltcdb.make_output_blanks(vertYrsFile, outPuts, 0)
 
-
-
 ftvTCBfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcb.tif')
 ftvTCGfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcg.tif')
 ftvTCWfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcw.tif')
-
-
 
 # open the output files for update
 dstTCB = gdal.Open(vertTCBfitFile, gdal.GA_Update)
@@ -63,8 +63,6 @@ blockSize = 256
 
 ##############################################################################
 
-
-
 for y in xrange(0, ySize, blockSize):
   #yRange = range(0, ySize, blockSize)
   #y=yRange[4]
@@ -81,8 +79,7 @@ for y in xrange(0, ySize, blockSize):
       cols = xSize - x
     
     npYrs = srcYrs.ReadAsArray(x, y, cols, rows)
-    
-    
+       
     npOutTCB = dstTCB.ReadAsArray(x, y, cols, rows)
     npOutTCG = dstTCG.ReadAsArray(x, y, cols, rows)
     npOutTCW = dstTCW.ReadAsArray(x, y, cols, rows)
@@ -98,8 +95,6 @@ for y in xrange(0, ySize, blockSize):
       #update_progress(progress)    
       for subX in xrange(subXsize):
         #subX = 0
-        
-        
         vertYrsPix = npYrs[:, subY, subX]
         
         # check to see if this is a NoData pixel    
@@ -117,7 +112,6 @@ for y in xrange(0, ySize, blockSize):
         ltcdb.write_array(dstTCB, b, npOutTCB, x, y)
         ltcdb.write_array(dstTCG, b, npOutTCG, x, y)
         ltcdb.write_array(dstTCW, b, npOutTCW, x, y)
-
       
 # close the output files
 dstTCB = None
