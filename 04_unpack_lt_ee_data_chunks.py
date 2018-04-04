@@ -73,7 +73,7 @@ root.destroy()
 
 
 
-start_time = time.time()
+startTime = time.time()
 
 ######################################################################
 
@@ -107,7 +107,7 @@ for name in names:
     os.mkdir(thisOutDir)
 
 
-  print('\nWorking on segmentation: '+runName)
+  print('\nWorking on LT run: '+runName)
   # find the files that belong to this set  
   matches = []
   for tif in tifs:   
@@ -314,7 +314,7 @@ for name in names:
 
 
 print('\nDone!')      
-print("LT-GEE data unpacking took {} minutes".format(round((time.time() - start_time)/60, 1)))
+print("LT-GEE data unpacking took {} minutes".format(round((time.time() - startTime)/60, 1)))
 
   
     

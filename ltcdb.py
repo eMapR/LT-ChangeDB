@@ -5,12 +5,14 @@ Created on Thu Mar 15 12:04:05 2018
 @author: braatenj
 """
 
-from osgeo import gdal, ogr
+from osgeo import gdal
 from shutil import copyfile
 import Tkinter, tkFileDialog
 import subprocess
 import os
 import numpy as np
+import sys
+import math
 
 
 def make_output_blanks(inputFtv, outPuts, adj):
@@ -36,7 +38,6 @@ def make_output_blanks(inputFtv, outPuts, adj):
       dst_ds = None
     else:
       copyfile(copyThis, thisOut)
-  print(nBands)
   return nBands
 
 
@@ -101,3 +102,8 @@ def year_to_band(bname):
   nYears = (endYear - startYear)+1
   yearIndex = np.array([0]*(startYear)+range(0, nYears))
   return yearIndex
+
+
+def update_progress(progress):
+  sys.stdout.write( '\r   {0}% {1}'.format(int(math.floor(progress*100)), 'done'))
+  sys.stdout.flush()

@@ -5,11 +5,10 @@ Created on Mon Dec  4 16:16:42 2017
 @author: braatenj
 """
 
-
+import time
 import os
 import sys
 import numpy as np
-import math
 from glob import glob
 import csv
 from osgeo import gdal
@@ -27,9 +26,9 @@ import ltcdb
 
 
 
-def update_progress(progress):
-  sys.stdout.write( '\r   {0}% {1}'.format(int(math.floor(progress*100)), 'done'))
-  sys.stdout.flush()
+#def update_progress(progress):
+#  sys.stdout.write( '\r   {0}% {1}'.format(int(math.floor(progress*100)), 'done'))
+#  sys.stdout.flush()
 
 
 
@@ -72,7 +71,7 @@ for segDir in ltRunDirs:
   # get the min mag
   minMagGood = 0
   while minMagGood is 0:
-    minMag = raw_input('Regarding LT run: '+os.path.basename(segDir) + '\nWhat is the desired minimum disturbance magnitude: ')
+    minMag = raw_input('\nRegarding LT run: '+os.path.basename(segDir) + '\nWhat is the desired minimum disturbance magnitude: ')
     try:
       minMag = int(minMag)
       minMag = abs(minMag) * -1
@@ -89,7 +88,7 @@ for segDir in ltRunDirs:
 
 
 for i, segDir in enumerate(ltRunDirs):
-  print('Working on LT run: ' + os.path.basename(segDir))
+  print('\n\nWorking on LT run: ' + os.path.basename(segDir))
   vertYrsFile = glob(segDir+'/*vert_yrs.tif')
   if len(vertYrsFile) == 0:
     sys.exit('ERROR: There was no *vert_yrs.tif file in the folder selected.\nPlease fix this.')   # TODO make this a better error message
@@ -136,7 +135,8 @@ for i, segDir in enumerate(ltRunDirs):
   # get the min mag
   minMag = minMags[i]
   
-  
+  startTime = time.time()
+
   
   ###################################################################################
   # get run info
@@ -252,8 +252,15 @@ for i, segDir in enumerate(ltRunDirs):
   ySize = srcYrs.RasterYSize
   blockSize = 256
   
-  ##############################################################################
+  # get info to print progress
+  nBlocks = 0
+  nBlock = 0
+  for y in xrange(0, ySize, blockSize):
+    for x in xrange(0, xSize, blockSize):
+      nBlocks += 1
   
+  ##############################################################################
+
   
   for y in xrange(0, ySize, blockSize):
     #yRange = range(0, ySize, blockSize)
@@ -269,6 +276,11 @@ for i, segDir in enumerate(ltRunDirs):
         cols = blockSize
       else:
         cols = xSize - x
+      
+      # print progress
+      nBlock += 1.0
+      progress = (nBlock)/nBlocks
+      ltcdb.update_progress(progress) 
       
       # load the SRC vert data for yrs, idx, and tc 
       npYrs = srcYrs.ReadAsArray(x, y, cols, rows)
@@ -410,3 +422,9 @@ for i, segDir in enumerate(ltRunDirs):
   dstPreTCB = None
   dstPreTCG = None
   dstPreTCW = None
+
+
+print('\n\nDone!')      
+print("Change identification took {} minutes".format(round((time.time() - startTime)/60, 1)))
+
+
