@@ -104,12 +104,31 @@ for i, changeDir in enumerate(ltRunDirs):
   startTime = time.time()
 
                    
+  # get info 
+  info = ltcdb.get_info(os.path.basename(yodFile))
   
-  
-                   
+  # figure out the vector path
+  bname = info['name']
+  vectorBname = bname+'-dist_info_'+str(mmu)+'mmu_'+str(connectedness)+'nbr' #os.path.join(polyDir, 'ltee_mora_'+str(mmu)+'mmu_annual_dist.shp') # this should be set
+  vectorDirFull = os.path.join(changeDir, os.sep.join([os.pardir]*4), 'vector', 'change', vectorBname)
+  vectorDirFullBlank = os.path.join(vectorDirFull, 'blank')
+  if not os.path.isdir(vectorDirFull):
+    #os.mkdirs(vectorDirFull)
+    os.makedirs(vectorDirFull)
+
+    
+
+                 
   # make a patch raster file from years - event has to occur on the same year
-  patchMaskFile = yodFile.replace('yrs.tif', 'patches.tif')
+  patchMaskFile = os.path.join(vectorDirFull, vectorBname+'_patches.tif')#yodFile.replace('yrs.tif', 'patches.tif')
   shutil.copyfile(yodFile, patchMaskFile)
+  
+  # copy the change attributes file
+  chngAttrFile = yodFile.replace('yrs.tif', 'attributes.csv')
+  # TODO deal with checking to see if exists
+  chngAttrFileCopy = os.path.join(vectorDirFull, os.path.basename(chngAttrFile))
+  shutil.copyfile(chngAttrFile, chngAttrFileCopy)
+  
   
   print('    sieving to minimum mapping unit...')
   
@@ -124,11 +143,8 @@ for i, changeDir in enumerate(ltRunDirs):
   
   srcPatches = None
   
-  
-  
-  
-  
-  
+
+
   # make polygons
   print('    making polygons from disturbance pixel patches...')
   
@@ -143,28 +159,20 @@ for i, changeDir in enumerate(ltRunDirs):
   nBands = srcPatches.RasterCount
   drv = ogr.GetDriverByName('ESRI shapefile')
   
-  # get info 
-  info = ltcdb.get_info(os.path.basename(patchMaskFile))
+
   
-  # set outDir paths
-  polyDir = os.path.join(os.path.dirname(patchMaskFile), 'polygon')
-  vectorDir = os.path.normpath(os.path.join(changeDir, os.sep.join([os.pardir]*4), 'vector'))
-  bname = info['name']
-  mergedPolyOutPath = os.path.join(vectorDir, bname+'-dist_info_'+str(mmu)+'mmu.shp') #os.path.join(polyDir, 'ltee_mora_'+str(mmu)+'mmu_annual_dist.shp') # this should be set
+  #mergedPolyOutPath = os.path.join(vectorDirFull, vectorBname+'_merged.shp') #os.path.join(polyDir, 'ltee_mora_'+str(mmu)+'mmu_annual_dist.shp') # this should be set
   dst_layername = 'out'
   dst_fieldname = 'yod'
   
-  if not os.path.exists(polyDir):
-    os.makedirs(polyDir)
-    
-  if not os.path.exists(vectorDir):
-    os.makedirs(vectorDir)
+
+
   
   # loop through bands
   for band, year in enumerate(range(info['startYear']+1,info['endYear']+1)):  
     band += 1
     print('        working on year: '+str(band)+'/'+str(nBands)+' ('+str(year)+')')
-    polyFile = os.path.join(polyDir, str(year)+'.shp')
+    polyFile = os.path.join(vectorDirFull, vectorBname+'_'+str(year)+'.shp')  #os.path.join(polyDir, info['name']+'-'+str(year)+'.shp')
     srcBand = srcPatches.GetRasterBand(band)
     maskBand = srcBand
     
