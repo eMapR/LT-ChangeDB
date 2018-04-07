@@ -187,14 +187,16 @@ for polyDir in ltRunDirs:
   os.rmdir(tmpDir)
   
 
-  if fn == 0:
-    changeDBfile = os.path.join(vectorDir,'lt_change_database.sqlite')
-    convertCmd = 'ogr2ogr -f "SQLite" -nlt PROMOTE_TO_MULTI -nln '+indexID+' -dsco SPATIALITE=YES ' + changeDBfile + ' ' + mergedPolyOutPath  
-  else:
-    convertCmd = 'ogr2ogr -f "SQLite" -nlt PROMOTE_TO_MULTI -nln '+indexID+' -dsco SPATIALITE=YES -update ' + changeDBfile + ' ' + mergedPolyOutPath  
-
-  subprocess.call(convertCmd, shell=True)
   
+  #changeDBfile = os.path.join(os.path.dirname(mergedPolyOutPath),'test.sqlite')
+  #convertCmd = 'ogr2ogr -f "SQLite" -nlt PROMOTE_TO_MULTI -nln NBR -dsco SPATIALITE=YES ' + changeDBfile + ' ' + mergedPolyOutPath  
+  #subprocess.call(convertCmd, shell=True)
+  
+ogr2ogr -f "SQLite" -nlt PROMOTE_TO_MULTI -nln NBR -dsco SPATIALITE=YES D:\work\proj\al\gee_test\test\vector\change\test.sqlite D:\work\proj\al\gee_test\test\vector\change\PARK_CODE-MORA-NBR-7-19842017-06010930-dist_info_11mmu_8nbr_merged.shp
+
+ogr2ogr -f "SQLite" -nlt PROMOTE_TO_MULTI -nln B5 -dsco SPATIALITE=YES -update D:\work\proj\al\gee_test\test\vector\change\test.sqlite D:\work\proj\al\gee_test\test\vector\change\PARK_CODE-MORA-B5-7-19842017-06010930-dist_info_11mmu_8nbr_merged.shp
+
+
   
   
   
