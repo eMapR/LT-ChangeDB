@@ -14,7 +14,8 @@ import fiona
 from shapely.geometry import shape
 import math
 import sys
-import subprocess 
+import subprocess
+import time 
 
 
 
@@ -52,6 +53,7 @@ for polyDir in ltRunDirs:
     sys.exit('ERROR: Can\'t find the polygon folder.\nTrying to find it at this location: '+polyDir+'\nIt\'s possible you did not run the 06_make_polygons.py file.\nPlease run the script and try again.')
 
 
+startTime = time.time()
 for polyDir in ltRunDirs:
 
   # get the polygon directory
@@ -196,8 +198,9 @@ for polyDir in ltRunDirs:
   subprocess.call(convertCmd, shell=True)
   
   
-  
-  
+
+print('\nDone!')      
+print("Appending zonal stats took {} minutes".format(round((time.time() - startTime)/60, 1)))  
   
   
   
