@@ -54,6 +54,8 @@ for polyDir in ltRunDirs:
 
 
 startTime = time.time()
+
+firstTime = 0
 for polyDir in ltRunDirs:
 
   # get the polygon directory
@@ -181,9 +183,11 @@ for polyDir in ltRunDirs:
     os.remove(fn)
     
 
-  if fn == 0:
+  # create/add to the database 
+  if firstTime == 0:
     changeDBfile = os.path.join(vectorDir,'lt_change_database.sqlite')
     convertCmd = 'ogr2ogr -f "SQLite" -nlt PROMOTE_TO_MULTI -nln '+indexID+' -dsco SPATIALITE=YES ' + changeDBfile + ' ' + mergedPolyOutPath  
+    firstTime += 1
   else:
     convertCmd = 'ogr2ogr -f "SQLite" -nlt PROMOTE_TO_MULTI -nln '+indexID+' -dsco SPATIALITE=YES -update ' + changeDBfile + ' ' + mergedPolyOutPath  
 
