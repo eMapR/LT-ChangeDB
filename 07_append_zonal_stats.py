@@ -180,14 +180,6 @@ for polyDir in ltRunDirs:
   for fn in shpFiles:
     os.remove(fn)
     
-  # move the filled polys
-  shpFiles = glob(os.path.join(tmpDir,'*'))     
-  newShpFiles = [os.path.join(polyDir, os.path.basename(fn)) for fn in shpFiles]
-  for old, new in zip(shpFiles, newShpFiles):
-    os.rename(old, new)
-    
-  os.rmdir(tmpDir)
-  
 
   if fn == 0:
     changeDBfile = os.path.join(vectorDir,'lt_change_database.sqlite')
@@ -197,6 +189,13 @@ for polyDir in ltRunDirs:
 
   subprocess.call(convertCmd, shell=True)
   
+  # move the filled polys
+  shpFiles = glob(os.path.join(tmpDir,'*'))     
+  newShpFiles = [os.path.join(polyDir, os.path.basename(fn)) for fn in shpFiles]
+  for old, new in zip(shpFiles, newShpFiles):
+    os.rename(old, new)
+    
+  os.rmdir(tmpDir)
   
 
 print('\nDone!')      
