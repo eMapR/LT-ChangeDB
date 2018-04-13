@@ -72,6 +72,19 @@ def get_dir(message):
   return thisDir
 
 
+def get_file(message):
+  root = Tkinter.Tk()
+  root.withdraw()
+  root.overrideredirect(1)
+  root.attributes('-alpha', 0.0)
+  root.deiconify()
+  root.lift()
+  root.focus_force()
+  thisFile = os.path.normpath(str(tkFileDialog.askopenfilename(initialdir = "/",title = message)))
+  root.destroy()
+  return thisFile
+
+
 def get_delta(vertVals):
   segStartVal = vertVals[:-1]
   segEndVal = vertVals[1:]
