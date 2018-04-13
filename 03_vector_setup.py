@@ -7,39 +7,50 @@ Created on Mon Mar 05 15:32:55 2018
 
 import os
 import subprocess
-import Tkinter, tkFileDialog
-import sys
 import zipfile
 from glob import glob
+import sys
+import time 
 
 
-#### At this point the fields need to be set to allow unique id
-#### do we need to collapse muliple feature to one?
+# change working directory to this script's dir
+scriptAbsPath = os.path.abspath(__file__)
+scriptDname = os.path.dirname(scriptAbsPath)
+os.chdir(scriptDname)
+
+import ltcdb
 
 
-root = Tkinter.Tk()
-fileName = str(tkFileDialog.askopenfilename(initialdir = "/",title = "Select Vector File To Prepare"))
-root.destroy()
 
-root = Tkinter.Tk()
-outDirName = str(tkFileDialog.askdirectory(initialdir = "/",title = "Select Vector Output Folder"))
-root.destroy()
+headDir = ltcdb.get_dir("Select the project head folder")
+if headDir == '':
+  sys.exit('ERROR: No folder containing LT-GEE files was selected.\nPlease re-run the script and select a folder.')
+
+vectorDir = os.path.join(headDir, 'vector')
+if not os.path.isdir(vectorDir):
+  sys.exit('ERROR: Can\'t find the vector folder.\nTrying to find it at this location: '+vectorDir+'\nIt\'s possible you provided an incorrect project head folder.\nPlease re-run the script and select the project head folder.')
+
+fileName = ltcdb.get_file("Select Vector File To Prepare")
+if fileName == '':
+  sys.exit('ERROR: No vector file was selected.\nPlease re-run the script and select a vector file.')
+
+
+startTime = time.time()
 
 bname = os.path.basename(os.path.splitext(fileName)[0])
-standardFileShp = os.path.normpath(os.path.join(outDirName, bname+'_ltgee_epsg5070.shp'))
+standardFileShp = os.path.normpath(os.path.join(vectorDir, bname+'_ltgee_epsg5070.shp'))
 standardFileKml = standardFileShp.replace('.shp', '.kml')
 
                             
-#kmlCmd = 'ogr2ogr -f "KML" ' + standardFileKml +' '+ fileName
-#subprocess.call(kmlCmd, shell=True)
 
 shpCmd = 'ogr2ogr -f "ESRI Shapefile" -t_srs EPSG:5070 '+ standardFileShp +' '+ fileName
 subprocess.call(shpCmd, shell=True)
 
-zipThese = glob(outDirName+'/*_ltgee_epsg5070*')
+zipThese = glob(vectorDir+'/*_ltgee_epsg5070*')
 
-with zipfile.ZipFile(os.path.join(outDirName, bname+'_ltgee.zip'), 'w') as zipIt:
+with zipfile.ZipFile(os.path.join(vectorDir, bname+'_ltgee.zip'), 'w') as zipIt:
   for f in zipThese:   
     zipIt.write(f, os.path.basename(f))
     
-    
+print('\nDone!')      
+print("LT-GEE vector setup took {} minutes".format(round((time.time() - startTime)/60, 1)))    
