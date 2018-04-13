@@ -19,7 +19,6 @@ libs = [
   'rasterio',
   'shapely',
   'fiona',
-  'shapely',
   'gdal'
 ]
 
