@@ -7,16 +7,22 @@ Created on Mon Mar 05 11:23:22 2018
 
 import os
 import sys
-import Tkinter, tkFileDialog
+import time
 
+# change working directory to this script's dir
+scriptAbsPath = os.path.abspath(__file__)
+scriptDname = os.path.dirname(scriptAbsPath)
+os.chdir(scriptDname)
 
+import ltcdb
 
  
-root = Tkinter.Tk()
-dirName = str(tkFileDialog.askdirectory(initialdir = "/",title = "Select/Create a Project Folder"))
-root.destroy()
+dirName = ltcdb.get_dir("Select or create and select a project head folder")
+
 if dirName == '':
   sys.exit('A "project folder" was not selected')
+
+startTime = time.time()
 
 dirs = [
   os.path.join(dirName, 'raster'),
@@ -32,3 +38,7 @@ dirs = [
 for thisDir in dirs:
   if not os.path.exists(thisDir):
     os.makedirs(thisDir)
+    
+    
+print('\nDone!')      
+print("LT-GEE project setup took {} minutes".format(round((time.time() - startTime)/60, 1)))
