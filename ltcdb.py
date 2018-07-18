@@ -20,7 +20,7 @@ def make_output_blanks(inputFtv, outPuts, adj):
   src_ds = gdal.Open(inputFtv)
   tx = src_ds.GetGeoTransform()
   prj = src_ds.GetProjection()
-  driver = src_ds.GetDriver()
+  driver = gdal.GetDriverByName('GTiff')
   band = src_ds.GetRasterBand(1)
   xsize = band.XSize
   ysize = band.YSize
@@ -32,17 +32,26 @@ def make_output_blanks(inputFtv, outPuts, adj):
     if i == 0:
       # make a new file
       copyThis = thisOut
-      dst_ds = driver.Create(thisOut, xsize, ysize, nBands, band.DataType)
+      dst_ds = driver.Create(thisOut, xsize, ysize, nBands, gdal.GDT_Int16)
       dst_ds.SetGeoTransform(tx)
       dst_ds.SetProjection(prj)
+      #dst_ds = None
+      
+      array = np.add(dst_ds.GetRasterBand(1).ReadAsArray(),-9999)
+      for b in range(1,nBands+1):
+        band = dst_ds.GetRasterBand(b)
+        band.WriteArray(array)
+        band.SetNoDataValue(-9999)
+        band.FlushCache()
       dst_ds = None
+      
     else:
       copyfile(copyThis, thisOut)
   return nBands
 
 
 def get_info(name):
-  pieces = name.split('-')[0:7]
+  pieces = name.split('-')[0:6]
   return {'key': pieces[0],
           'value': pieces[1],
           'indexID': pieces[2],

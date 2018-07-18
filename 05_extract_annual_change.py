@@ -88,6 +88,10 @@ for segDir in ltRunDirs:
 
 
 for i, segDir in enumerate(ltRunDirs):
+  i=0
+  segDir = ltRunDirs[0]
+  
+  
   print('\n\nWorking on LT run: ' + os.path.basename(segDir))
   vertYrsFile = glob(segDir+'/*vert_yrs.tif')
   if len(vertYrsFile) == 0:
@@ -117,14 +121,16 @@ for i, segDir in enumerate(ltRunDirs):
   
   # get the vert fit file
   vertYrsFile = vertYrsFile[0]
-  vertFitIDXFile = vertYrsFile.replace('yrs.tif', 'fit_idx.tif')
+  vertFitIDXFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_idx.tif')
   vertFitTCBFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcb.tif')
   vertFitTCGFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcg.tif')
   vertFitTCWFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcw.tif')
   
-  #TODO need to error check for existence of TC vert files
-  if not os.path.exists(vertFitIDXFile):
-    sys.exit('ERROR: There was no *vert_fit_idx.tif file in the folder selected.\nPlease fix this.') 
+  #TODO need to error check for existence of all files that we just identified names for
+  if not os.path.exists(vertFitTCBFile): #vertFitIDXFile
+    sys.exit('ERROR: There was no *vert_fit_tcb.tif file in the folder selected.\nPlease fix this.') 
+  
+  
   
   #segDir = r"D:\work\proj\al\gee_test\test\raster\landtrendr\segmentation\PARK_CODE-MORA-NBR-7-19842017-06010930"
   #vertYrsFile = r"D:\work\proj\al\gee_test\test\raster\landtrendr\segmentation\PARK_CODE-MORA-NBR-7-19842017-06010930\PARK_CODE-MORA-NBR-7-19842017-06010930-vert_yrs.tif"
@@ -150,23 +156,21 @@ for i, segDir in enumerate(ltRunDirs):
   
   ###################################################################################
   
-  # create ouput file - needs to be a copy of an ftv minus 1 band
-  # find an ftv file
-  ftvFiles = glob(os.path.dirname(vertFitIDXFile)+'/*ftv_idx.tif')
-  # TODO - deal with not finding an ftv file
-  ftvFile = ftvFiles[0]
   
   # make new file names
   distInfoOutYrs = os.path.join(outDir, bname+'-change_yrs.tif')
   distInfoOutDur = os.path.join(outDir, bname+'-change_dur.tif')
   distInfoOutMagIDX = os.path.join(outDir, bname+'-change_idx_mag.tif')
-  distInfoOutPreIDX = os.path.join(outDir, bname+'-change_idx_pre.tif')
+  #distInfoOutPreIDX = os.path.join(outDir, bname+'-change_idx_pre.tif')
   distInfoOutMagTCB = os.path.join(outDir, bname+'-change_tcb_mag.tif')
   distInfoOutPreTCB = os.path.join(outDir, bname+'-change_tcb_pre.tif')
+  distInfoOutPostTCB = os.path.join(outDir, bname+'-change_tcb_post.tif')
   distInfoOutMagTCG = os.path.join(outDir, bname+'-change_tcg_mag.tif')
   distInfoOutPreTCG = os.path.join(outDir, bname+'-change_tcg_pre.tif')
+  distInfoOutPostTCG = os.path.join(outDir, bname+'-change_tcg_post.tif')
   distInfoOutMagTCW = os.path.join(outDir, bname+'-change_tcw_mag.tif')
   distInfoOutPreTCW = os.path.join(outDir, bname+'-change_tcw_pre.tif')
+  distInfoOutPostTCW = os.path.join(outDir, bname+'-change_tcw_post.tif')
   
   # make a summary stats file
   summaryInfoFile = os.path.join(outDir, bname+'-change_attributes.csv') 
@@ -176,10 +180,14 @@ for i, segDir in enumerate(ltRunDirs):
       [distInfoOutMagTCB, 'tcbMag', 'con', 'annual', 'int'],
       [distInfoOutMagTCG, 'tcgMag', 'con', 'annual', 'int'],
       [distInfoOutMagTCW, 'tcwMag', 'con', 'annual', 'int'],
-      [distInfoOutPreIDX, 'idxPre', 'con', 'annual', 'int'],
+      #[distInfoOutPreIDX, 'idxPre', 'con', 'annual', 'int'],
       [distInfoOutPreTCB, 'tcbPre', 'con', 'annual', 'int'],
       [distInfoOutPreTCG, 'tcgPre', 'con', 'annual', 'int'],
       [distInfoOutPreTCW, 'tcwPre', 'con', 'annual', 'int'],
+      
+      [distInfoOutPostTCB, 'tcbPost', 'con', 'annual', 'int'],
+      [distInfoOutPostTCG, 'tcgPost', 'con', 'annual', 'int'],
+      [distInfoOutPostTCW, 'tcwPost', 'con', 'annual', 'int'],
   ]
   
   with open(summaryInfoFile, 'w') as f:
@@ -188,14 +196,19 @@ for i, segDir in enumerate(ltRunDirs):
   
   
   
-  # create the blanks
+  # create the blanks  needs to be a copy of an ftv minus 1 band
   outPuts = [distInfoOutYrs, distInfoOutDur, 
-             distInfoOutMagIDX, distInfoOutPreIDX,
-             distInfoOutMagTCB, distInfoOutPreTCB,
-             distInfoOutMagTCG, distInfoOutPreTCG,
-             distInfoOutMagTCW, distInfoOutPreTCW]
+             distInfoOutMagIDX, #distInfoOutPreIDX,
+             distInfoOutMagTCB, distInfoOutPreTCB, distInfoOutPostTCB,
+             distInfoOutMagTCG, distInfoOutPreTCG, distInfoOutPostTCG,
+             distInfoOutMagTCW, distInfoOutPreTCW, distInfoOutPostTCW]
   
-  nBands = ltcdb.make_output_blanks(ftvFile, outPuts, -1)
+  ftvTemplate = glob(os.path.dirname(vertYrsFile)+'/*ftv_tcb.tif')
+  
+  if len(ftvTemplate) == 0: #vertFitIDXFile
+    sys.exit('ERROR: There was no *ftv_tcb.tif file in the folder selected.\nPlease fix this.')
+  
+  nBands = ltcdb.make_output_blanks(ftvTemplate[0], outPuts, -1) # use a TC FTV file as a template for image specs
   
   
   ###################################################################################
@@ -217,7 +230,9 @@ for i, segDir in enumerate(ltRunDirs):
     'TCB' :  1,
     'NDSI': -1,
     'TCG' : -1,
-    'B3'  :  1
+    'B3'  :  1,
+    'NBRz':  1,
+    'ENC' :  1
   }
   flipper = flippers[indexID]*-1
   
@@ -234,13 +249,16 @@ for i, segDir in enumerate(ltRunDirs):
   dstYrs = gdal.Open(distInfoOutYrs, gdal.GA_Update)
   dstDur = gdal.Open(distInfoOutDur, gdal.GA_Update)
   dstMagIDX = gdal.Open(distInfoOutMagIDX, gdal.GA_Update)
-  dstPreIDX = gdal.Open(distInfoOutPreIDX, gdal.GA_Update)
+  #dstPreIDX = gdal.Open(distInfoOutPreIDX, gdal.GA_Update)
   dstMagTCB = gdal.Open(distInfoOutMagTCB, gdal.GA_Update)
   dstPreTCB = gdal.Open(distInfoOutPreTCB, gdal.GA_Update)
+  dstPostTCB = gdal.Open(distInfoOutPostTCB, gdal.GA_Update)
   dstMagTCG = gdal.Open(distInfoOutMagTCG, gdal.GA_Update)
   dstPreTCG = gdal.Open(distInfoOutPreTCG, gdal.GA_Update)
+  dstPostTCG = gdal.Open(distInfoOutPostTCG, gdal.GA_Update)
   dstMagTCW = gdal.Open(distInfoOutMagTCW, gdal.GA_Update)
   dstPreTCW = gdal.Open(distInfoOutPreTCW, gdal.GA_Update)
+  dstPostTCW = gdal.Open(distInfoOutPostTCW, gdal.GA_Update)
   
   
   
@@ -293,15 +311,18 @@ for i, segDir in enumerate(ltRunDirs):
       npOutYrs = dstYrs.ReadAsArray(x, y, cols, rows)
       npOutDur = dstDur.ReadAsArray(x, y, cols, rows)
       npOutMagIDX = dstMagIDX.ReadAsArray(x, y, cols, rows)
-      npOutPreIDX = dstPreIDX.ReadAsArray(x, y, cols, rows)
+      #npOutPreIDX = dstPreIDX.ReadAsArray(x, y, cols, rows)
       
       # load the annual TC output chunk as an np array
       npOutMagTCB = dstMagTCB.ReadAsArray(x, y, cols, rows)
       npOutPreTCB = dstPreTCB.ReadAsArray(x, y, cols, rows)
+      npOutPostTCB = dstPostTCB.ReadAsArray(x, y, cols, rows)
       npOutMagTCG = dstMagTCG.ReadAsArray(x, y, cols, rows)
       npOutPreTCG = dstPreTCG.ReadAsArray(x, y, cols, rows)
+      npOutPostTCG = dstPostTCG.ReadAsArray(x, y, cols, rows)
       npOutMagTCW = dstMagTCW.ReadAsArray(x, y, cols, rows)
       npOutPreTCW = dstPreTCW.ReadAsArray(x, y, cols, rows)
+      npOutPostTCW = dstPostTCW.ReadAsArray(x, y, cols, rows)
   
       # TODO flip the magnitude if need - is this needed - how best to deal with this 
       if flipper == -1:
@@ -318,7 +339,7 @@ for i, segDir in enumerate(ltRunDirs):
           vertYrs = npYrs[:, subY, subX]
   
           # check to see if this is a NoData pixel    
-          if (vertYrs == 0).all():
+          if (vertYrs == -9999).all():
             continue
   
           # get indices of the verts
@@ -362,14 +383,18 @@ for i, segDir in enumerate(ltRunDirs):
           magTCW = ltcdb.get_delta(vertValsTCW)[distIndex]
           
           # extract the predist value this disturbance
-          preIDX = vertValsIDX[distIndex]
-          if flipper == -1:
-            preIDX = preIDX * flipper
+          #preIDX = vertValsIDX[distIndex]
+          #if flipper == -1:
+            #preIDX = preIDX * flipper
           
           preTCB = vertValsTCB[distIndex]
           preTCG = vertValsTCG[distIndex]
           preTCW = vertValsTCW[distIndex]
-  
+            
+          postDistIndex = [ix+1 for ix in distIndex]
+          postTCB = vertValsTCB[postDistIndex]
+          postTCG = vertValsTCG[postDistIndex]
+          postTCW = vertValsTCW[postDistIndex]
           
           
           # replace the pixel values of the ouput series 
@@ -380,10 +405,14 @@ for i, segDir in enumerate(ltRunDirs):
           npOutMagTCB[theseBands, subY, subX] = magTCB
           npOutMagTCG[theseBands, subY, subX] = magTCG
           npOutMagTCW[theseBands, subY, subX] = magTCW        
-          npOutPreIDX[theseBands, subY, subX] = preIDX
+          #npOutPreIDX[theseBands, subY, subX] = preIDX
           npOutPreTCB[theseBands, subY, subX] = preTCB
           npOutPreTCG[theseBands, subY, subX] = preTCG
           npOutPreTCW[theseBands, subY, subX] = preTCW
+          
+          npOutPostTCB[theseBands, subY, subX] = postTCB
+          npOutPostTCG[theseBands, subY, subX] = postTCG
+          npOutPostTCW[theseBands, subY, subX] = postTCW
   
   
   
@@ -399,11 +428,14 @@ for i, segDir in enumerate(ltRunDirs):
         ltcdb.write_array(dstMagTCB, b, npOutMagTCB, x, y)
         ltcdb.write_array(dstMagTCG, b, npOutMagTCG, x, y)
         ltcdb.write_array(dstMagTCW, b, npOutMagTCW, x, y)
-        ltcdb.write_array(dstPreIDX, b, npOutPreIDX, x, y)
+        #ltcdb.write_array(dstPreIDX, b, npOutPreIDX, x, y)
         ltcdb.write_array(dstPreTCB, b, npOutPreTCB, x, y)
         ltcdb.write_array(dstPreTCG, b, npOutPreTCG, x, y)
         ltcdb.write_array(dstPreTCW, b, npOutPreTCW, x, y)
         
+        ltcdb.write_array(dstPostTCB, b, npOutPostTCB, x, y)
+        ltcdb.write_array(dstPostTCG, b, npOutPostTCG, x, y)
+        ltcdb.write_array(dstPostTCW, b, npOutPostTCW, x, y)
     
   # close the output files
   srcYrs = None
@@ -422,6 +454,9 @@ for i, segDir in enumerate(ltRunDirs):
   dstPreTCB = None
   dstPreTCG = None
   dstPreTCW = None
+  dstPostTCB = None
+  dstPostTCG = None
+  dstPostTCW = None
 
 
 print('\n\nDone!')      

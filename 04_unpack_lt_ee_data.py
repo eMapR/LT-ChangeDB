@@ -225,7 +225,7 @@ for name in names:
     # make background values -9999
     nBands = gdal.Open(outFile).RasterCount
     bands = ' '.join(['-b '+str(band) for band in range(1,nBands+1)])
-    cmd = 'gdal_rasterize -i -burn -9999 '+bands+' '+outShpFile+' '+outFile
+    cmd = 'gdal_rasterize -q -i -burn -9999 '+bands+' '+outShpFile+' '+outFile
     subprocess.call(cmd, shell=True)
 
 
@@ -286,6 +286,14 @@ for name in names:
   ySize = srcYrs.RasterYSize
   blockSize = 256
   
+  # get info to print progress
+  nBlocks = 0
+  nBlock = 0
+  for y in xrange(0, ySize, blockSize):
+    for x in xrange(0, xSize, blockSize):
+      nBlocks += 1
+  
+  
   ##############################################################################
   
   for y in xrange(0, ySize, blockSize):
@@ -302,6 +310,13 @@ for name in names:
         cols = blockSize
       else:
         cols = xSize - x
+      
+      
+      # print progress
+      nBlock += 1.0
+      progress = (nBlock)/nBlocks
+      ltcdb.update_progress(progress)
+      
       
       npYrs = srcYrs.ReadAsArray(x, y, cols, rows)
          

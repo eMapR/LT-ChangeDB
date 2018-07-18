@@ -109,14 +109,14 @@ for i, changeDir in enumerate(ltRunDirs):
   
   # figure out the vector path
   bname = info['name']
-  vectorBname = bname+'-dist_info_'+str(mmu)+'mmu_'+str(connectedness)+'nbr' #os.path.join(polyDir, 'ltee_mora_'+str(mmu)+'mmu_annual_dist.shp') # this should be set
-  vectorDirFull = os.path.join(changeDir, os.sep.join([os.pardir]*4), 'vector', 'change', vectorBname)
-  vectorDirFullBlank = os.path.join(vectorDirFull, 'blank')
+  vectorBname = bname+'-dist_info_'+str(mmu)+'mmu_'+str(connectedness)+'con'#+'nbr' #os.path.join(polyDir, 'ltee_mora_'+str(mmu)+'mmu_annual_dist.shp') # this should be set
+  vectorDirFull = os.path.join(headDir, 'vector', 'change', vectorBname)
+  #vectorDirFullBlank = os.path.join(vectorDirFull, 'blank')  # not used ???
   if not os.path.isdir(vectorDirFull):
-    #os.mkdirs(vectorDirFull)
     os.makedirs(vectorDirFull)
 
-    
+  
+###outDir = os.path.normpath(os.path.join(chunkDir, os.sep.join([os.pardir]*2), 'landtrendr', 'segmentation'))  
 
                  
   # make a patch raster file from years - event has to occur on the same year
