@@ -25,6 +25,9 @@ if dirName == '':
 startTime = time.time()
 
 dirs = [
+  os.path.join(dirName, 'timesync'),
+  os.path.join(dirName, 'timesync', 'images'),
+  os.path.join(dirName, 'timesync', 'prep'),
   os.path.join(dirName, 'raster'),
   os.path.join(dirName, 'vector'),
   os.path.join(dirName, 'scripts'),

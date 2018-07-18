@@ -11,8 +11,9 @@ import fnmatch
 import subprocess
 import sys
 import numpy as np
-from osgeo import gdal
+from osgeo import gdal, ogr
 from glob import glob
+from shutil import copyfile
 
 
 # change working directory to this script's dir
@@ -45,7 +46,7 @@ if not os.path.isdir(chunkDir):
 # find the tif chunks
 tifs = []
 for root, dirnames, filenames in os.walk(chunkDir):
-  for filename in fnmatch.filter(filenames, '*.tif'):
+  for filename in fnmatch.filter(filenames, '*LTdata*.tif'):
     tifs.append(os.path.join(root, filename))
 
 # are there any tif files to work with?
@@ -77,8 +78,7 @@ startTime = time.time()
 
 ######################################################################
 
-# define the projection
-proj = 'EPSG:5070'
+
 
 # make sure path parts are right
 if chunkDir[-1] != '/':
@@ -87,14 +87,14 @@ if outDir[-1] != '/':
   outDir += '/'
 
 # set the unique names 
-names = list(set(['-'.join(fn.split('-')[0:6]) for fn in tifs])) 
-
+names = list(set(['-'.join(fn.split('-')[0:7]) for fn in tifs])) 
 
 # loop through each unique names, find the matching set, merge them as vrt, and then decompose them
 for name in names:
   #name = names[0] 
   # create output dirs
-  runName = os.path.splitext(os.path.basename(name))[0]
+  runName = os.path.basename(name)  #  #runName = os.path.splitext(bname)[0]
+
   
   # make a dir to unpack the data
   thisOutDirPrep = os.path.join(os.path.dirname(chunkDir), os.pardir, runName)
@@ -114,6 +114,23 @@ for name in names:
     if name in tif:
       matches.append(tif)
 
+
+  # define the projection - get the first matched file and extract the crs from it
+  proj = os.path.basename(matches[0]).split('-')[6]
+  proj = proj[0:4]+':'+proj[4:]
+  
+  
+  # deal with the shapefile - find it reproject it to the vector folder
+  prepDir = os.path.dirname(matches[0])
+  ltAoi = glob(chunkDir+'/'+runName+'*LTaoi.shp')
+  if(len(ltAoi) != 0):
+    outShpFile = os.path.join(os.path.sep.join(chunkDir.split(os.path.sep)[:-3]),'vector',runName+'-LTaoi.shp')
+    cmd = 'ogr2ogr -f "ESRI Shapefile" -t_srs '+proj+' '+outShpFile+' '+ltAoi[0]
+    subprocess.call(cmd, shell=True)
+  else:
+    sys.exit('ERROR: Can\'t find the shapefile that is suppose to be with the data downloaded from Google Drive')
+
+  
   # get info about the GEE run
   info = ltcdb.get_info(runName)
 
@@ -125,9 +142,8 @@ for name in names:
   
   # define the list of replacement types in the new out images    
   outTypes = ['vert_yrs.tif',
-              'vert_src_idx.tif',
               'vert_fit_idx.tif',
-              'ftv_idx.tif',            
+              'seg_rmse.tif',        
               'ftv_tcb.tif',
               'ftv_tcg.tif',
               'ftv_tcw.tif']
@@ -135,15 +151,17 @@ for name in names:
 
   # make a list of band ranges for each out type
   vertStops = []
-  for vertType in range(4):  
+  for vertType in range(3): #4  
     vertStops.append(vertType*info['nVert']+1)
+  
+  rmseStops = [vertStops[-1]+1]
   
   nYears = (info['endYear'] - info['startYear']) + 1
   ftvStops = []  
   for ftvType in range(1,len(outTypes)-2):  
-    ftvStops.append(ftvType*nYears+vertStops[-1])
+    ftvStops.append(ftvType*nYears+rmseStops[0])
     
-  bandStops = vertStops+ftvStops
+  bandStops = vertStops+rmseStops+ftvStops
   bandRanges = [range(bandStops[i],bandStops[i+1]) for i in range(len(bandStops)-1)]
 
 
@@ -158,7 +176,6 @@ for name in names:
   # loop through the datasets and pull them out of the mega stack and write them to the define outDir
   print('   Unpacking file:')
   for i in range(len(outTypes)):
-    #i=0
     print('      '+runName+'-'+outTypes[i])
     block = 0
     for y in xrange(0, ySize, blockSize):
@@ -193,9 +210,25 @@ for name in names:
     ltcdb.make_vrt(blockFiles, outTypeVrtFile)
     
     # make the merged file
+    # read in the inShape file and get the extent
+    driver = ogr.GetDriverByName('ESRI Shapefile')
+    inDataSource = driver.Open(outShpFile, 0)
+    extent = inDataSource.GetLayer().GetExtent()
+    projwin = '{} {} {} {}'.format(extent[0], extent[3], extent[1], extent[2])  
+    inDataSource = None
+    extent = None
+  
     outFile = os.path.normpath(os.path.join(thisOutDir, runName+'-'+outTypes[i]))
-    cmd = 'gdal_translate -q -of GTiff -a_srs ' + proj + ' ' + outTypeVrtFile + ' ' + outFile #
+    cmd = 'gdal_translate -q -of GTiff -a_nodata -9999 -a_srs ' + proj + ' -projwin ' + projwin + ' ' + outTypeVrtFile + ' ' + outFile #
     subprocess.call(cmd, shell=True)
+
+    # make background values -9999
+    nBands = gdal.Open(outFile).RasterCount
+    bands = ' '.join(['-b '+str(band) for band in range(1,nBands+1)])
+    cmd = 'gdal_rasterize -i -burn -9999 '+bands+' '+outShpFile+' '+outFile
+    subprocess.call(cmd, shell=True)
+
+
 
     # clear the dir for the next data
     deleteThese = glob(thisOutDirPrep+'/*'+os.path.splitext(outTypes[i])[0]+'*')
@@ -214,7 +247,7 @@ for name in names:
   ##########################################################################################################
   ######## MAKE THE vert_fit_tc* FILES
   ##########################################################################################################
-  
+  print('   Creating TC vert_fit data')
    
   # make a copy of vert files for tc vals
   vertTCBfitFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcb.tif')
@@ -222,19 +255,23 @@ for name in names:
   vertTCWfitFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcw.tif')
   outPuts = [vertTCBfitFile, vertTCGfitFile, vertTCWfitFile]
   
-  ltcdb.make_output_blanks(vertYrsFile, outPuts, 0)
+  #ltcdb.make_output_blanks(vertYrsFile, outPuts, 0)
+  for outPut in outPuts:
+    copyfile(vertYrsFile, outPut)
   
-  ftvTCBfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcb.tif')
-  ftvTCGfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcg.tif')
-  ftvTCWfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcw.tif')
   
   # open the output files for update
   dstTCB = gdal.Open(vertTCBfitFile, gdal.GA_Update)
   dstTCG = gdal.Open(vertTCGfitFile, gdal.GA_Update)
   dstTCW = gdal.Open(vertTCWfitFile, gdal.GA_Update)
   
-  # open the vertYrs file for read
+  # open the vertYrs file for read - so w eknow what years to pull out of the TC FTV stacks
   srcYrs = gdal.Open(vertYrsFile, gdal.GA_ReadOnly)
+  
+  # read in the TC FTV stacks (all years)
+  ftvTCBfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcb.tif')
+  ftvTCGfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcg.tif')
+  ftvTCWfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcw.tif')
   
   srcFtvTCB = gdal.Open(ftvTCBfitFile, gdal.GA_ReadOnly)
   srcFtvTCG = gdal.Open(ftvTCGfitFile, gdal.GA_ReadOnly)
@@ -286,7 +323,7 @@ for name in names:
           vertYrsPix = npYrs[:, subY, subX]
           
           # check to see if this is a NoData pixel    
-          if (vertYrsPix == 0).all():
+          if (vertYrsPix == -9999).all():   #0
             continue
           
           vertIndex = vertYrsPix[np.where(vertYrsPix != 0)[0]]
@@ -310,8 +347,14 @@ for name in names:
   srcFtvTCG = None
   srcFtvTCW = None
 
-
-
+  """
+  # make background values -9999
+  for outPut in outPuts:
+    nBands = gdal.Open(outPut).RasterCount
+    bands = ' '.join(['-b '+str(band) for band in range(1,nBands+1)])
+    cmd = 'gdal_rasterize -i -burn -9999 '+bands+' '+outShpFile+' '+outPut
+    subprocess.call(cmd, shell=True)
+  """
 
 print('\nDone!')      
 print("LT-GEE data unpacking took {} minutes".format(round((time.time() - startTime)/60, 1)))

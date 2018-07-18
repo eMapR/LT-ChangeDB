@@ -42,13 +42,15 @@ def make_output_blanks(inputFtv, outPuts, adj):
 
 
 def get_info(name):
-  pieces = name.split('-')[0:6]
+  pieces = name.split('-')[0:7]
   return {'key': pieces[0],
           'value': pieces[1],
           'indexID': pieces[2],
           'nVert': int(pieces[3]),
           'startYear':int(pieces[4][0:4]),
           'endYear':int(pieces[4][4:8]),
+          'startDay':pieces[5][0:4],
+          'endDay':pieces[5][4:8],
           'name': '-'.join(pieces)}
 
  
