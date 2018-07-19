@@ -88,8 +88,8 @@ for segDir in ltRunDirs:
 
 
 for i, segDir in enumerate(ltRunDirs):
-  i=0
-  segDir = ltRunDirs[0]
+  #i=0
+  #segDir = ltRunDirs[0]
   
   
   print('\n\nWorking on LT run: ' + os.path.basename(segDir))
@@ -345,6 +345,15 @@ for i, segDir in enumerate(ltRunDirs):
           # get indices of the verts
           vertIndex = np.where(vertYrs != 0)[0]
           
+          # get vertVals for TC
+          vertValsTCB = npFitTCB[vertIndex, subY, subX]
+          if len(np.where(vertValsTCB == -9999)[0]) != 0:
+            continue
+          
+          vertValsTCG = npFitTCG[vertIndex, subY, subX]
+          vertValsTCW = npFitTCW[vertIndex, subY, subX]
+          
+
           # extract the vert years
           vertYrs = vertYrs[vertIndex]
   
@@ -361,10 +370,7 @@ for i, segDir in enumerate(ltRunDirs):
           if len(distIndex) == 0:
             continue
   
-          # get vertVals for TC
-          vertValsTCB = npFitTCB[vertIndex, subY, subX]
-          vertValsTCG = npFitTCG[vertIndex, subY, subX]
-          vertValsTCW = npFitTCW[vertIndex, subY, subX]
+
   
           #  extract year of detection yod
           segStartYear = vertYrs[:-1]+1
