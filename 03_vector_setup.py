@@ -30,23 +30,23 @@ vectorDir = os.path.join(headDir, 'vector')
 if not os.path.isdir(vectorDir):
   sys.exit('ERROR: Can\'t find the vector folder.\nTrying to find it at this location: '+vectorDir+'\nIt\'s possible you provided an incorrect project head folder.\nPlease re-run the script and select the project head folder.')
 
-fileName = ltcdb.get_file("Select Vector File To Prepare")
-if fileName == '':
+fileName = ltcdb.get_file("Select Vector File To Prepare", vectorDir)
+if fileName == '.':
   sys.exit('ERROR: No vector file was selected.\nPlease re-run the script and select a vector file.')
 
 
 startTime = time.time()
 
 bname = os.path.basename(os.path.splitext(fileName)[0])
-standardFileShp = os.path.normpath(os.path.join(vectorDir, bname+'_ltgee_epsg5070.shp'))
+standardFileShp = os.path.normpath(os.path.join(vectorDir, bname+'_ltgee_epsg4326.shp'))
 standardFileKml = standardFileShp.replace('.shp', '.kml')
 
                             
 
-shpCmd = 'ogr2ogr -f "ESRI Shapefile" -t_srs EPSG:5070 '+ standardFileShp +' '+ fileName
+shpCmd = 'ogr2ogr -f "ESRI Shapefile" -t_srs EPSG:4326 '+ standardFileShp +' '+ fileName
 subprocess.call(shpCmd, shell=True)
 
-zipThese = glob(vectorDir+'/*_ltgee_epsg5070*')
+zipThese = glob(vectorDir+'/*_ltgee_epsg4326*')
 
 with zipfile.ZipFile(os.path.join(vectorDir, bname+'_ltgee.zip'), 'w') as zipIt:
   for f in zipThese:   
