@@ -83,7 +83,7 @@ def get_dir(message):
   return thisDir
 
 
-def get_file(message):
+def get_file(message, initialdir = "/"):
   root = Tkinter.Tk()
   root.withdraw()
   root.overrideredirect(1)
@@ -91,7 +91,7 @@ def get_file(message):
   root.deiconify()
   root.lift()
   root.focus_force()
-  thisFile = os.path.normpath(str(tkFileDialog.askopenfilename(initialdir = "/",title = message)))
+  thisFile = os.path.normpath(str(tkFileDialog.askopenfilename(initialdir = initialdir, title = message)))
   root.destroy()
   return thisFile
 
