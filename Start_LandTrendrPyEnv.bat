@@ -1,6 +1,8 @@
 REM %PATH%;
-SET PATH=%HOMEDRIVE%%HOMEPATH%\LandTrendrPyEnv;%HOMEDRIVE%%HOMEPATH%\LandTrendrPyEnv\Library\bin;%HOMEDRIVE%%HOMEPATH%\LandTrendrPyEnv\Scripts;%HOMEDRIVE%%HOMEPATH%\LandTrendrPyEnv\site-packages
-SET GDAL_DATA=%HOMEDRIVE%%HOMEPATH%\LandTrendrPyEnv\Library\share\gdal
-SET PYTHONPATH=%HOMEDRIVE%%HOMEPATH%\LandTrendrPyEnv\site-packages;PYTHONPATH=%HOMEDRIVE%%HOMEPATH%\LandTrendrPyEnv\site-packages\click; REM click is in a weird place - need to define its path explicitly
+SET LT_PY_ENV="C:\users\braatenj\LandTrendrPyEnv"
+SET PATH=%LT_PY_ENV%;%LT_PY_ENV%\Library\bin;%LT_PY_ENV%\Scripts;%LT_PY_ENV%\site-packages
+SET GDAL_DATA=%LT_PY_ENV%\Library\share\gdal
+SET PYTHONPATH=%LT_PY_ENV%\site-packages
+REM SET PYTHONPATH=%LT_PY_ENV%\site-packages;PYTHONPATH=%LT_PY_ENV%\site-packages\click; REM click is in a weird place - need to define its path explicitly -- this line works
 start cmd.exe /k
 
