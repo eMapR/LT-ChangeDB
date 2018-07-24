@@ -87,7 +87,7 @@ if outDir[-1] != '/':
   outDir += '/'
 
 # set the unique names 
-names = list(set(['-'.join(fn.split('-')[0:7]) for fn in tifs])) 
+names = list(set(['-'.join(fn.split('-')[0:8]) for fn in tifs])) 
 
 # loop through each unique names, find the matching set, merge them as vrt, and then decompose them
 for name in names:
