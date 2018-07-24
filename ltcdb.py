@@ -5,7 +5,7 @@ Created on Thu Mar 15 12:04:05 2018
 @author: braatenj
 """
 
-from osgeo import gdal, ogr
+from osgeo import gdal, ogr, osr
 from shutil import copyfile
 import Tkinter, tkFileDialog
 import subprocess
