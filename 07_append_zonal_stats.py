@@ -81,7 +81,7 @@ for polyDir in ltRunDirs:
   
   attrList = np.genfromtxt(attributeList, delimiter=',', dtype='object')
   info = ltcdb.get_info(os.path.basename(attributeList))
-  bandIndex =  ltcdb.year_to_band(os.path.basename(attributeList))
+  bandIndex =  ltcdb.year_to_band(os.path.basename(attributeList), -1) # adjust this by -1 band because disturbance layers are n-1
   indexID = info['indexID']
   
   
