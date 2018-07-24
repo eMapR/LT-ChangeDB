@@ -105,7 +105,7 @@ for polyDir in ltRunDirs:
       print('    attribute: '+attrBname)
       stats = zonal_stats(polyFile, attr[0], band=band, stats=['mean', 'std'])
       statsDF = pd.DataFrame.from_dict(stats).round().astype(int)
-      statsDF.columns = [attrBname+'Mean', attrBname+'Std']
+      statsDF.columns = [attrBname+'Mn', attrBname+'Sd']
       fullDF = pd.concat([fullDF, statsDF], axis=1)
     
 
