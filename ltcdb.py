@@ -5,7 +5,7 @@ Created on Thu Mar 15 12:04:05 2018
 @author: braatenj
 """
 
-from osgeo import gdal
+from osgeo import gdal, ogr
 from shutil import copyfile
 import Tkinter, tkFileDialog
 import subprocess
@@ -113,21 +113,116 @@ def make_vrt(chunkFiles, vrtFile):
   cmd = 'gdalbuildvrt -q -input_file_list '+listFile+' '+vrtFile
   subprocess.call(cmd, shell=True)
   
-  
-#def add_field(layer, fieldName, dtype):
-#  field = ogr.FieldDefn(fieldName, dtype)
-#  layer.CreateField(field)
-#  return layer
 
-def year_to_band(bname):
+def add_field(layer, fieldName, dtype):
+  field = ogr.FieldDefn(fieldName, dtype)
+  layer.CreateField(field)
+  return layer
+
+
+def year_to_band(bname, adj):
   info = get_info(bname)
-  startYear = info['startYear']
+  startYear = info['startYear'] + adj
   endYear = info['endYear']
   nYears = (endYear - startYear)+1
-  yearIndex = np.array([0]*(startYear)+range(0, nYears))
+  yearIndex = np.array([0]*(startYear)+range(1, nYears+1))
   return yearIndex
 
 
 def update_progress(progress):
   sys.stdout.write( '\r   {0}% {1}'.format(int(math.floor(progress*100)), 'done'))
   sys.stdout.flush()
+  
+  
+def zonal_stats(feat, input_zone_polygon, input_value_raster, band): #, raster_band
+
+  # Open data
+  raster = gdal.Open(input_value_raster)
+  shp = ogr.Open(input_zone_polygon)
+  lyr = shp.GetLayer()
+  
+  # Get raster georeference info
+  transform = raster.GetGeoTransform()
+  xOrigin = transform[0]
+  yOrigin = transform[3]
+  pixelWidth = transform[1]
+  pixelHeight = transform[5]
+  
+  # Reproject vector geometry to same projection as raster
+  #sourceSR = lyr.GetSpatialRef()
+  #targetSR = osr.SpatialReference()
+  #targetSR.ImportFromWkt(raster.GetProjectionRef())
+  #coordTrans = osr.CoordinateTransformation(sourceSR,targetSR)
+  #feat = lyr.GetNextFeature()
+  #geom = feat.GetGeometryRef()
+  #geom.Transform(coordTrans)
+  
+  # Get extent of feat
+  geom = feat.GetGeometryRef()
+  if (geom.GetGeometryName() == 'MULTIPOLYGON'):
+    count = 0
+    pointsX = []; pointsY = []
+    for polygon in geom:
+      geomInner = geom.GetGeometryRef(count)
+      ring = geomInner.GetGeometryRef(0)
+      numpoints = ring.GetPointCount()
+      for p in range(numpoints):
+        lon, lat, z = ring.GetPoint(p)
+        pointsX.append(lon)
+        pointsY.append(lat)
+      count += 1
+  elif (geom.GetGeometryName() == 'POLYGON'):
+    ring = geom.GetGeometryRef(0)
+    numpoints = ring.GetPointCount()
+    pointsX = []; pointsY = []
+    for p in range(numpoints):
+      lon, lat, z = ring.GetPoint(p)
+      pointsX.append(lon)
+      pointsY.append(lat)
+
+  else:
+    sys.exit("ERROR: Geometry needs to be either Polygon or Multipolygon")
+
+  xmin = min(pointsX)
+  xmax = max(pointsX)
+  ymin = min(pointsY)
+  ymax = max(pointsY)
+
+  # Specify offset and rows and columns to read
+  xoff = int((xmin - xOrigin)/pixelWidth)
+  yoff = int((yOrigin - ymax)/pixelWidth)
+  xcount = int((xmax - xmin)/pixelWidth) #+1 !!!!!!!!!!!!!!!!!!!!! This adds a pixel to the right side
+  ycount = int((ymax - ymin)/pixelWidth) #+1 !!!!!!!!!!!!!!!!!!!!! This adds a pixel to the bottom side
+  
+  #print(xoff, yoff, xcount, ycount)
+              
+  # Create memory target raster
+  target_ds = gdal.GetDriverByName('MEM').Create('', xcount, ycount, 1, gdal.GDT_Byte)
+  target_ds.SetGeoTransform((
+    xmin, pixelWidth, 0,
+    ymax, 0, pixelHeight,
+  ))
+
+  # Create for target raster the same projection as for the value raster
+  raster_srs = osr.SpatialReference()
+  raster_srs.ImportFromWkt(raster.GetProjectionRef())
+  target_ds.SetProjection(raster_srs.ExportToWkt())
+
+  # Rasterize zone polygon to raster
+  gdal.RasterizeLayer(target_ds, [1], lyr, burn_values=[1])
+
+  # Read raster as arrays
+  dataBandRaster = raster.GetRasterBand(band)
+  data = dataBandRaster.ReadAsArray(xoff, yoff, xcount, ycount).astype(np.float)
+  bandmask = target_ds.GetRasterBand(1)
+  datamask = bandmask.ReadAsArray(0, 0, xcount, ycount).astype(np.float)
+
+  # data zone of raster
+  dataZone = np.ma.masked_array(data,  np.logical_not(datamask))
+
+  raster_srs = None
+  raster = None
+  shp = None
+  lyr = None
+  # Calculate statistics of zonal raster
+  return int(round(np.mean(dataZone))),int(round(np.std(dataZone)))
