@@ -66,7 +66,14 @@ for polyDir in ltRunDirs:
   
   # get the annual polygon files
   polyFiles = glob(os.path.join(polyDir,'*.shp'))
+  if len(polyFiles) == 0:
+    sys.exit('ERROR: There was no *.shp files in the folder selected.\nPlease fix this.')
+  
   attributeList = glob(os.path.join(polyDir,'*.csv'))[0]
+  
+  if len(attributeList) != 1:
+    sys.exit('ERROR: There was no *.csv file in the folder selected.\nPlease fix this.') 
+  attributeList = attributeList[0]
   
   # get the attribute list file
   #attributeList = r"D:\work\proj\al\gee_test\test\raster\landtrendr\change\PARK_CODE-MORA-NBR-7-19842017-06010930\PARK_CODE-MORA-NBR-7-19842017-06010930-change_attributes.csv"
