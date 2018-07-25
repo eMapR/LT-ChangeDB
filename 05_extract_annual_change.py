@@ -172,30 +172,7 @@ for i, segDir in enumerate(ltRunDirs):
   distInfoOutPreTCW = os.path.join(outDir, bname+'-change_tcw_pre.tif')
   distInfoOutPostTCW = os.path.join(outDir, bname+'-change_tcw_post.tif')
   
-  # make a summary stats file
-  summaryInfoFile = os.path.join(outDir, bname+'-change_attributes.csv') 
-  summaryInfo = [
-      [distInfoOutDur   , 'dur'   , 'con', 'annual', 'int'],  # con (continuous) or cat (categorical)
-      [distInfoOutMagIDX, 'idxMag', 'con', 'annual', 'int'],
-      [distInfoOutMagTCB, 'tcbMag', 'con', 'annual', 'int'],
-      [distInfoOutMagTCG, 'tcgMag', 'con', 'annual', 'int'],
-      [distInfoOutMagTCW, 'tcwMag', 'con', 'annual', 'int'],
-      #[distInfoOutPreIDX, 'idxPre', 'con', 'annual', 'int'],
-      [distInfoOutPreTCB, 'tcbPre', 'con', 'annual', 'int'],
-      [distInfoOutPreTCG, 'tcgPre', 'con', 'annual', 'int'],
-      [distInfoOutPreTCW, 'tcwPre', 'con', 'annual', 'int'],
-      
-      [distInfoOutPostTCB, 'tcbPst', 'con', 'annual', 'int'],
-      [distInfoOutPostTCG, 'tcgPst', 'con', 'annual', 'int'],
-      [distInfoOutPostTCW, 'tcwPst', 'con', 'annual', 'int'],
-  ]
-  
-  with open(summaryInfoFile, 'w') as f:
-      writer = csv.writer(f, lineterminator='\n')
-      writer.writerows(summaryInfo)
-  
-  
-  
+
   # create the blanks  needs to be a copy of an ftv minus 1 band
   outPuts = [distInfoOutYrs, distInfoOutDur, 
              distInfoOutMagIDX, #distInfoOutPreIDX,
@@ -203,12 +180,52 @@ for i, segDir in enumerate(ltRunDirs):
              distInfoOutMagTCG, distInfoOutPreTCG, distInfoOutPostTCG,
              distInfoOutMagTCW, distInfoOutPreTCW, distInfoOutPostTCW]
   
-  ftvTemplate = glob(os.path.dirname(vertYrsFile)+'/*ftv_tcb.tif')
+  # find the tc tfv files
+  tcbFtv = glob(os.path.dirname(vertYrsFile)+'/*ftv_tcb.tif') 
+  tcgFtv = glob(os.path.dirname(vertYrsFile)+'/*ftv_tcg.tif')
+  tcwFtv = glob(os.path.dirname(vertYrsFile)+'/*ftv_tcw.tif')
+
+  # make sure the tc ftv fiels are found
+  for fn, srch in zip([tcbFtv, tcgFtv, tcwFtv], ['*ftv_tcb.tif', '*ftv_tcg.tif', '*ftv_tcw.tif',]):
+    if len(fn) != 1:
+      sys.exit('ERROR: There was no '+srch+' file in the folder selected.\nPlease fix this.') 
   
-  if len(ftvTemplate) == 0: #vertFitIDXFile
-    sys.exit('ERROR: There was no *ftv_tcb.tif file in the folder selected.\nPlease fix this.')
+  tcbFtv = tcbFtv[0]
+  tcgFtv = tcgFtv[0]
+  tcwFtv = tcwFtv[0]
   
-  nBands = ltcdb.make_output_blanks(ftvTemplate[0], outPuts, -1) # use a TC FTV file as a template for image specs
+  
+  # make blank copies for annual change writing to  
+  nBands = ltcdb.make_output_blanks(tcbFtv, outPuts, -1) # use a TC FTV file as a template for image specs
+  
+  
+  # make a summary stats file
+  summaryInfoFile = os.path.join(outDir, bname+'-change_attributes.csv') 
+  summaryInfo = [
+      [distInfoOutDur   , 'dur'   , 'con', 'annual', 'int', '0'],  # con (continuous) or cat (categorical)
+      [distInfoOutMagIDX, 'idxMag', 'con', 'annual', 'int', '0'],
+      [distInfoOutMagTCB, 'tcbMag', 'con', 'annual', 'int', '0'],
+      [distInfoOutMagTCG, 'tcgMag', 'con', 'annual', 'int', '0'],
+      [distInfoOutMagTCW, 'tcwMag', 'con', 'annual', 'int', '0'],
+      #[distInfoOutPreIDX, 'idxPre', 'con', 'annual', 'int'],
+      [distInfoOutPreTCB, 'tcbPre', 'con', 'annual', 'int', '0'],
+      [distInfoOutPreTCG, 'tcgPre', 'con', 'annual', 'int', '0'],
+      [distInfoOutPreTCW, 'tcwPre', 'con', 'annual', 'int', '0'],
+      
+      [distInfoOutPostTCB, 'tcbPst', 'con', 'annual', 'int', '0'],
+      [distInfoOutPostTCG, 'tcgPst', 'con', 'annual', 'int', '0'],
+      [distInfoOutPostTCW, 'tcwPst', 'con', 'annual', 'int', '0'],
+      
+      [tcbFtv, 'tcbPst', 'con', 'dynamic', 'int', '1|3|7|15'],
+      [tcbFtv, 'tcgPst', 'con', 'dynamic', 'int', '1|3|7|15'],
+      [tcbFtv, 'tcwPst', 'con', 'dynamic', 'int', '1|3|7|15']
+  ]
+  
+  with open(summaryInfoFile, 'w') as f:
+      writer = csv.writer(f, lineterminator='\n')
+      writer.writerows(summaryInfo)
+  
+  
   
   
   ###################################################################################
