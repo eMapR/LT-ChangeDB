@@ -70,7 +70,7 @@ def write_array(dsOut, band, data, x, y):
   
   
   
-def get_dir(message):
+def get_dir(message, initialdir = "/"):
   root = Tkinter.Tk()
   root.withdraw()
   root.overrideredirect(1)
@@ -78,7 +78,7 @@ def get_dir(message):
   root.deiconify()
   root.lift()
   root.focus_force()
-  thisDir = os.path.normpath(str(tkFileDialog.askdirectory(initialdir = "/",title = message)))
+  thisDir = os.path.normpath(str(tkFileDialog.askdirectory(initialdir = initialdir, title = message)))
   root.destroy()
   return thisDir
 
