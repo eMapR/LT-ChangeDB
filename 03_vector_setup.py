@@ -22,7 +22,7 @@ import ltcdb
 
 
 
-headDir = ltcdb.get_dir("Select the project head folder")
+headDir = ltcdb.get_dir("Select the project head folder", scriptDname)
 if headDir == '':
   sys.exit('ERROR: No folder containing LT-GEE files was selected.\nPlease re-run the script and select a folder.')
 
