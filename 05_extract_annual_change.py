@@ -37,7 +37,7 @@ import ltcdb
 #################################################################################################################
 
 
-headDir = ltcdb.get_dir("Select the project head folder")
+headDir = ltcdb.get_dir("Select the project head folder", scriptDname)
 
 #headDir = r'D:\work\proj\al\gee_test\test'
 
