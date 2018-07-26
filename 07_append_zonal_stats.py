@@ -5,6 +5,7 @@ Created on Sat Mar 31 14:48:18 2018
 @author: braatenj
 """
 
+from osgeo import ogr
 import os
 from rasterstats import zonal_stats
 from glob import glob
@@ -69,7 +70,7 @@ for polyDir in ltRunDirs:
   if len(polyFiles) == 0:
     sys.exit('ERROR: There was no *.shp files in the folder selected.\nPlease fix this.')
   
-  attributeList = glob(os.path.join(polyDir,'*.csv'))[0]
+  attributeList = glob(os.path.join(polyDir,'*.csv'))
   
   if len(attributeList) != 1:
     sys.exit('ERROR: There was no *.csv file in the folder selected.\nPlease fix this.') 
@@ -81,36 +82,59 @@ for polyDir in ltRunDirs:
   #attributeList = glob(os.path.join(polyDir, os.pardir, '*attributes.csv'))[0]
   
   # TODO check if there are more than one
-  # TODO check if it exits
-  
   
   print('\nAdding disturbance attributes to the shapefile table...\n')
   
-  attrList = np.genfromtxt(attributeList, delimiter=',', dtype='object')
-  info = ltcdb.get_info(os.path.basename(attributeList))
-  bandIndex =  ltcdb.year_to_band(os.path.basename(attributeList), -1) # adjust this by -1 band because disturbance layers are n-1
-  indexID = info['indexID']
+  # read in the attribute list
+  attrList = pd.read_csv(attributeList, header=None)
+  #attrList = np.genfromtxt(attributeList, delimiter=',', dtype='object')
+  if attrList.shape[0] == 0:
+    sys.exit('ERROR: There are no rows in file '+attributeList+'.\nPlease fix this.')
   
+  #check for annual - need to exist
+  annualAttr = attrList[attrList.iloc[:,3] == 'annual']
+  if annualAttr.shape[0] == 0:
+    sys.exit('ERROR: There are no "annual" rows in file '+attributeList+'.\nPlease fix this.')
+    
+  #check for dynamic  - need to exist
+  dynamicAttr = attrList[attrList.iloc[:,3] == 'dynamic']
+  if dynamicAttr.shape[0] == 0:
+    sys.exit('ERROR: There are no "dynamic" rows in file '+attributeList+'.\nPlease fix this.')
   
-   # make a temp dir to hold the new file
+  # make a temp dir to hold the new files
   tmpDir = os.path.join(polyDir,'tmp')
   if not os.path.exists(tmpDir):
     os.mkdir(tmpDir) 
   
+  # get file info
+  info = ltcdb.get_info(os.path.basename(attributeList))
+  
+  # set some var needed later
+  annualBandIndex =  ltcdb.year_to_band(os.path.basename(attributeList), 1) # adjust this by 1 band because disturbance layers start +1 year from time series start
+  dynamicBandIndex =  ltcdb.year_to_band(os.path.basename(attributeList), 0)
+  endYear = info['endYear']
+  indexID = info['indexID']
   
   # loop through the polygons
   for fn, polyFile in enumerate(polyFiles):
-    #polyFile = polyFiles[8]
+    #fn=7
+    #polyFile = polyFiles[7]
+    
+    
     newPolyFile = os.path.join(tmpDir, os.path.basename(polyFile))
     year = int(os.path.splitext(os.path.basename(polyFile))[0][-4:])    
     print('Working on year: '+str(fn+1)+'/'+str(len(polyFiles))+' ('+str(year)+')')
-    band = bandIndex[year]  
+    
+    # do the annual attributes, the id attributes, and the shape attributes - doing this through pandas and and
+    band = annualBandIndex[year]
     fullDF = pd.DataFrame()
-    for attr in attrList:
+    for ri, attr in annualAttr.iterrows():
+      #print(attr.iloc[1])
+      
       #attr = attrList[1,]
-      attrBname = attr[1]
+      attrBname = attr.iloc[1]
       print('    attribute: '+attrBname)
-      stats = zonal_stats(polyFile, attr[0], band=band, stats=['mean', 'std'])
+      stats = zonal_stats(polyFile, attr.iloc[0], band=band, stats=['mean', 'std'])
       statsDF = pd.DataFrame.from_dict(stats).round().astype(int)
       statsDF.columns = [attrBname+'Mn', attrBname+'Sd']
       fullDF = pd.concat([fullDF, statsDF], axis=1)
@@ -164,6 +188,64 @@ for polyDir in ltRunDirs:
           
           # write the feature to disk 
           poly.write(feature)
+  
+    # do the dynamic attributes
+    for ri, attr in dynamicAttr.iterrows():
+      #attr = dynamicAttr.iloc[0,:]
+      
+      
+      # make field names
+      pstIntervals = attr.iloc[5].split('|')
+      pstIntervalsLabel = [thisOne.zfill(2) for thisOne in pstIntervals]
+      pstIntervalsInt = [int(thisOne) for thisOne in pstIntervals]
+      print('    attribute: '+attr[1]+' year intervals '+', '.join(pstIntervals))
+      
+      fieldNamesPre = np.array([attr.iloc[1]+thisOne for thisOne in pstIntervalsLabel]) # need this to be np array for later use in indexing
+      fieldNamesAll = []
+      for thisOne in fieldNamesPre:
+        fieldNamesAll.append(thisOne+'Mn')
+        fieldNamesAll.append(thisOne+'Sd')
+      
+      # read in the polygon
+      driver = ogr.GetDriverByName('ESRI Shapefile')
+      dataSource = driver.Open(newPolyFile, 1) # 0 means read-only. 1 means writeable.
+      layer = dataSource.GetLayer()
+      
+      # add field names to the polygon
+      for fieldName in fieldNamesAll:
+        layer = ltcdb.add_field(layer, fieldName, ogr.OFTInteger)
+  
+      # get the number of features in the layer
+      nFeatures = layer.GetFeatureCount()
+
+
+      for i in range(nFeatures):
+        progress = (i+1.0)/nFeatures
+        ltcdb.update_progress(progress, '        ') 
+        
+        feature = layer.GetFeature(i) 
+        yod = int(feature.GetField("yod"))-1
+        durMean = int(feature.GetField("durMn"))
+        distEndYear = yod+durMean
+        postYearsInt = np.array([distEndYear+thisOne for thisOne in pstIntervalsInt])
+        goodYears = np.where(postYearsInt <= endYear)
+        postYearsInt = postYearsInt[goodYears]
+        postYearsLabel = fieldNamesPre[goodYears]
+                
+        for yr, field in zip(postYearsInt, postYearsLabel):
+          #print(yearIndex[yr])
+          summary = ltcdb.zonal_stats(feature, newPolyFile, attr[0], dynamicBandIndex[yr]) 
+        
+          feature.SetField(field+'Mn', summary[0])
+          feature.SetField(field+'Sd', summary[1])
+      
+          # set the changes to ith feature in the layer
+        layer.SetFeature(feature)
+        feature = None
+
+      layer = None
+      dataSource = None
+  
   
   shpFiles = glob(os.path.join(tmpDir,'*.shp'))     
   
