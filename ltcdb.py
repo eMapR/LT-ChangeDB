@@ -83,7 +83,7 @@ def get_dir(message, initialdir = "/"):
   return thisDir
 
 
-def get_file(message, initialdir = "/"):
+def get_file(message, initialdir = "/", filetypes = [("all files","*.*")]):
   root = Tkinter.Tk()
   root.withdraw()
   root.overrideredirect(1)
@@ -91,9 +91,25 @@ def get_file(message, initialdir = "/"):
   root.deiconify()
   root.lift()
   root.focus_force()
-  thisFile = os.path.normpath(str(tkFileDialog.askopenfilename(initialdir = initialdir, title = message)))
+  thisFile = os.path.normpath(str(tkFileDialog.askopenfilename(initialdir = initialdir, title = message, filetypes = filetypes)))
   root.destroy()
   return thisFile
+
+
+def save_file(message, initialdir = "/"):
+  root = Tkinter.Tk()
+  root.withdraw()
+  root.overrideredirect(1)
+  root.attributes('-alpha', 0.0)
+  root.deiconify()
+  root.lift()
+  root.focus_force()
+  thisFile = tkFileDialog.asksaveasfile(initialdir = initialdir, title = message, mode='w',defaultextension=".shp")
+  root.destroy()
+  fileName = os.path.normpath(str(thisFile.name))
+  thisFile.close()
+  os.remove(fileName)
+  return fileName
 
 
 def get_delta(vertVals):
