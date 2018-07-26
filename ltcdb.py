@@ -129,8 +129,8 @@ def year_to_band(bname, adj):
   return yearIndex
 
 
-def update_progress(progress):
-  sys.stdout.write( '\r   {0}% {1}'.format(int(math.floor(progress*100)), 'done'))
+def update_progress(progress, space='     '):
+  sys.stdout.write( '\r'+space+'{0}% {1}'.format(int(math.floor(progress*100)), 'done'))
   sys.stdout.flush()
   
   
