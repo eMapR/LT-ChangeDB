@@ -281,7 +281,7 @@ for name in names:
   
   
   # set some size variables
-  ftvIndex =  ltcdb.year_to_band(os.path.basename(vertYrsFile))
+  ftvIndex =  ltcdb.year_to_band(os.path.basename(vertYrsFile), 1) #TODO: make sure that the offset is correct here - compared the old and new year_to_band functions results and using adj 1 makes them equal, so should be okay, but look at actual numbers
   xSize = srcYrs.RasterXSize
   ySize = srcYrs.RasterYSize
   blockSize = 256
