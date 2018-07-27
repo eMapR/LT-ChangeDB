@@ -192,13 +192,16 @@ for polyDir in ltRunDirs:
     # do the dynamic attributes
     for ri, attr in dynamicAttr.iterrows():
       #attr = dynamicAttr.iloc[0,:]
-      
+      if ri > 0:
+        nextLine = '\n'
+      else:
+        nextLine = ''
       
       # make field names
       pstIntervals = attr.iloc[5].split('|')
       pstIntervalsLabel = [thisOne.zfill(2) for thisOne in pstIntervals]
       pstIntervalsInt = [int(thisOne) for thisOne in pstIntervals]
-      print('    attribute: '+attr[1]+' year intervals '+', '.join(pstIntervals))
+      print(nextLine+'    attribute: '+attr[1]+' year intervals '+', '.join(pstIntervals))
       
       fieldNamesPre = np.array([attr.iloc[1]+thisOne for thisOne in pstIntervalsLabel]) # need this to be np array for later use in indexing
       fieldNamesAll = []
