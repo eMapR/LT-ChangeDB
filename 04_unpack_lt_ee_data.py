@@ -315,7 +315,7 @@ for name in names:
       # print progress
       nBlock += 1.0
       progress = (nBlock)/nBlocks
-      ltcdb.update_progress(progress)
+      ltcdb.update_progress(progress, '      ')
       
       
       npYrs = srcYrs.ReadAsArray(x, y, cols, rows)
