@@ -109,8 +109,10 @@ for i, changeDir in enumerate(ltRunDirs):
   
   # figure out the vector path
   bname = info['name']
-  vectorBname = bname+'-dist_info_'+str(mmu)+'mmu_'+str(connectedness)+'con'#+'nbr' #os.path.join(polyDir, 'ltee_mora_'+str(mmu)+'mmu_annual_dist.shp') # this should be set
-  vectorDirFull = os.path.join(headDir, 'vector', 'change', vectorBname)
+  vectorBnameDir = bname+'-dist_info_'+str(mmu)+'mmu_'+str(connectedness)+'con'#+'nbr' #os.path.join(polyDir, 'ltee_mora_'+str(mmu)+'mmu_annual_dist.shp') # this should be set  !!!!USED TO BE: vectorBname
+  vectorBname = 'dist_info'
+  
+  vectorDirFull = os.path.join(headDir, 'vector', 'change', vectorBnameDir)
   #vectorDirFullBlank = os.path.join(vectorDirFull, 'blank')  # not used ???
   if not os.path.isdir(vectorDirFull):
     os.makedirs(vectorDirFull)
