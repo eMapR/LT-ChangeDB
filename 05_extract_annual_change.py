@@ -202,23 +202,23 @@ for i, segDir in enumerate(ltRunDirs):
   # make a summary stats file
   summaryInfoFile = os.path.join(outDir, bname+'-change_attributes.csv') 
   summaryInfo = [
-      [distInfoOutDur   , 'dur'   , 'con', 'annual', 'int', '0'],  # con (continuous) or cat (categorical)
-      [distInfoOutMagIDX, 'idxMag', 'con', 'annual', 'int', '0'],
-      [distInfoOutMagTCB, 'tcbMag', 'con', 'annual', 'int', '0'],
-      [distInfoOutMagTCG, 'tcgMag', 'con', 'annual', 'int', '0'],
-      [distInfoOutMagTCW, 'tcwMag', 'con', 'annual', 'int', '0'],
+      [distInfoOutDur   , 'dur'   , 'con', 'annual', 'int', '0', '1'],  # con (continuous) or cat (categorical)
+      [distInfoOutMagIDX, 'idxMag', 'con', 'annual', 'int', '0', '1'],
+      [distInfoOutMagTCB, 'tcbMag', 'con', 'annual', 'int', '0', '1'],
+      [distInfoOutMagTCG, 'tcgMag', 'con', 'annual', 'int', '0', '1'],
+      [distInfoOutMagTCW, 'tcwMag', 'con', 'annual', 'int', '0', '1'],
       #[distInfoOutPreIDX, 'idxPre', 'con', 'annual', 'int'],
-      [distInfoOutPreTCB, 'tcbPre', 'con', 'annual', 'int', '0'],
-      [distInfoOutPreTCG, 'tcgPre', 'con', 'annual', 'int', '0'],
-      [distInfoOutPreTCW, 'tcwPre', 'con', 'annual', 'int', '0'],
+      [distInfoOutPreTCB, 'tcbPre', 'con', 'annual', 'int', '0', '1'],
+      [distInfoOutPreTCG, 'tcgPre', 'con', 'annual', 'int', '0', '1'],
+      [distInfoOutPreTCW, 'tcwPre', 'con', 'annual', 'int', '0', '1'],
       
-      [distInfoOutPostTCB, 'tcbPst', 'con', 'annual', 'int', '0'],
-      [distInfoOutPostTCG, 'tcgPst', 'con', 'annual', 'int', '0'],
-      [distInfoOutPostTCW, 'tcwPst', 'con', 'annual', 'int', '0'],
+      [distInfoOutPostTCB, 'tcbPst', 'con', 'annual', 'int', '0', '1'],
+      [distInfoOutPostTCG, 'tcgPst', 'con', 'annual', 'int', '0', '1'],
+      [distInfoOutPostTCW, 'tcwPst', 'con', 'annual', 'int', '0', '1'],
       
-      [tcbFtv, 'tcbPst', 'con', 'dynamic', 'int', '1|3|7|15'],
-      [tcbFtv, 'tcgPst', 'con', 'dynamic', 'int', '1|3|7|15'],
-      [tcbFtv, 'tcwPst', 'con', 'dynamic', 'int', '1|3|7|15']
+      [tcbFtv, 'tcbPst', 'con', 'dynamic', 'int', '1|3|7|15', '1'],
+      [tcbFtv, 'tcgPst', 'con', 'dynamic', 'int', '1|3|7|15', '1'],
+      [tcbFtv, 'tcwPst', 'con', 'dynamic', 'int', '1|3|7|15', '1']
   ]
   
   with open(summaryInfoFile, 'w') as f:
@@ -315,7 +315,7 @@ for i, segDir in enumerate(ltRunDirs):
       # print progress
       nBlock += 1.0
       progress = (nBlock)/nBlocks
-      ltcdb.update_progress(progress) 
+      ltcdb.update_progress(progress, '   ')
       
       # load the SRC vert data for yrs, idx, and tc 
       npYrs = srcYrs.ReadAsArray(x, y, cols, rows)
