@@ -7,7 +7,6 @@ Created on Tue Mar 06 14:09:32 2018
 
 import time
 import os
-import fnmatch
 import subprocess
 import sys
 import numpy as np
@@ -16,117 +15,91 @@ from glob import glob
 from shutil import copyfile
 
 
-# change working directory to this script's dir
+# change working directory to this script's dir so we can load the ltcdb library
 scriptAbsPath = os.path.abspath(__file__)
 scriptDname = os.path.dirname(scriptAbsPath)
 os.chdir(scriptDname)
-
 import ltcdb
 
-
-
-
-
+# get the head folder
 headDir = ltcdb.get_dir("Select the project head folder", scriptDname)
+ltcdb.is_headDir(headDir)
 
-#headDir = r'D:\work\proj\al\gee_test\test'
-
-
-if headDir == '':
-  sys.exit('ERROR: No folder containing LT-GEE files was selected.\nPlease re-run the script and select a folder.')
-
-chunkDir = os.path.join(headDir, 'raster', 'prep', 'gee_chunks')
-if not os.path.isdir(chunkDir):
-  sys.exit('ERROR: Can\'t find the gee_chunk folder.\nTrying to find it at this location: '+chunkDir+'\nIt\'s possible you provided an incorrect project head folder.\nPlease re-run the script and select the project head folder.')
-
-# could try to find the gee_chunk folder
-#[x[0] for x in os.walk(chunkDir)]
-
+# get dir paths we need 
+chunkDir = ltcdb.dir_path(headDir, 'rPg')
+timeSyncDir = ltcdb.dir_path(headDir, 'tsV')
+segDir = ltcdb.dir_path(headDir, 'rLs')
 
 # find the tif chunks
-tifs = []
-for root, dirnames, filenames in os.walk(chunkDir):
-  for filename in fnmatch.filter(filenames, '*LTdata*.tif'):
-    tifs.append(os.path.join(root, filename))
+tifs = glob(os.path.join(chunkDir,'*LTdata*.tif'))
 
 # are there any tif files to work with?
 if len(tifs) == 0:
   sys.exit('ERROR: There are no TIF files in the folder selected.\nPlease fix this.')
 
-
-outDir = os.path.normpath(os.path.join(chunkDir, os.sep.join([os.pardir]*2), 'landtrendr', 'segmentation'))
-# could just make the folder
-if not os.path.isdir(chunkDir):
-    sys.exit('ERROR: Can\'t find the segmentation folder.\nTrying to find it at this location: '+outDir+'\nIt\'s possible you have not run the directory setup script.\nPlease make sure the folder exists.')
-#outDir = ltcdb.get_dir("Select folder to place LT segmentation outputs in\n\n(*\\raster\\landtrendr\segmentation)")
-#if outDir == '':
-#  sys.exit('ERROR: No folder containing LT-GEE files was selected.\nPlease re-run the script and select a folder.')
-  
-#TODO check for existing files
-
-"""
-root = Tkinter.Tk()
-clipFile = str(tkFileDialog.askopenfilename(initialdir = "/",title = "Select standardized vector file\n\n(*\\vector\\*ltgee*.shp)"))
-root.destroy()
-"""
-  
-#TODO check to make sure that it is a .shp and that it has *ltgee* possibly check for epsg5070 proj - should be file is *ltgee*
-
-
-
+######################################################################
+# start tracking time
 startTime = time.time()
 
-######################################################################
-
-
-
-# make sure path parts are right
-if chunkDir[-1] != '/':
-  chunkDir += '/'
-if outDir[-1] != '/':
-  outDir += '/'
-
 # set the unique names 
-names = list(set(['-'.join(fn.split('-')[0:8]) for fn in tifs])) 
+runNames = list(set(['-'.join(os.path.basename(fn).split('-')[0:6]) for fn in tifs])) 
+
 
 # loop through each unique names, find the matching set, merge them as vrt, and then decompose them
-for name in names:
-  #name = names[0] 
-  # create output dirs
-  runName = os.path.basename(name)  #  #runName = os.path.splitext(bname)[0]
+for runName in runNames:
 
-  
   # make a dir to unpack the data
-  thisOutDirPrep = os.path.join(os.path.dirname(chunkDir), os.pardir, runName)
+  thisOutDirPrep = os.path.join(ltcdb.dir_path(headDir, 'rP'), runName)
   if not os.path.exists(thisOutDirPrep):
     os.mkdir(thisOutDirPrep)
   
   # make a dir for the final data stacks 
-  thisOutDir = os.path.join(outDir, runName)
+  thisOutDir = os.path.join(segDir, runName)
   if not os.path.exists(thisOutDir):
     os.mkdir(thisOutDir)
 
 
   print('\nWorking on LT run: '+runName)
   # find the files that belong to this set  
-  matches = []
-  for tif in tifs:   
-    if name in tif:
-      matches.append(tif)
+  matches = glob(os.path.join(chunkDir,runName+'*LTdata*.tif'))
+  if len(matches) == 0: 
+    sys.exit('ERROR: Cannot find '+runName+'*LTdata*.tif files in this dir: '+chunkDir)
 
 
   # define the projection - get the first matched file and extract the crs from it
   proj = os.path.basename(matches[0]).split('-')[6]
+  if proj[0:4] != 'EPSG':
+    sys.exit('ERROR: Cannot parse the CRS properly from this file name: '+os.path.basename(matches[0])+'.\n')
   proj = proj[0:4]+':'+proj[4:]
   
   
-  # deal with the shapefile - find it reproject it to the vector folder
-  prepDir = os.path.dirname(matches[0])
-  ltAoi = glob(chunkDir+'/'+runName+'*LTaoi.shp')
-  if(len(ltAoi) != 0):
-    outShpFile = os.path.join(os.path.sep.join(chunkDir.split(os.path.sep)[:-3]),'vector',runName+'-LTaoi.shp')
-    cmd = 'ogr2ogr -f "ESRI Shapefile" -t_srs '+proj+' '+outShpFile+' '+ltAoi[0]
-    subprocess.call(cmd, shell=True)
+  
+  
+  # move and reproject the timesync files if there are any
+  tsAoi = glob(os.path.join(chunkDir,runName+'*TSaoi.shp'))
+  if len(tsAoi) != 0:
+    outShpFile = os.path.join(ltcdb.dir_path(headDir, 'tsV'), runName+'-TSaoi.shp')
+    if not os.path.exists(outShpFile): 
+      cmd = 'ogr2ogr -f "ESRI Shapefile" -t_srs '+proj+' '+outShpFile+' '+tsAoi[0]
+      cmdFailed = subprocess.call(cmd, shell=True)
+      ltcdb.is_success(cmdFailed)
+  
+  tsData = glob(os.path.join(chunkDir,runName+'*TSdata*.tif'))
+  if len(tsData) != 0:
+    for fromThis in tsData:
+      toThis = os.path.join(ltcdb.dir_path(headDir, 'tsP'), os.path.basename(fromThis))
+      if not os.path.exists(toThis): 
+        os.rename(fromThis, toThis)
+
+  # deal with the LT shapefile - find it reproject it to the vector folder
+  ltAoi = glob(os.path.join(chunkDir,runName+'*LTaoi.shp'))
+  
+  if len(ltAoi) != 0:
+    outShpFile = os.path.join(ltcdb.dir_path(headDir, 'v'), runName+'-LTaoi.shp')
+    if not os.path.exists(outShpFile):
+      cmd = 'ogr2ogr -f "ESRI Shapefile" -t_srs '+proj+' '+outShpFile+' '+ltAoi[0]
+      cmdFailed = subprocess.call(cmd, shell=True)
+      ltcdb.is_success(cmdFailed)
   else:
     sys.exit('ERROR: Can\'t find the shapefile that is suppose to be with the data downloaded from Google Drive')
 
@@ -134,11 +107,9 @@ for name in names:
   # get info about the GEE run
   info = ltcdb.get_info(runName)
 
-
   # make a master vrt
   masterVrtFile = os.path.normpath(os.path.join(thisOutDirPrep, runName+'.vrt'))
   ltcdb.make_vrt(matches, masterVrtFile)
-  
   
   # define the list of replacement types in the new out images    
   outTypes = ['vert_yrs.tif',
@@ -147,7 +118,6 @@ for name in names:
               'ftv_tcb.tif',
               'ftv_tcg.tif',
               'ftv_tcw.tif']
-
 
   # make a list of band ranges for each out type
   vertStops = []
@@ -198,8 +168,9 @@ for name in names:
         bands = ' -b '+' -b '.join([str(band) for band in bandRanges[i]])
         win = '{0} {1} {2} {3}'.format(x, y, blockSize, blockSize)
         cmd = 'gdal_translate -q -of GTiff -a_srs ' + proj + ' -srcwin '+ win + ' ' + bands +' '+ masterVrtFile + ' ' + outFileBlock #
-        subprocess.call(cmd, shell=True)
-  
+        cmdFailed = subprocess.call(cmd, shell=True)
+        ltcdb.is_success(cmdFailed)
+        
         block += 1
 
     blockFiles = glob(thisOutDirPrep+'/*'+outTypes[i])
@@ -220,14 +191,15 @@ for name in names:
   
     outFile = os.path.normpath(os.path.join(thisOutDir, runName+'-'+outTypes[i]))
     cmd = 'gdal_translate -q -of GTiff -a_nodata -9999 -a_srs ' + proj + ' -projwin ' + projwin + ' ' + outTypeVrtFile + ' ' + outFile #
-    subprocess.call(cmd, shell=True)
+    cmdFailed = subprocess.call(cmd, shell=True)
+    ltcdb.is_success(cmdFailed)
 
     # make background values -9999
     nBands = gdal.Open(outFile).RasterCount
     bands = ' '.join(['-b '+str(band) for band in range(1,nBands+1)])
     cmd = 'gdal_rasterize -q -i -burn -9999 '+bands+' '+outShpFile+' '+outFile
-    subprocess.call(cmd, shell=True)
-
+    cmdFailed = subprocess.call(cmd, shell=True)
+    ltcdb.is_success(cmdFailed)
 
 
     # clear the dir for the next data
@@ -235,14 +207,11 @@ for name in names:
     for this in deleteThese:
       os.remove(this)
 
-
-  
-  vertYrsFile = glob(os.path.join(thisOutDir,'*vert_yrs.tif'))[0]
-  
-  # TODO return error message if the vertYrsFile is not found
-
-
-
+  # find the vert_yrs file as a template
+  vertYrsFile = glob(os.path.join(thisOutDir,'*vert_yrs.tif'))
+  if len(vertYrsFile) == 0:
+    sys.exit('\nERROR: Can\'t find *vert_yrs.tif files in this dir: '+thisOutDir)
+  vertYrsFile = vertYrsFile[0]
 
   ##########################################################################################################
   ######## MAKE THE vert_fit_tc* FILES
@@ -362,19 +331,10 @@ for name in names:
   srcFtvTCG = None
   srcFtvTCW = None
 
-  """
-  # make background values -9999
-  for outPut in outPuts:
-    nBands = gdal.Open(outPut).RasterCount
-    bands = ' '.join(['-b '+str(band) for band in range(1,nBands+1)])
-    cmd = 'gdal_rasterize -i -burn -9999 '+bands+' '+outShpFile+' '+outPut
-    subprocess.call(cmd, shell=True)
-  """
-
 print('\nDone!')      
 print("LT-GEE data unpacking took {} minutes".format(round((time.time() - startTime)/60, 1)))
 
   
-    
+# TODO: delete the contents of the prep folder
     
       

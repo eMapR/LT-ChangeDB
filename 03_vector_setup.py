@@ -13,44 +13,44 @@ import sys
 import time 
 
 
-# change working directory to this script's dir
+# change working directory to this script's dir so we can load the ltcdb library
 scriptAbsPath = os.path.abspath(__file__)
 scriptDname = os.path.dirname(scriptAbsPath)
 os.chdir(scriptDname)
-
 import ltcdb
 
-
-
+# get the head folder
 headDir = ltcdb.get_dir("Select the project head folder", scriptDname)
-if headDir == '':
-  sys.exit('ERROR: No folder containing LT-GEE files was selected.\nPlease re-run the script and select a folder.')
+ltcdb.is_headDir(headDir)
 
-vectorDir = os.path.join(headDir, 'vector')
-if not os.path.isdir(vectorDir):
-  sys.exit('ERROR: Can\'t find the vector folder.\nTrying to find it at this location: '+vectorDir+'\nIt\'s possible you provided an incorrect project head folder.\nPlease re-run the script and select the project head folder.')
+# get dir paths we need 
+vectorDir = ltcdb.dir_path(headDir, 'v')
 
-fileName = ltcdb.get_file("Select Vector File To Prepare", vectorDir)
+# select a vector file
+fileName = ltcdb.get_file("Select Vector File To Prepare", vectorDir, [("Shapefile","*.shp"), ("GeoJSON","*.geojson")])
 if fileName == '.':
   sys.exit('ERROR: No vector file was selected.\nPlease re-run the script and select a vector file.')
 
-
+# start tracking time
 startTime = time.time()
 
+# make new shapefile name
 bname = os.path.basename(os.path.splitext(fileName)[0])
 standardFileShp = os.path.normpath(os.path.join(vectorDir, bname+'_ltgee_epsg4326.shp'))
-standardFileKml = standardFileShp.replace('.shp', '.kml')
 
-                            
-
+# standardize projection and format for GEE
 shpCmd = 'ogr2ogr -f "ESRI Shapefile" -t_srs EPSG:4326 '+ standardFileShp +' '+ fileName
-subprocess.call(shpCmd, shell=True)
+cmdFailed = subprocess.call(shpCmd, shell=True)
+ltcdb.is_success(cmdFailed)
 
+# find files to zip
 zipThese = glob(vectorDir+'/*_ltgee_epsg4326*')
+if len(zipThese) == 0:
+  sys.exit('ERROR: There were no *_ltgee_epsg4326* files found in dir:\n'+ vectorDir+'\nNo files to zip.')
 
+# zip files
 with zipfile.ZipFile(os.path.join(vectorDir, bname+'_ltgee.zip'), 'w') as zipIt:
   for f in zipThese:   
     zipIt.write(f, os.path.basename(f))
     
-print('\nDone!')      
-print("LT-GEE vector setup took {} minutes".format(round((time.time() - startTime)/60, 1)))    
+print('\nDone!')

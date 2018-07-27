@@ -12,31 +12,21 @@ import sys
 import shutil
 from glob import glob
 
-# change working directory to this script's dir
+
+# change working directory to this script's dir so we can load the ltcdb library
 scriptAbsPath = os.path.abspath(__file__)
 scriptDname = os.path.dirname(scriptAbsPath)
 os.chdir(scriptDname)
 import ltcdb
 
-
-
+# get the head folder
 headDir = ltcdb.get_dir("Select the project head folder", scriptDname)
+ltcdb.is_headDir(headDir)
 
-#headDir = r'D:\work\proj\al\gee_test\test'
+# get dir paths we need 
+changeDir = ltcdb.dir_path(headDir, 'rLc')
 
-
-if headDir == '':
-  sys.exit('ERROR: No folder containing LT-GEE files was selected.\nPlease re-run the script and select a folder.')
-
-changeDir = os.path.join(headDir, 'raster', 'landtrendr', 'change')
-if not os.path.isdir(changeDir):
-  sys.exit('ERROR: Can\'t find the change folder.\nTrying to find it at this location: '+changeDir+'\nIt\'s possible you provided an incorrect project head folder.\nPlease re-run the script and select the project head folder.')
-
-# could try to find the gee_chunk folder
-#[x[0] for x in os.walk(chunkDir)]
-
-changeDir = os.path.normpath(changeDir)
-#segDir = r'D:\work\proj\al\gee_test\test\raster\landtrendr\segmentation'
+# get the various run dirs
 ltRunDirs = [os.path.join(changeDir, thisRunDir) for thisRunDir in os.listdir(changeDir)]
 
 
@@ -110,7 +100,7 @@ for i, changeDir in enumerate(ltRunDirs):
   # figure out the vector path
   bname = info['name']
   vectorBnameDir = bname+'-dist_info_'+str(mmu)+'mmu_'+str(connectedness)+'con'#+'nbr' #os.path.join(polyDir, 'ltee_mora_'+str(mmu)+'mmu_annual_dist.shp') # this should be set  !!!!USED TO BE: vectorBname
-  vectorBname = 'dist_info'
+  vectorBname = 'dist' # TODO: this can change to grow, if we switch to mapping growth
   
   vectorDirFull = os.path.join(headDir, 'vector', 'change', vectorBnameDir)
   #vectorDirFullBlank = os.path.join(vectorDirFull, 'blank')  # not used ???
@@ -174,7 +164,7 @@ for i, changeDir in enumerate(ltRunDirs):
   for band, year in enumerate(range(info['startYear']+1,info['endYear']+1)):  
     band += 1
     print('        working on year: '+str(band)+'/'+str(nBands)+' ('+str(year)+')')
-    polyFile = os.path.join(vectorDirFull, vectorBname+'_'+str(year)+'.shp')  #os.path.join(polyDir, info['name']+'-'+str(year)+'.shp')
+    polyFile = os.path.join(vectorDirFull, vectorBname+str(year)+'.shp')  #os.path.join(polyDir, info['name']+'-'+str(year)+'.shp')
     srcBand = srcPatches.GetRasterBand(band)
     maskBand = srcBand
     

@@ -242,3 +242,41 @@ def zonal_stats(feat, input_zone_polygon, input_value_raster, band): #, raster_b
   lyr = None
   # Calculate statistics of zonal raster
   return int(round(np.mean(dataZone))),int(round(np.std(dataZone)))
+
+
+def dir_path(headDir, path):
+  dirs = {
+    'ts':os.path.join(headDir, 'timesync'),
+    'tsR':os.path.join(headDir, 'timesync', 'raster'),
+    'tsP':os.path.join(headDir, 'timesync', 'prep'),
+    'tsV':os.path.join(headDir, 'timesync', 'vector'),
+    'r':os.path.join(headDir, 'raster'),
+    'v':os.path.join(headDir, 'vector'),
+    's':os.path.join(headDir, 'scripts'),
+    'rP':os.path.join(headDir, 'raster', 'prep'),
+    'rPg':os.path.join(headDir, 'raster', 'prep', 'gee_chunks'),            
+    'rL':os.path.join(headDir, 'raster', 'landtrendr'),
+    'rLs':os.path.join(headDir, 'raster', 'landtrendr', 'segmentation'),
+    'rLc':os.path.join(headDir, 'raster', 'landtrendr', 'change')
+  }
+  
+  if path == 'all':
+    out = [os.path.normpath(value) for key, value in dirs.iteritems()]
+  else:    
+    out = os.path.normpath(dirs[path])
+  return out
+
+def is_headDir(headDir):
+  if headDir == '.':
+    sys.exit()
+  test = dir_path(headDir, 'rLs')
+  if not os.path.isdir(test):
+    sys.exit('ERROR: The selected folder does not appear to be an LT-ChangeDB project head folder.\nPlease re-run the script and select an LT-ChangeDB project head folder.')
+
+def is_success(cmdFailed):
+  if cmdFailed:
+    sys.exit('\nERROR: A command sent to an external program has failed.\nThe program may have printed a message above, please address the issue and re-run this script.')
+
+
+
+

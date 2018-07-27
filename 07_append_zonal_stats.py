@@ -19,24 +19,15 @@ import subprocess
 import time 
 
 
-
-
-
-# change working directory to this script's dir
+# change working directory to this script's dir so we can load the ltcdb library
 scriptAbsPath = os.path.abspath(__file__)
 scriptDname = os.path.dirname(scriptAbsPath)
 os.chdir(scriptDname)
 import ltcdb
 
-
-
+# get the head folder
 headDir = ltcdb.get_dir("Select the project head folder", scriptDname)
-
-#headDir = r'D:\work\proj\al\gee_test\test'
-
-
-if headDir == '':
-  sys.exit('ERROR: No folder containing LT-GEE files was selected.\nPlease re-run the script and select a folder.')
+ltcdb.is_headDir(headDir)
 
 vectorDir = os.path.join(headDir, 'vector', 'change')
 if not os.path.isdir(vectorDir):
@@ -198,6 +189,9 @@ for polyDir in ltRunDirs:
         nextLine = ''
       
       # make field names
+      pstRun = int(attr.iloc[6])
+      if pstRun == 0:
+        continue
       pstIntervals = attr.iloc[5].split('|')
       pstIntervalsLabel = [thisOne.zfill(2) for thisOne in pstIntervals]
       pstIntervalsInt = [int(thisOne) for thisOne in pstIntervals]

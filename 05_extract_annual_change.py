@@ -14,58 +14,24 @@ import csv
 from osgeo import gdal
 
 
-# change working directory to this script's dir
+# change working directory to this script's dir so we can load the ltcdb library
 scriptAbsPath = os.path.abspath(__file__)
 scriptDname = os.path.dirname(scriptAbsPath)
 os.chdir(scriptDname)
-
 import ltcdb
 
-
-
-
-
-
-#def update_progress(progress):
-#  sys.stdout.write( '\r   {0}% {1}'.format(int(math.floor(progress*100)), 'done'))
-#  sys.stdout.flush()
-
-
-
-  
-#################################################################################################################
-#################################################################################################################
-
-
+# get the head folder
 headDir = ltcdb.get_dir("Select the project head folder", scriptDname)
+ltcdb.is_headDir(headDir)
 
-#headDir = r'D:\work\proj\al\gee_test\test'
+# get dir paths we need 
+segDir = ltcdb.dir_path(headDir, 'rLs')
+changeDir = ltcdb.dir_path(headDir, 'rLc')
 
-
-if headDir == '':
-  sys.exit('ERROR: No folder containing LT-GEE files was selected.\nPlease re-run the script and select a folder.')
-
-segDir = os.path.join(headDir, 'raster', 'landtrendr', 'segmentation')
-if not os.path.isdir(segDir):
-  sys.exit('ERROR: Can\'t find the segmentation folder.\nTrying to find it at this location: '+segDir+'\nIt\'s possible you provided an incorrect project head folder.\nPlease re-run the script and select the project head folder.')
-
-# could try to find the gee_chunk folder
-#[x[0] for x in os.walk(chunkDir)]
-
-
-
-"""
-segDir = ltcdb.get_dir("Select a folder that contains LT segmentation files\n\n(*\\raster\\landtrendr\\segmentation\\*)")
-if segDir == '':
-  sys.exit('ERROR: No folder containing LT segmentation files was selected.\nPlease re-run the script and select a folder.')
-"""
-
-
-
-
-segDir = os.path.normpath(segDir)
-#segDir = r'D:\work\proj\al\gee_test\test\raster\landtrendr\segmentation'
+# list the run directories in the seg folder 
 ltRunDirs = [os.path.join(segDir, thisRunDir) for thisRunDir in os.listdir(segDir)]
+
+# get the min change for each 
 minMags = []
 for segDir in ltRunDirs:
   # get the min mag
@@ -85,42 +51,31 @@ for segDir in ltRunDirs:
 
 
 
-
-
+# iterate through each run
 for i, segDir in enumerate(ltRunDirs):
   #i=0
   #segDir = ltRunDirs[0]
   
   
   print('\n\nWorking on LT run: ' + os.path.basename(segDir))
+  
+  # get the vert_yrs.tif
   vertYrsFile = glob(segDir+'/*vert_yrs.tif')
   if len(vertYrsFile) == 0:
     sys.exit('ERROR: There was no *vert_yrs.tif file in the folder selected.\nPlease fix this.')   # TODO make this a better error message
-  
+  vertYrsFile = vertYrsFile[0]
   #TODO need to deal with multiple finds
   
-  pieces = segDir.split(os.sep)
-  bname = pieces[-1]
-  outDir = os.path.normpath(os.path.join('/'.join(pieces[0:-2]), 'change', bname))
+  # make a change output dir for this run  
+  bname = os.path.basename(segDir)
+  outDir = os.path.join(changeDir, bname)
   if not os.path.exists(outDir):
     os.makedirs(outDir)
   
   
-  """
-  #vertYrsFile = 'D:/work/proj/al/gee_test/raster/landtrendr/segmentation/ltee_nccn_mora_seg08test_06010930_20180109_vert_yrs.bsq'
-  outDir = 'D:/work/proj/al/gee_test/raster/landtrendr/annual_disturbance/'
-  startYear = 1984
-  endYear = 2016
-  mmu = 9
-  minMag = -50
-  
-  #flipper = -1    
-  #nYears = endYear-startYear+1
-  """
   #################################################################################################################
   
-  # get the vert fit file
-  vertYrsFile = vertYrsFile[0]
+  # make output file names
   vertFitIDXFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_idx.tif')
   vertFitTCBFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcb.tif')
   vertFitTCGFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcg.tif')
@@ -130,17 +85,10 @@ for i, segDir in enumerate(ltRunDirs):
   if not os.path.exists(vertFitTCBFile): #vertFitIDXFile
     sys.exit('ERROR: There was no *vert_fit_tcb.tif file in the folder selected.\nPlease fix this.') 
   
-  
-  
-  #segDir = r"D:\work\proj\al\gee_test\test\raster\landtrendr\segmentation\PARK_CODE-MORA-NBR-7-19842017-06010930"
-  #vertYrsFile = r"D:\work\proj\al\gee_test\test\raster\landtrendr\segmentation\PARK_CODE-MORA-NBR-7-19842017-06010930\PARK_CODE-MORA-NBR-7-19842017-06010930-vert_yrs.tif"
-  #vertFitFile = r"D:\work\proj\al\gee_test\test\raster\landtrendr\segmentation\PARK_CODE-MORA-NBR-7-19842017-06010930\PARK_CODE-MORA-NBR-7-19842017-06010930-vert_fit.tif"
-  #info = get_info('PARK_CODE-MORA-NBR-7-19842017-06010930')
-  
-  
-  # get the min mag
+  # get the min mag for this run
   minMag = minMags[i]
   
+  # start tracking time
   startTime = time.time()
 
   
@@ -152,11 +100,7 @@ for i, segDir in enumerate(ltRunDirs):
   endYear = info['endYear']
   startYearChng = startYear+1
   
-  
-  
   ###################################################################################
-  
-  
   # make new file names
   distInfoOutYrs = os.path.join(outDir, bname+'-change_yrs.tif')
   distInfoOutDur = os.path.join(outDir, bname+'-change_dur.tif')
@@ -238,8 +182,9 @@ for i, segDir in enumerate(ltRunDirs):
   startYearChng = startYear+1
   
   ##############################################################################
-  # figure out if we did to flip the data over
+  # figure out if we did to flip the data over - we always want disturbance to be a negative delta
   # available spectral indices: ['NBR', -1], ['B5', 1], ['NDVI', -1], ['TCB', 1], ['NDSI', -1], ['TCG', -1], ['B3', 1]];
+  # TODO: need to error if the index is not found
   flippers = {
     'NBR' : -1,
     'B5'  :  1,
@@ -249,9 +194,10 @@ for i, segDir in enumerate(ltRunDirs):
     'TCG' : -1,
     'B3'  :  1,
     'NBRz':  1,
-    'ENC' :  1
+    'ENC' :  1,
+    'Band5z': 1
   }
-  flipper = flippers[indexID]*-1
+  flipper = flippers[indexID]*-1 # above are the flipper from LT-GEE - there dist is considered postive delta
   
   ##############################################################################
   # open inputs
