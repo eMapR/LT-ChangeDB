@@ -107,21 +107,19 @@ for i, changeDir in enumerate(ltRunDirs):
   if not os.path.isdir(vectorDirFull):
     os.makedirs(vectorDirFull)
 
-  
-###outDir = os.path.normpath(os.path.join(chunkDir, os.sep.join([os.pardir]*2), 'landtrendr', 'segmentation'))  
-
-                 
-  # make a patch raster file from years - event has to occur on the same year
-  patchMaskFile = os.path.join(vectorDirFull, vectorBname+'_patches.tif')#yodFile.replace('yrs.tif', 'patches.tif')
-  shutil.copyfile(yodFile, patchMaskFile)
-  
   # copy the change attributes file
   chngAttrFile = yodFile.replace('yrs.tif', 'attributes.csv')
-  # TODO deal with checking to see if exists
-  chngAttrFileCopy = os.path.join(vectorDirFull, os.path.basename(chngAttrFile))
+  if not os.path.exists(chngAttrFile):
+    sys.exit('ERROR: Could not find file: '+chngAttrFile+'.\Something might have gone wrong while running script: 05_extract_annual_change.py')  
+
+  chngAttrFileCopy = os.path.join(vectorDirFull, 'attributes.csv')
   shutil.copyfile(chngAttrFile, chngAttrFileCopy)
+                 
+  # make a patch raster file from years
+  patchMaskFile = os.path.join(vectorDirFull, 'patches.tif')
+  shutil.copyfile(yodFile, patchMaskFile)
   
-  
+
   print('    sieving to minimum mapping unit...')
   
   srcPatches = gdal.Open(patchMaskFile, gdal.GA_Update)
