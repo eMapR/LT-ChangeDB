@@ -61,9 +61,9 @@ for polyDir in ltRunDirs:
   if len(polyFiles) == 0:
     sys.exit('ERROR: There was no *.shp files in the folder selected.\nPlease fix this.')
   
-  attributeList = glob(os.path.join(polyDir,'*.csv'))
+  attributeList = glob(os.path.join(polyDir,'*attributes.csv'))
   
-  if len(attributeList) != 1:
+  if len(attributeList) == 0:
     sys.exit('ERROR: There was no *.csv file in the folder selected.\nPlease fix this.') 
   attributeList = attributeList[0]
   
@@ -83,33 +83,40 @@ for polyDir in ltRunDirs:
     sys.exit('ERROR: There are no rows in file '+attributeList+'.\nPlease fix this.')
   
   #check for annual - need to exist
-  annualAttr = attrList[attrList.iloc[:,3] == 'annual']
-  if annualAttr.shape[0] == 0:
-    sys.exit('ERROR: There are no "annual" rows in file '+attributeList+'.\nPlease fix this.')
+  annualAttr = attrList[(attrList.iloc[:,3] == 'annual') & (attrList.loc[:,6] == 1)]
+  #if annualAttr.shape[0] == 0:
+  #  sys.exit('ERROR: There are no "annual" rows in file '+attributeList+'.\nPlease fix this.')
     
   #check for dynamic  - need to exist
-  dynamicAttr = attrList[attrList.iloc[:,3] == 'dynamic']
-  if dynamicAttr.shape[0] == 0:
-    sys.exit('ERROR: There are no "dynamic" rows in file '+attributeList+'.\nPlease fix this.')
+  dynamicAttr = attrList[(attrList.iloc[:,3] == 'dynamic') & (attrList.loc[:,6] == 1)]
+  #if dynamicAttr.shape[0] == 0:
+  #  sys.exit('ERROR: There are no "dynamic" rows in file '+attributeList+'.\nPlease fix this.')
+  
+  #check for dynamic  - need to exist
+  staticAttr = attrList[(attrList.iloc[:,3] == 'static') & (attrList.loc[:,6] == 1)]
   
   # make a temp dir to hold the new files
   tmpDir = os.path.join(polyDir,'tmp')
   if not os.path.exists(tmpDir):
     os.mkdir(tmpDir) 
   
+  # get the run name # TODO: need to handle figuring out the run name better - this one we need to get from the dir name - in earlier steps we get it from the file basename
+  runName = os.path.basename(os.path.dirname(attributeList))
   # get file info
-  info = ltcdb.get_info(os.path.basename(attributeList))
+  info = ltcdb.get_info(runName)
   
   # set some var needed later
-  annualBandIndex =  ltcdb.year_to_band(os.path.basename(attributeList), 1) # adjust this by 1 band because disturbance layers start +1 year from time series start
-  dynamicBandIndex =  ltcdb.year_to_band(os.path.basename(attributeList), 0)
+  annualBandIndex =  ltcdb.year_to_band(runName, 1) # os.path.basename(attributeList)    # adjust this by 1 band because disturbance layers start +1 year from time series start
+  dynamicBandIndex =  ltcdb.year_to_band(runName, 0) # os.path.basename(attributeList)
   endYear = info['endYear']
   indexID = info['indexID']
   
   # loop through the polygons
   for fn, polyFile in enumerate(polyFiles):
-    #fn=7
-    #polyFile = polyFiles[7]
+    #fn=0
+    #polyFile = polyFiles[0]
+    
+    
     
     
     newPolyFile = os.path.join(tmpDir, os.path.basename(polyFile))
@@ -123,6 +130,8 @@ for polyDir in ltRunDirs:
       #print(attr.iloc[1])
       
       #attr = attrList[1,]
+      
+      # TODO: need to check to make sure that the file to summarize exits
       attrBname = attr.iloc[1]
       print('    attribute: '+attrBname)
       stats = zonal_stats(polyFile, attr.iloc[0], band=band, stats=['mean', 'std'])
@@ -183,15 +192,18 @@ for polyDir in ltRunDirs:
     # do the dynamic attributes
     for ri, attr in dynamicAttr.iterrows():
       #attr = dynamicAttr.iloc[0,:]
+      
+      # TODO: need to check to make sure that the file to summarize exits
+      
       if ri > 0:
         nextLine = '\n'
       else:
         nextLine = ''
       
       # make field names
-      pstRun = int(attr.iloc[6])
-      if pstRun == 0:
-        continue
+      #pstRun = int(attr.iloc[6]) # this is taken care of earlier on
+      #if pstRun == 0:
+      #  continue
       pstIntervals = attr.iloc[5].split('|')
       pstIntervalsLabel = [thisOne.zfill(2) for thisOne in pstIntervals]
       pstIntervalsInt = [int(thisOne) for thisOne in pstIntervals]
@@ -244,14 +256,73 @@ for polyDir in ltRunDirs:
       dataSource = None
   
   
-  shpFiles = glob(os.path.join(tmpDir,'*.shp'))     
   
-  # check if there are shpFiles
+  
+  
+    # do the static attributes
+    print('\n')
+    if staticAttr.shape[0] > 0:
+      fullDF = pd.DataFrame()
+      tempFile = os.path.join(os.path.dirname(newPolyFile), 'temp.shp')
+      for ri, attr in staticAttr.iterrows():
+        #print(attr.iloc[1])
+        
+        #attr = attrList[1,]
+        attrBname = attr.iloc[1]
+        print('    attribute: '+attrBname)
+        # TODO: need to check to make sure that the file to summarize exits
+        stats = zonal_stats(polyFile, attr.iloc[0], band=int(attr.iloc[5]), stats=['mean', 'std']) # TODO when the attribute table is read in set the column types so we don't need to specify type every time 
+        statsDF = pd.DataFrame.from_dict(stats).round().astype(int)
+        statsDF.columns = [attrBname+'Mn', attrBname+'Sd']
+        fullDF = pd.concat([fullDF, statsDF], axis=1)
+      
+  
+      with fiona.open(newPolyFile, 'r') as src:
+        # make a copy of the schema
+        schema = src.schema.copy()
+        
+        # add fields to the schema      
+        for col in fullDF.columns:
+          schema['properties'][col] = 'int:10'
+              
+        # copy info as template for the new polgon file
+        crs = src.crs
+        driver = src.driver
+  
+  
+          
+        # open the shapefile for writing to using info from the source polygon file # TODO: we're assuming that this new files exits, if it doesn't then we need to create a new file first
+        with fiona.open(tempFile, 'w', crs=crs, driver=driver, schema=schema) as poly:
+          # loop through all the features
+          for i, feature in enumerate(src):
+            # add all the attributes from the attribute list
+            for col in fullDF.columns:
+              feature['properties'][col] = fullDF.loc[i, col]  # this will add both the "mean" and "stDev"        
+                      
+            # write the feature to disk 
+            poly.write(feature)
+  
+      #replace the file 
+      tempFiles = glob(os.path.join(os.path.dirname(newPolyFile), '*temp*'))
+      newPolyFileBase = os.path.splitext(newPolyFile)[0]
+      replacements = [newPolyFileBase+os.path.splitext(thisOne)[1] for thisOne in tempFiles]
+      deleteThese = glob(newPolyFileBase+'*')
+      for thisOne in deleteThese:
+        os.remove(thisOne)
+      for old, new in zip(tempFiles,replacements):
+        os.rename(old, new)
+      
+      
+      
+
+
+  # find all the shapefiles that have been attributed 
+  shpFiles = glob(os.path.join(tmpDir,'*.shp'))     
   if len(shpFiles) == 0:
     sys.exit('ERROR: No .shp files were found in directory: '+tmpDir)
   
   # merge the polygons  
-  mergedPolyOutPath = os.path.join(tmpDir, os.path.splitext(os.path.basename(shpFiles[0]))[0][:-4]+'merged.shp')
+  mergedPolyOutPath = os.path.join(tmpDir, os.path.splitext(os.path.basename(shpFiles[0]))[0][:-4]+'all.shp')
   
   mergeCmd = 'ogr2ogr -f "ESRI Shapefile" ' + mergedPolyOutPath + ' ' + shpFiles[0]
   subprocess.call(mergeCmd, shell=True)
@@ -269,13 +340,15 @@ for polyDir in ltRunDirs:
     os.remove(fn)
     
 
-  # create/add to the database 
+  # create/add to the database
+  dbName = 'dist'
   if firstTime == 0:
-    changeDBfile = os.path.join(vectorDir,'lt_change_database.sqlite')
-    convertCmd = 'ogr2ogr -f "SQLite" -nlt PROMOTE_TO_MULTI -nln '+indexID+' -dsco SPATIALITE=YES ' + changeDBfile + ' ' + mergedPolyOutPath  
+    changeDBfile = mergedPolyOutPath.replace('.shp', '.sqlite')
+    #changeDBfile = os.path.join(polyDir,'lt_change_database.sqlite') #vectorDir
+    convertCmd = 'ogr2ogr -f "SQLite" -nlt PROMOTE_TO_MULTI -nln '+dbName+' -dsco SPATIALITE=YES ' + changeDBfile + ' ' + mergedPolyOutPath  
     firstTime += 1
   else:
-    convertCmd = 'ogr2ogr -f "SQLite" -nlt PROMOTE_TO_MULTI -nln '+indexID+' -dsco SPATIALITE=YES -update ' + changeDBfile + ' ' + mergedPolyOutPath  
+    convertCmd = 'ogr2ogr -f "SQLite" -nlt PROMOTE_TO_MULTI -nln '+dbName+' -dsco SPATIALITE=YES -update ' + changeDBfile + ' ' + mergedPolyOutPath  
 
   subprocess.call(convertCmd, shell=True)
   
