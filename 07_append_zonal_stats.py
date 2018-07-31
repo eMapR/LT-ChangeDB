@@ -116,12 +116,25 @@ for polyDir in ltRunDirs:
     #fn=0
     #polyFile = polyFiles[0]
     
-    
-    
-    
-    newPolyFile = os.path.join(tmpDir, os.path.basename(polyFile))
+    # get the year out
     year = int(os.path.splitext(os.path.basename(polyFile))[0][-4:])    
+    
+    # are there features to work on?
+    driver = ogr.GetDriverByName('ESRI Shapefile')
+    dataSource = driver.Open(polyFile, 0) # 0 means read-only. 1 means writeable.
+    layer = dataSource.GetLayer()
+    nFeatures = layer.GetFeatureCount()
+    layer = None
+    dataSource = None
+    if nFeatures == 0:
+      print('Skipping year: '+str(fn+1)+'/'+str(len(polyFiles))+' ('+str(year)+') - no polygon features')
+      continue
+    
     print('Working on year: '+str(fn+1)+'/'+str(len(polyFiles))+' ('+str(year)+')')
+    
+    
+    # define name of tmp polygom file
+    newPolyFile = os.path.join(tmpDir, os.path.basename(polyFile))
     
     # do the annual attributes, the id attributes, and the shape attributes - doing this through pandas and and
     band = annualBandIndex[year]
