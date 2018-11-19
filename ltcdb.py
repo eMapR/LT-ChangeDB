@@ -13,6 +13,7 @@ import os
 import numpy as np
 import sys
 import math
+import pandas as pd
 
 
 def make_output_blanks(inputFtv, outPuts, adj):
@@ -278,5 +279,10 @@ def is_success(cmdFailed):
     sys.exit('\nERROR: A command sent to an external program has failed.\nThe program may have printed a message above, please address the issue and re-run this script.')
 
 
-
+def save_metadata(inFile, outFile):
+  df = pd.read_csv(inFile).iloc[:, 1:-1]
+  df = pd.DataFrame.transpose(df)
+  labels = [i+':' for i in df.index]
+  df.index = labels
+  df.to_csv(outFile, ' ', header=False)
 
