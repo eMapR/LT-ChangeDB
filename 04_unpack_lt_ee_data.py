@@ -20,6 +20,7 @@ scriptAbsPath = os.path.abspath(__file__)
 scriptDname = os.path.dirname(scriptAbsPath)
 os.chdir(scriptDname)
 import ltcdb
+#reload(ltcdb)
 
 # get the head folder
 headDir = ltcdb.get_dir("Select the project head folder", scriptDname)
@@ -42,12 +43,15 @@ if len(tifs) == 0:
 startTime = time.time()
 
 # set the unique names 
-runNames = list(set(['-'.join(os.path.basename(fn).split('-')[0:6]) for fn in tifs])) 
-
+runNames = list(set(['-'.join(os.path.basename(fn).split('-')[0:8]) for fn in tifs])) 
 
 # loop through each unique names, find the matching set, merge them as vrt, and then decompose them
 for runName in runNames:
-
+  # get info about the GEE run
+  info = ltcdb.get_info(runName)  
+  runName = info['name']
+  proj = info['crs']
+  
   # make a dir to unpack the data
   thisOutDirPrep = os.path.join(ltcdb.dir_path(headDir, 'rP'), runName)
   if not os.path.exists(thisOutDirPrep):
@@ -65,15 +69,13 @@ for runName in runNames:
   if len(matches) == 0: 
     sys.exit('ERROR: Cannot find '+runName+'*LTdata*.tif files in this dir: '+chunkDir)
 
-
+  """
   # define the projection - get the first matched file and extract the crs from it
   proj = os.path.basename(matches[0]).split('-')[6]
   if proj[0:4] != 'EPSG':
     sys.exit('ERROR: Cannot parse the CRS properly from this file name: '+os.path.basename(matches[0])+'.\n')
-  proj = proj[0:4]+':'+proj[4:]
-  
-  
-  
+  proj = info
+  """
   
   # move and reproject the timesync files if there are any
   tsAoi = glob(os.path.join(chunkDir,runName+'*TSaoi.shp'))
@@ -93,7 +95,6 @@ for runName in runNames:
 
   # deal with the LT shapefile - find it reproject it to the vector folder
   ltAoi = glob(os.path.join(chunkDir,runName+'*LTaoi.shp'))
-  
   if len(ltAoi) != 0:
     outShpFile = os.path.join(ltcdb.dir_path(headDir, 'v'), runName+'-LTaoi.shp')
     if not os.path.exists(outShpFile):
@@ -112,9 +113,6 @@ for runName in runNames:
   else:
     sys.exit('ERROR: Can\'t find the metadata file that is suppose to be with the data downloaded from Google Drive')
   
-  # get info about the GEE run
-  info = ltcdb.get_info(runName)
-
   # make a master vrt
   masterVrtFile = os.path.normpath(os.path.join(thisOutDirPrep, runName+'.vrt'))
   ltcdb.make_vrt(matches, masterVrtFile)
@@ -208,7 +206,6 @@ for runName in runNames:
     cmd = 'gdal_rasterize -q -i -burn -9999 '+bands+' '+outShpFile+' '+outFile
     cmdFailed = subprocess.call(cmd, shell=True)
     ltcdb.is_success(cmdFailed)
-
 
     # clear the dir for the next data
     deleteThese = glob(thisOutDirPrep+'/*'+os.path.splitext(outTypes[i])[0]+'*')
