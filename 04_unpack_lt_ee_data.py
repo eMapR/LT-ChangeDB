@@ -103,6 +103,14 @@ for runName in runNames:
   else:
     sys.exit('ERROR: Can\'t find the shapefile that is suppose to be with the data downloaded from Google Drive')
 
+  # format the metadata file
+  ltMeta = glob(os.path.join(chunkDir,runName+'*runInfo.csv'))
+  if len(ltMeta) != 0:
+    ltMetaOut = os.path.join(headDir, runName+'-runInfo.txt')
+    if not os.path.exists(ltMetaOut):
+      ltcdb.save_metadata(ltMeta[0], ltMetaOut)
+  else:
+    sys.exit('ERROR: Can\'t find the metadata file that is suppose to be with the data downloaded from Google Drive')
   
   # get info about the GEE run
   info = ltcdb.get_info(runName)
