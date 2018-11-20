@@ -207,6 +207,36 @@ for runName in runNames:
     for this in deleteThese:
       os.remove(this)
 
+  # clear the dir for the next data
+  deleteThese = glob(thisOutDirPrep+'/*')
+  for this in deleteThese:
+    os.remove(this)
+
+  # unpack the clear pixel file
+  clearPixelData = glob(os.path.join(chunkDir,runName+'*ClearPixelCount*.tif'))
+  if len(clearPixelData) != 0:
+    outFile = os.path.normpath(os.path.join(thisOutDir, runName+'-ClearPixelCount.tif'))
+    print('   Unpacking file: ')
+    print('      '+os.path.basename(outFile))
+    vrtFile = outFile.replace('.tif', '.vrt') #os.path.normpath(os.path.join(thisOutDirPrep, runName+'-ClearPixelCount.vrt'))
+    ltcdb.make_vrt(clearPixelData, vrtFile)
+    cmd = 'gdal_translate -q -of GTiff -a_nodata -9999 -a_srs ' + proj + ' -projwin ' + projwin + ' ' + vrtFile + ' ' + outFile #
+    cmdFailed = subprocess.call(cmd, shell=True)
+    ltcdb.is_success(cmdFailed)
+
+    # make background values -9999
+    nBands = gdal.Open(outFile).RasterCount
+    bands = ' '.join(['-b '+str(band) for band in range(1,nBands+1)])
+    cmd = 'gdal_rasterize -q -i -burn -9999 '+bands+' '+outShpFile+' '+outFile
+    cmdFailed = subprocess.call(cmd, shell=True)
+    ltcdb.is_success(cmdFailed)
+
+    # clear the dir for the next data
+    deleteThese = glob(thisOutDirPrep+'/*')
+    for this in deleteThese:
+      os.remove(this)
+
+
   # find the vert_yrs file as a template
   vertYrsFile = glob(os.path.join(thisOutDir,'*vert_yrs.tif'))
   if len(vertYrsFile) == 0:
@@ -333,8 +363,5 @@ for runName in runNames:
 
 print('\nDone!')      
 print("LT-GEE data unpacking took {} minutes".format(round((time.time() - startTime)/60, 1)))
-
-  
-# TODO: delete the contents of the prep folder
     
       

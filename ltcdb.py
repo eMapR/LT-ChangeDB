@@ -53,9 +53,9 @@ def make_output_blanks(inputFtv, outPuts, adj):
 
 def get_info(name):
   pieces = name.split('-')[0:8]
-  crs = pieces[6]
+  crs = pieces[7]
   crs = crs[0:4]+':'+crs[4:]
-  del pieces[6]
+  del pieces[7]
   return {'key': pieces[0],
           'value': pieces[1],
           'indexID': pieces[2],
