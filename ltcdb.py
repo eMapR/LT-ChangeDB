@@ -291,3 +291,23 @@ def save_metadata(inFile, outFile):
   df.index = labels
   df.to_csv(outFile, ' ', header=False)
 
+def calc_delta(ftvFile, deltaFile):
+  srcFtv = gdal.Open(ftvFile)
+  srcDelta = gdal.Open(deltaFile, 1)
+  nBands = srcFtv.RasterCount
+ 
+  for b in range(0,nBands):     
+    if b == 0:
+      former = srcFtv.GetRasterBand(1).ReadAsArray()
+      latter = former 
+      delta = np.subtract(latter, former)
+    else:
+      former = srcFtv.GetRasterBand(b).ReadAsArray()
+      latter = srcFtv.GetRasterBand(b+1).ReadAsArray() 
+      delta = np.subtract(latter, former)
+      
+    outBand = srcDelta.GetRasterBand(b+1)
+    outBand.WriteArray(delta)
+  
+  srcFtv = None
+  srcDelta = None

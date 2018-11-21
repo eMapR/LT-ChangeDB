@@ -242,12 +242,40 @@ for runName in runNames:
       os.remove(this)
 
 
+
   # find the vert_yrs file as a template
   vertYrsFile = glob(os.path.join(thisOutDir,'*vert_yrs.tif'))
   if len(vertYrsFile) == 0:
     sys.exit('\nERROR: Can\'t find *vert_yrs.tif files in this dir: '+thisOutDir)
   vertYrsFile = vertYrsFile[0]
 
+  ##########################################################################################################
+  ######## MAKE THE *delta.tif FILES
+  ##########################################################################################################
+
+  # make names for the delta tc files
+  ftvTCBfitDeltaFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcb_delta.tif')
+  ftvTCGfitDeltaFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcg_delta.tif')
+  ftvTCWfitDeltaFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcw_delta.tif')
+  outPutsDelta = [ftvTCBfitDeltaFile, ftvTCGfitDeltaFile, ftvTCWfitDeltaFile]
+  
+  # get the names of the ftv files
+  ftvTCBfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcb.tif')
+  ftvTCGfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcg.tif')
+  ftvTCWfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcw.tif')
+
+  # make copies of ftv files for writing delta to
+  for outPutDelta in outPutsDelta:
+    copyfile(ftvTCBfitFile, outPutDelta)
+  
+  print('   Creating TC ftv delta data')
+  print('      '+os.path.basename(ftvTCBfitDeltaFile))
+  ltcdb.calc_delta(ftvTCBfitFile, ftvTCBfitDeltaFile)
+  print('      '+os.path.basename(ftvTCGfitDeltaFile))
+  ltcdb.calc_delta(ftvTCGfitFile, ftvTCGfitDeltaFile)
+  print('      '+os.path.basename(ftvTCWfitDeltaFile))
+  ltcdb.calc_delta(ftvTCWfitFile, ftvTCWfitDeltaFile)
+  
   ##########################################################################################################
   ######## MAKE THE vert_fit_tc* FILES
   ##########################################################################################################
@@ -272,11 +300,7 @@ for runName in runNames:
   # open the vertYrs file for read - so w eknow what years to pull out of the TC FTV stacks
   srcYrs = gdal.Open(vertYrsFile, gdal.GA_ReadOnly)
   
-  # read in the TC FTV stacks (all years)
-  ftvTCBfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcb.tif')
-  ftvTCGfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcg.tif')
-  ftvTCWfitFile = vertYrsFile.replace('vert_yrs.tif', 'ftv_tcw.tif')
-  
+  # read in the TC FTV stacks (all years)  
   srcFtvTCB = gdal.Open(ftvTCBfitFile, gdal.GA_ReadOnly)
   srcFtvTCG = gdal.Open(ftvTCGfitFile, gdal.GA_ReadOnly)
   srcFtvTCW = gdal.Open(ftvTCWfitFile, gdal.GA_ReadOnly)
