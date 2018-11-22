@@ -295,7 +295,8 @@ def calc_delta(ftvFile, deltaFile):
   srcFtv = gdal.Open(ftvFile)
   srcDelta = gdal.Open(deltaFile, 1)
   nBands = srcFtv.RasterCount
- 
+  noDataMask = np.where(srcFtv.GetRasterBand(1).ReadAsArray() == -9999)
+  
   for b in range(0,nBands):     
     if b == 0:
       former = srcFtv.GetRasterBand(1).ReadAsArray()
@@ -306,7 +307,9 @@ def calc_delta(ftvFile, deltaFile):
       latter = srcFtv.GetRasterBand(b+1).ReadAsArray() 
       delta = np.subtract(latter, former)
       
+    delta[noDataMask] = -9999  
     outBand = srcDelta.GetRasterBand(b+1)
+    outBand.SetNoDataValue(-9999)
     outBand.WriteArray(delta)
   
   srcFtv = None
