@@ -220,10 +220,10 @@ for runName in runNames:
   # unpack the clear pixel file
   clearPixelData = glob(os.path.join(chunkDir,runName+'*ClearPixelCount*.tif'))
   if len(clearPixelData) != 0:
-    outFile = os.path.normpath(os.path.join(thisOutDir, runName+'-ClearPixelCount.tif'))
+    outFile = os.path.normpath(os.path.join(thisOutDir, runName+'-clear_pixel_count.tif'))
     print('   Unpacking file: ')
     print('      '+os.path.basename(outFile))
-    vrtFile = outFile.replace('.tif', '.vrt') #os.path.normpath(os.path.join(thisOutDirPrep, runName+'-ClearPixelCount.vrt'))
+    vrtFile = os.path.normpath(os.path.join(thisOutDirPrep, runName+'-clear_pixel_count.vrt')) #outFile.replace('.tif', '.vrt') #
     ltcdb.make_vrt(clearPixelData, vrtFile)
     cmd = 'gdal_translate -q -of GTiff -a_nodata -9999 -a_srs ' + proj + ' -projwin ' + projwin + ' ' + vrtFile + ' ' + outFile #
     cmdFailed = subprocess.call(cmd, shell=True)
