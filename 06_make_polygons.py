@@ -11,6 +11,7 @@ from osgeo import gdal, ogr, osr
 import sys
 import shutil
 from glob import glob
+import subprocess
 
 
 # change working directory to this script's dir so we can load the ltcdb library
@@ -28,6 +29,28 @@ changeDir = ltcdb.dir_path(headDir, 'rLc')
 
 # get the various run dirs
 ltRunDirs = [os.path.join(changeDir, thisRunDir) for thisRunDir in os.listdir(changeDir)]
+ltRunDirsBase = [os.path.basename(thisRunDir) for thisRunDir in ltRunDirs]
+
+print('\nHere is the list of raster change definitions:')
+for i, thisOne in enumerate(ltRunDirsBase):
+  print(str(i+1)+': '+thisOne)
+
+changeDirIndexGood = 0
+while changeDirIndexGood is 0:
+  changeDirIndex = raw_input('\nWhich one would you like to convert to polygons (enter the number): ')
+  try:
+    changeDirIndex = int(changeDirIndex)
+    changeDirIndex -= 1
+    changeDirIndexGood = 1
+    if changeDirIndex not in range(len(ltRunDirsBase)):
+      print('\nERROR: The selected value is outside the valid range.')
+      print('       Please try again and make sure to enter a valid selection.')
+      changeDirIndexGood = 0
+  except ValueError: 
+    print('\nERROR: The selected value cannot be converted to an integer.')
+    print('       Please try again and make sure to enter a number.')
+
+
 
 
 
@@ -45,12 +68,13 @@ if len(changeDir.split('-')) is not 6:
            'Please re-run the script and select a different folder.')
 """
 
+ltRunDirs = [ltRunDirs[changeDirIndex]]
 mmus = []
 for changeDir in ltRunDirs:
   # get the mmu
   mmuGood = 0
   while mmuGood is 0:
-    mmu = raw_input('\nRegarding LT run: '+os.path.basename(changeDir) + '\nWhat is the desired minimum mapping unit in pixels per patch: ')
+    mmu = raw_input('\n\nRegarding raster change definition: '+os.path.basename(changeDir) + '\nWhat is the desired minimum mapping unit in pixels per patch: ')
     try:
       mmu = int(mmu)
       mmuGood = 1
@@ -60,14 +84,15 @@ for changeDir in ltRunDirs:
   
   mmus.append(mmu)
 
-  
+
+
     
 # get the connected
 connectednesses = []
 for changeDir in ltRunDirs:
   connectednessGood = 0
   while connectednessGood is 0:
-    connectedness = raw_input('\nRegarding LT run: '+os.path.basename(changeDir) + '\nShould diagonal adjacency warrant pixel inclusion in patches? - yes or no: ').lower().strip()
+    connectedness = raw_input('\n\nRegarding raster change definition: '+os.path.basename(changeDir) + '\nShould diagonal adjacency warrant pixel inclusion in patches? - yes or no: ').lower().strip()
     if connectedness not in ['yes', 'no']:
       print('\nERROR: The given entry was not yes or no.')
       print('       Please type either: yes or no.\n')
@@ -79,8 +104,10 @@ for changeDir in ltRunDirs:
       connectednessGood = 1
   connectednesses.append(connectedness) 
 
+
+
 for i, changeDir in enumerate(ltRunDirs):
-  print('\n\nWorking on LT run: ' + os.path.basename(changeDir))
+  print('\n\nWorking on raster change definition: ' + os.path.basename(changeDir))
   # get the year of detection file - will patchify this
   yodFile = glob(os.path.join(changeDir,'*yrs.tif'))
   if len(yodFile) == 0:
@@ -98,14 +125,18 @@ for i, changeDir in enumerate(ltRunDirs):
   info = ltcdb.get_info(os.path.basename(yodFile))
   
   # figure out the vector path
-  bname = info['name']
-  vectorBnameDir = bname+'-dist_info_'+str(mmu)+'mmu_'+str(connectedness)+'con'#+'nbr' #os.path.join(polyDir, 'ltee_mora_'+str(mmu)+'mmu_annual_dist.shp') # this should be set  !!!!USED TO BE: vectorBname
-  vectorBname = 'dist' # TODO: this can change to grow, if we switch to mapping growth
+  #TODO: add the changeDir name to the info getter/printer
+  bname = os.path.basename(changeDir) #info['name']
+  vectorBnameDir = bname+'-'+str(mmu)+'mmu_'+str(connectedness)+'con'#+'nbr' #os.path.join(polyDir, 'ltee_mora_'+str(mmu)+'mmu_annual_dist.shp') # this should be set  !!!!USED TO BE: vectorBname
+  vectorBname = 'change' # TODO: this can change to grow, if we switch to mapping growth
   
   vectorDirFull = os.path.join(headDir, 'vector', 'change', vectorBnameDir)
   #vectorDirFullBlank = os.path.join(vectorDirFull, 'blank')  # not used ???
-  if not os.path.isdir(vectorDirFull):
+  if os.path.exists(vectorDirFull):
+    sys.exit('\nERROR: Directory '+vectorDirFull+' already exits.\n       Please re-run with different MMU and/or connectivity, if so desired.')
+  else:
     os.makedirs(vectorDirFull)
+  
 
   # copy the change attributes file
   chngAttrFile = yodFile.replace('yrs.tif', 'attributes.csv')
@@ -150,19 +181,16 @@ for i, changeDir in enumerate(ltRunDirs):
   drv = ogr.GetDriverByName('ESRI shapefile')
   
 
-  
-  #mergedPolyOutPath = os.path.join(vectorDirFull, vectorBname+'_merged.shp') #os.path.join(polyDir, 'ltee_mora_'+str(mmu)+'mmu_annual_dist.shp') # this should be set
   dst_layername = 'out'
   dst_fieldname = 'yod'
   
 
-
-  
   # loop through bands
+  mergedPolyOutPath = os.path.join(vectorDirFull, '_'+vectorBname+'_merged.shp')
   for band, year in enumerate(range(info['startYear']+1,info['endYear']+1)):  
     band += 1
     print('        working on year: '+str(band)+'/'+str(nBands)+' ('+str(year)+')')
-    polyFile = os.path.join(vectorDirFull, vectorBname+str(year)+'.shp')  #os.path.join(polyDir, info['name']+'-'+str(year)+'.shp')
+    polyFile = os.path.join(vectorDirFull, vectorBname+'_'+str(year)+'.shp')  #os.path.join(polyDir, info['name']+'-'+str(year)+'.shp')
     srcBand = srcPatches.GetRasterBand(band)
     maskBand = srcBand
     
@@ -181,18 +209,35 @@ for i, changeDir in enumerate(ltRunDirs):
     dstPoly = None
      
     # merge the polygons
-    #if band == 1:
-    #  mergeCmd = 'ogr2ogr -f "ESRI Shapefile" ' + mergedPolyOutPath + ' ' + polyFile
-    #else:
-    #  mergeCmd = 'ogr2ogr -f "ESRI Shapefile" -append -update ' + mergedPolyOutPath + ' ' + polyFile  
-    #subprocess.call(mergeCmd, shell=True)
+    if band == 1:
+      mergeCmd = 'ogr2ogr -f "ESRI Shapefile" ' + mergedPolyOutPath + ' ' + polyFile
+    else:
+      mergeCmd = 'ogr2ogr -f "ESRI Shapefile" -append -update ' + mergedPolyOutPath + ' ' + polyFile  
+    subprocess.call(mergeCmd, shell=True)
     
   # close the files
   srcPatches = None
   
+  """
+  # find the annual files and merge them 
+  shpFiles = glob(os.path.join(vectorBnameDir,'*.shp'))     
+  if len(shpFiles) == 0:
+    sys.exit('ERROR: No .shp files were found in directory: '+vectorBnameDir)
+  
+  # merge the polygons  
+  mergedPolyOutPath = os.path.join(vectorBnameDir, os.path.splitext(os.path.basename(shpFiles[0]))[0][:-4]+'all.shp')
+  
+  mergeCmd = 'ogr2ogr -f "ESRI Shapefile" ' + mergedPolyOutPath + ' ' + shpFiles[0]
+  subprocess.call(mergeCmd, shell=True)
+  
+  for i in range(1,len(shpFiles)):
+    mergeCmd = 'ogr2ogr -f "ESRI Shapefile" -append -update ' + mergedPolyOutPath + ' ' + shpFiles[i]  
+    subprocess.call(mergeCmd, shell=True)
+  
+  
   # remove the individual year files
   #shutil.rmtree(polyDir)
-  
+  """
 print('\n\nDone!')      
 print("Polygon creation took {} minutes".format(round((time.time() - startTime)/60, 1)))  
-  
+

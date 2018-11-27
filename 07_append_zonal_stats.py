@@ -39,11 +39,40 @@ if not os.path.isdir(vectorDir):
 #segDir = r'D:\work\proj\al\gee_test\test\raster\landtrendr\segmentation'
 ltRunDirs = [os.path.join(vectorDir, thisRunDir) for thisRunDir in os.listdir(vectorDir)]
 
-# make sure the dirs exist
+ltRunDirsBase = [os.path.basename(thisRunDir) for thisRunDir in ltRunDirs]
+
+print('\nHere is the list of vector change definitions:')
+for i, thisOne in enumerate(ltRunDirsBase):
+  print(str(i+1)+': '+thisOne)
+
+changeDirIndexGood = 0
+while changeDirIndexGood is 0:
+  changeDirIndex = raw_input('\nWhich one would you like to append zonal statistics to (enter the number): ')
+  try:
+    changeDirIndex = int(changeDirIndex)
+    changeDirIndex -= 1
+    changeDirIndexGood = 1
+    if changeDirIndex not in range(len(ltRunDirsBase)):
+      print('\nERROR: The selected value is outside the valid range.')
+      print('       Please try again and make sure to enter a valid selection.')
+      changeDirIndexGood = 0
+  except ValueError: 
+    print('\nERROR: The selected value cannot be converted to an integer.')
+    print('       Please try again and make sure to enter a number.')
+
+# index out the one requested
+ltRunDirs = [ltRunDirs[changeDirIndex]]
+
+mergeFiles = glob(os.path.join(ltRunDirs[0],'*merged*')) 
+if len(mergeFiles) == 0:
+  sys.exit('\nERROR: The selected polygon definition: '+ltRunDirs[0]+'\nhas already had zonal statistics appended.')
+
+
+
+# make sure the dirs exists - TODO: seems like this is not needed - the dir has already been found
 for polyDir in ltRunDirs:
   if not os.path.isdir(polyDir):
-    sys.exit('ERROR: Can\'t find the polygon folder.\nTrying to find it at this location: '+polyDir+'\nIt\'s possible you did not run the 06_make_polygons.py file.\nPlease run the script and try again.')
-
+    sys.exit('\nERROR: Can\'t find the polygon folder.\nTrying to find it at this location: '+polyDir+'\nIt\'s possible you did not run the 06_make_polygons.py file.\nPlease run the script and try again.')
 
 startTime = time.time()
 
@@ -57,14 +86,14 @@ for polyDir in ltRunDirs:
   
   
   # get the annual polygon files
-  polyFiles = glob(os.path.join(polyDir,'*.shp'))
+  polyFiles = glob(os.path.join(polyDir,'change*.shp'))
   if len(polyFiles) == 0:
-    sys.exit('ERROR: There was no *.shp files in the folder selected.\nPlease fix this.')
+    sys.exit('\nERROR: There was no *.shp files in the folder selected.\nPlease fix this.')
   
   attributeList = glob(os.path.join(polyDir,'*attributes.csv'))
   
   if len(attributeList) == 0:
-    sys.exit('ERROR: There was no *.csv file in the folder selected.\nPlease fix this.') 
+    sys.exit('\nERROR: There was no *.csv file in the folder selected.\nPlease fix this.') 
   attributeList = attributeList[0]
   
   # get the attribute list file
@@ -80,7 +109,7 @@ for polyDir in ltRunDirs:
   attrList = pd.read_csv(attributeList, header=None)
   #attrList = np.genfromtxt(attributeList, delimiter=',', dtype='object')
   if attrList.shape[0] == 0:
-    sys.exit('ERROR: There are no rows in file '+attributeList+'.\nPlease fix this.')
+    sys.exit('\nERROR: There are no rows in file '+attributeList+'.\nPlease fix this.')
   
   #check for annual - need to exist
   annualAttr = attrList[(attrList.iloc[:,3] == 'annual') & (attrList.loc[:,6] == 1)]
@@ -110,6 +139,7 @@ for polyDir in ltRunDirs:
   dynamicBandIndex =  ltcdb.year_to_band(runName, 0) # os.path.basename(attributeList)
   endYear = info['endYear']
   indexID = info['indexID']
+  version = info['version']
   
   # loop through the polygons
   for fn, polyFile in enumerate(polyFiles):
@@ -162,7 +192,7 @@ for polyDir in ltRunDirs:
       # add fields to the schema
       schema['properties']['index'] = 'str:10'
       schema['properties']['annualID'] = 'int:10'
-      schema['properties']['uniqID'] = 'str:20'
+      schema['properties']['uniqID'] = 'str:30'
       
       for col in fullDF.columns:
         schema['properties'][col] = 'int:6'
@@ -187,7 +217,7 @@ for polyDir in ltRunDirs:
           annualID = i+1
           feature['properties']['annualID'] = annualID 
           feature['properties']['index'] = indexID
-          feature['properties']['uniqID'] = indexID+str(year)+str(annualID)
+          feature['properties']['uniqID'] = indexID+'_'+version+'_'+str(year)+'_'+str(annualID)
           
           # add the shape attributes
           geom = shape(feature['geometry'])
@@ -334,8 +364,11 @@ for polyDir in ltRunDirs:
   if len(shpFiles) == 0:
     sys.exit('ERROR: No .shp files were found in directory: '+tmpDir)
   
+  # sort the list
+  shpFiles.sort()
+  
   # merge the polygons  
-  mergedPolyOutPath = os.path.join(tmpDir, os.path.splitext(os.path.basename(shpFiles[0]))[0][:-4]+'all.shp')
+  mergedPolyOutPath = os.path.join(tmpDir, 'changeDB.shp')
   
   mergeCmd = 'ogr2ogr -f "ESRI Shapefile" ' + mergedPolyOutPath + ' ' + shpFiles[0]
   subprocess.call(mergeCmd, shell=True)
@@ -354,7 +387,8 @@ for polyDir in ltRunDirs:
     
 
   # create/add to the database
-  dbName = 'dist'
+  dbName = 'change'
+  """
   if firstTime == 0:
     changeDBfile = mergedPolyOutPath.replace('.shp', '.sqlite')
     #changeDBfile = os.path.join(polyDir,'lt_change_database.sqlite') #vectorDir
@@ -362,9 +396,11 @@ for polyDir in ltRunDirs:
     firstTime += 1
   else:
     convertCmd = 'ogr2ogr -f "SQLite" -nlt PROMOTE_TO_MULTI -nln '+dbName+' -dsco SPATIALITE=YES -update ' + changeDBfile + ' ' + mergedPolyOutPath  
-
+  """
+  changeDBfile = mergedPolyOutPath.replace('.shp', '.sqlite')
+  convertCmd = 'ogr2ogr -f "SQLite" -nlt PROMOTE_TO_MULTI -nln '+dbName+' -dsco SPATIALITE=YES -lco SPATIAL_INDEX=NO ' + changeDBfile + ' ' + mergedPolyOutPath  
   subprocess.call(convertCmd, shell=True)
-  
+
   # move the filled polys
   shpFiles = glob(os.path.join(tmpDir,'*'))     
   newShpFiles = [os.path.join(polyDir, os.path.basename(fn)) for fn in shpFiles]
@@ -373,6 +409,14 @@ for polyDir in ltRunDirs:
     
   os.rmdir(tmpDir)
   
+  #remove the _merge file
+  mergeFiles = glob(os.path.join(polyDir,'*merged*'))     
+  for fn in mergeFiles:
+    os.remove(fn)
+
+  # write a file to know that zonal stats have been appended - don't need this since we know that if *merged* does not exist, stats have been appended
+  #with open(os.path.join(polyDir, 'stats_appended.txt'), 'w') as the_file:
+  #  the_file.write('zonal stats have been appended to all polygon files in this directory\n')
 
 print('\nDone!')      
 print("Appending zonal stats took {} minutes".format(round((time.time() - startTime)/60, 1)))  
