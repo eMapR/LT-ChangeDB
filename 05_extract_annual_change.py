@@ -32,44 +32,58 @@ changeDir = ltcdb.dir_path(headDir, 'rLc')
 ltRunDirs = [os.path.join(segDir, thisRunDir) for thisRunDir in os.listdir(segDir)]
 
 # get the min change for each 
+changeTypes = []
 minMags = []
 for segDir in ltRunDirs:
   # get the min mag
+  changeTypeGood = 0
+  while changeTypeGood is 0:
+    changeType = raw_input('\nRegarding LT run: '+os.path.basename(segDir) + '\nWhat change do you want to map (disturbance or growth)?: ')
+    changeType = str(changeType).lower()
+    if changeType in ['growth', 'disturbance']:
+      changeTypeGood = 1
+      minMagAdj = 1 if changeType == 'disturbance' else -1
+    else:
+      print('\n')
+      print('ERROR: The selected change type does not equal either disturbance or growth.')
+      print('       Please try again and make sure to enter only a single accepted option.')
+  changeTypes.append(changeType)
+
   minMagGood = 0
   while minMagGood is 0:
-    minMag = raw_input('\nRegarding LT run: '+os.path.basename(segDir) + '\nWhat is the desired minimum disturbance magnitude: ')
+    minMag = raw_input('\nRegarding LT run: '+os.path.basename(segDir) + '\nWhat is the desired minimum change magnitude: ')
     try:
       minMag = int(minMag)
-      minMag = abs(minMag) * -1
+      minMag = abs(minMag) * -1 * minMagAdj
       minMagGood = 1
     except ValueError: 
       print('\n')
       print('ERROR: The selected value cannot be converted to an integer.')
       print('       Please try again and make sure to enter a number.')
-  
   minMags.append(minMag)
-
+  
 
 
 # iterate through each run
 for i, segDir in enumerate(ltRunDirs):
   #i=0
   #segDir = ltRunDirs[0]
-  
-  
+
   print('\n\nWorking on LT run: ' + os.path.basename(segDir))
   
   # get the vert_yrs.tif
   vertYrsFile = glob(segDir+'/*vert_yrs.tif')
   if len(vertYrsFile) == 0:
-    sys.exit('ERROR: There was no *vert_yrs.tif file in the folder selected.\nPlease fix this.')   # TODO make this a better error message
+    sys.exit('\nERROR: There was no *vert_yrs.tif file in the folder selected.\n       Please fix this.')   # TODO make this a better error message
   vertYrsFile = vertYrsFile[0]
   #TODO need to deal with multiple finds
   
-  # make a change output dir for this run  
-  bname = os.path.basename(segDir)
+  # make a change output dir for this run
+  bname = os.path.basename(segDir)+'-'+changeTypes[i]+'_'+str(abs(minMags[i]))
   outDir = os.path.join(changeDir, bname)
-  if not os.path.exists(outDir):
+  if os.path.exists(outDir):
+    sys.exit('\nERROR: Directory '+outDir+' already exits.\n       Please re-run with different change type and/or magnitude, if so desired.')
+  else:
     os.makedirs(outDir)
   
   
@@ -84,9 +98,6 @@ for i, segDir in enumerate(ltRunDirs):
   #TODO need to error check for existence of all files that we just identified names for
   if not os.path.exists(vertFitTCBFile): #vertFitIDXFile
     sys.exit('ERROR: There was no *vert_fit_tcb.tif file in the folder selected.\nPlease fix this.') 
-  
-  # get the min mag for this run
-  minMag = minMags[i]
   
   # start tracking time
   startTime = time.time()
@@ -327,7 +338,11 @@ for i, segDir in enumerate(ltRunDirs):
           segMagIDX = ltcdb.get_delta(vertValsIDX)
           
           # figure out which segs are disturbance
-          distIndex = np.where(segMagIDX < minMag)[0] # why have to index 0?
+          if changeTypes[i] == 'disturbance':
+            distIndex = np.where(segMagIDX < minMags[i])[0] # why have to index 0?
+          else:
+            distIndex = np.where(segMagIDX > minMags[i])[0] # why have to index 0?
+
           
           # check to see if there are any disturbances
           if len(distIndex) == 0:
