@@ -1,0 +1,31 @@
+name: LandTrendrPyEnv
+version: 0.3
+
+install_in_dependency_order: True
+
+channels:
+  - https://conda.anaconda.org/conda-forge/
+  - http://repo.anaconda.com/pkgs/main/
+  - https://conda.anaconda.org/IOOS/
+  
+specs:
+  - python 2.7*
+  - conda [win]
+  - pandas [win]
+  - gdal [win] 
+  - https://conda.anaconda.org/conda-forge/win-64/rasterstats-0.12.0-py27_0.tar.bz2
+  - https://conda.anaconda.org/IOOS/win-64/rasterio-1.0a2-np111py27_0.tar.bz2
+  - shapely [win]
+  - fiona [win]
+
+register_python_default: False
+
+add_to_path_default: False
+
+ignore_duplicate_files: True
+
+welcome_image: img.jpg
+
+header_image: img.jpg
+
+icon_image: img.jpg
