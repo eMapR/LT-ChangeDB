@@ -52,21 +52,36 @@ def make_output_blanks(inputFtv, outPuts, adj):
 
 
 def get_info(name):
-  pieces = name.split('-')[0:8]
-  crs = pieces[7]
-  crs = crs[0:4]+':'+crs[4:]
-  del pieces[7]
-  return {'key': pieces[0],
-          'value': pieces[1],
-          'indexID': pieces[2],
-          'nVert': int(pieces[3]),
-          'startYear':int(pieces[4][0:4]),
-          'endYear':int(pieces[4][4:8]),
-          'startDay':pieces[5][0:4],
-          'endDay':pieces[5][4:8],
-          'crs':crs,
-          'version':pieces[6],
-          'name': '-'.join(pieces)}
+  pieces = name.split('-')
+  if len(pieces) >= 8:
+    pieces = pieces[0:8]
+    crs = pieces[7]
+    crs = crs[0:4]+':'+crs[4:]
+    del pieces[7]
+    info = {'key': pieces[0],
+            'value': pieces[1],
+            'indexID': pieces[2],
+            'nVert': int(pieces[3]),
+            'startYear':int(pieces[4][0:4]),
+            'endYear':int(pieces[4][4:8]),
+            'startDay':pieces[5][0:4],
+            'endDay':pieces[5][4:8],
+            'crs':crs,
+            'version':pieces[6],
+            'name': '-'.join(pieces)}
+  else:
+    pieces = pieces[0:7]
+    info = {'key': pieces[0],
+            'value': pieces[1],
+            'indexID': pieces[2],
+            'nVert': int(pieces[3]),
+            'startYear':int(pieces[4][0:4]),
+            'endYear':int(pieces[4][4:8]),
+            'startDay':pieces[5][0:4],
+            'endDay':pieces[5][4:8],
+            'version':pieces[6],
+            'name': '-'.join(pieces)}
+  return info
 
  
 def write_array(dsOut, band, data, x, y):
@@ -256,6 +271,7 @@ def dir_path(headDir, path):
     'tsR':os.path.join(headDir, 'timesync', 'raster'),
     'tsP':os.path.join(headDir, 'timesync', 'prep'),
     'tsV':os.path.join(headDir, 'timesync', 'vector'),
+    'vid':os.path.join(headDir, 'video'),
     'r':os.path.join(headDir, 'raster'),
     'v':os.path.join(headDir, 'vector'),
     's':os.path.join(headDir, 'scripts'),
