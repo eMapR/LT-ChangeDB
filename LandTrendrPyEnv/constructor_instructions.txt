@@ -1,0 +1,14 @@
+# extensive info on testing and building: https://docs.google.com/document/d/1JRZ_b4ep6B2WoCt-fh-HZNu-5UIxtYHaGVKXXNBVRJk/edit?usp=sharing
+
+# cd to dir where all the files are
+
+D:
+cd \work\code_library\LT-ChangeDB\LandTrendrPyEnv
+
+# do a dry run
+constructor . --dry-run -v
+
+# do the actual run
+constructor . --output-dir=D:\work\code_library\LT-ChangeDB\Utilities
+
+
