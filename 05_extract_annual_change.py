@@ -34,6 +34,7 @@ ltRunDirs = [os.path.join(segDir, thisRunDir) for thisRunDir in os.listdir(segDi
 # get the min change for each 
 changeTypes = []
 minMags = []
+collapseEm = []
 for segDir in ltRunDirs:
   # get the min mag
   changeTypeGood = 0
@@ -61,6 +62,18 @@ for segDir in ltRunDirs:
       print('ERROR: The selected value cannot be converted to an integer.')
       print('       Please try again and make sure to enter a number.')
   minMags.append(minMag)
+  
+  collapseGood = 0
+  while collapseGood is 0:
+    collapse = raw_input('\nRegarding LT run: '+os.path.basename(segDir) + '\nMaximum segment slope difference to collapse (-1 to ignore): ')
+    try:
+      collapse = float(minMag)
+      collapseGood = 1
+    except ValueError: 
+      print('\n')
+      print('ERROR: The selected value cannot be converted to a float value.')
+      print('       Please try again and make sure to enter a number.')
+  collapseEm.append(collapse)
   
 
 
@@ -317,7 +330,11 @@ for i, segDir in enumerate(ltRunDirs):
             continue
   
           # get indices of the verts
-          vertIndex = np.where(vertYrs != 0)[0]
+          
+          if collapseEm[i] != -1:
+            vertIndex = ltcdb.collapse_segs(vertYrs, npFitIDX[:, subY, subX], collapseEm[i])
+          else:
+            vertIndex = np.where(vertYrs != 0)[0]
           
           # get vertVals for TC
           vertValsTCB = npFitTCB[vertIndex, subY, subX]
