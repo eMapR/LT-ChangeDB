@@ -330,3 +330,32 @@ def calc_delta(ftvFile, deltaFile):
   
   srcFtv = None
   srcDelta = None
+
+  
+  
+def get_dur(vertYrs):
+  segStartYr = vertYrs[:-1]
+  segEndYr = vertYrs[1:]
+  segDur = segEndYr - segStartYr
+  return segDur  
+  
+def collapse_segs(vertYrs, npFitIDX, thresh):
+  vertIndex = np.where(vertYrs != 0)[0]
+  if len(vertIndex) > 2:
+    check = True
+    while check:
+      vertYrsTemp = vertYrs[vertIndex]
+      vertValsIDXTemp = npFitIDX[vertIndex]
+      segMagIDXTemp = get_delta(vertValsIDXTemp).astype(float) 
+      segDurTemp = get_dur(vertYrsTemp).astype(float) 
+      slope = np.divide(segMagIDXTemp, segDurTemp)
+      checkLen = len(segMagIDXTemp)-1
+      for i in range(checkLen):
+        if np.sign(slope[i]) == np.sign(slope[i+1]):  # -1, 0, 1
+          dif = abs(slope[i] - slope[i+1])/((slope[i] + slope[i+1])/2.0)
+          if dif < thresh:
+            vertIndex = np.delete(vertIndex, i+1)
+            break
+      if i == checkLen-1:
+        check = False
+  return(vertIndex)
