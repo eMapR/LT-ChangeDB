@@ -55,7 +55,7 @@ for segDir in ltRunDirs:
     minMag = raw_input('\nRegarding LT run: '+os.path.basename(segDir) + '\nWhat is the desired minimum change magnitude: ')
     try:
       minMag = int(minMag)
-      minMag = abs(minMag) * -1 * minMagAdj
+      minMag = abs(minMag) * minMagAdj # -1 *
       minMagGood = 1
     except ValueError: 
       print('\n')
@@ -209,6 +209,7 @@ for i, segDir in enumerate(ltRunDirs):
   # figure out if we did to flip the data over - we always want disturbance to be a negative delta
   # available spectral indices: ['NBR', -1], ['B5', 1], ['NDVI', -1], ['TCB', 1], ['NDSI', -1], ['TCG', -1], ['B3', 1]];
   # TODO: need to error if the index is not found
+  """
   flippers = {
     'NBR' : -1,
     'B5'  :  1,
@@ -222,7 +223,7 @@ for i, segDir in enumerate(ltRunDirs):
     'Band5z': 1
   }
   flipper = flippers[indexID]*-1 # above are the flipper from LT-GEE - there dist is considered postive delta
-  
+  """
   ##############################################################################
   # open inputs
   srcYrs = gdal.Open(vertYrsFile)
@@ -312,8 +313,8 @@ for i, segDir in enumerate(ltRunDirs):
       npOutPostTCW = dstPostTCW.ReadAsArray(x, y, cols, rows)
   
       # TODO flip the magnitude if need - is this needed - how best to deal with this 
-      if flipper == -1:
-        npFitIDX = npFitIDX * flipper
+      #if flipper == -1:
+      #  npFitIDX = npFitIDX * flipper
       nVerts, subYsize, subXsize = npYrs.shape
    
       for subY in xrange(subYsize):
@@ -356,9 +357,9 @@ for i, segDir in enumerate(ltRunDirs):
           
           # figure out which segs are disturbance
           if changeTypes[i] == 'disturbance':
-            distIndex = np.where(segMagIDX < minMags[i])[0] # why have to index 0?
-          else:
             distIndex = np.where(segMagIDX > minMags[i])[0] # why have to index 0?
+          else:
+            distIndex = np.where(segMagIDX < minMags[i])[0] # why have to index 0?
 
           
           # check to see if there are any disturbances
@@ -378,7 +379,7 @@ for i, segDir in enumerate(ltRunDirs):
           dur = segDur[distIndex]
           
           # extract the mags for the disturbance(s)
-          magIDX = segMagIDX[distIndex]
+          magIDX = np.abs(segMagIDX[distIndex])
           magTCB = ltcdb.get_delta(vertValsTCB)[distIndex]
           magTCG = ltcdb.get_delta(vertValsTCG)[distIndex]
           magTCW = ltcdb.get_delta(vertValsTCW)[distIndex]
