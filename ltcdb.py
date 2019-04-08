@@ -51,15 +51,15 @@ def make_output_blanks(inputFtv, outPuts, adj):
   return nBands
 
 
-def get_info(name):
+def get_info(name, eeFile=False):
   pieces = name.split('-')
-  if len(pieces) >= 8:
+  if eeFile:
     pieces = pieces[0:8]
     crs = pieces[7]
     crs = crs[0:4]+':'+crs[4:]
     del pieces[7]
-    info = {'key': pieces[0],
-            'value': pieces[1],
+    info = {#'key': pieces[0],
+            #'value': pieces[1],
             'indexID': pieces[2],
             'nVert': int(pieces[3]),
             'startYear':int(pieces[4][0:4]),
@@ -68,19 +68,19 @@ def get_info(name):
             'endDay':pieces[5][4:8],
             'crs':crs,
             'version':pieces[6],
-            'name': '-'.join(pieces)}
+            'name': '-'.join(pieces[2:])}
   else:
     pieces = pieces[0:7]
-    info = {'key': pieces[0],
-            'value': pieces[1],
-            'indexID': pieces[2],
-            'nVert': int(pieces[3]),
-            'startYear':int(pieces[4][0:4]),
-            'endYear':int(pieces[4][4:8]),
-            'startDay':pieces[5][0:4],
-            'endDay':pieces[5][4:8],
-            'version':pieces[6],
-            'name': '-'.join(pieces)}
+    info = {#'key': pieces[0],
+            #'value': pieces[1],
+            'indexID': pieces[0],
+            'nVert': int(pieces[1]),
+            'startYear':int(pieces[2][0:4]),
+            'endYear':int(pieces[2][4:8]),
+            'startDay':pieces[3][0:4],
+            'endDay':pieces[3][4:8],
+            'version':pieces[4],
+            'name': '-'.join(pieces[2:])}
   return info
 
  

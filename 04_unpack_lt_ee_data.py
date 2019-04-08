@@ -48,7 +48,7 @@ runNames = list(set(['-'.join(os.path.basename(fn).split('-')[0:8]) for fn in ti
 # loop through each unique names, find the matching set, merge them as vrt, and then decompose them
 for runName in runNames:
   # get info about the GEE run
-  info = ltcdb.get_info(runName)  
+  info = ltcdb.get_info(runName, eeFile=True)  
   runName = info['name']
   proj = info['crs']
   
@@ -65,9 +65,9 @@ for runName in runNames:
 
   print('\nWorking on LT run: '+runName)
   # find the files that belong to this set  
-  matches = glob(os.path.join(chunkDir,runName+'*LTdata*.tif'))
+  matches = glob(os.path.join(chunkDir,'*'+runName+'*LTdata*.tif'))
   if len(matches) == 0: 
-    sys.exit('ERROR: Cannot find '+runName+'*LTdata*.tif files in this dir: '+chunkDir)
+    sys.exit('ERROR: Cannot find '+'*'+runName+'*LTdata*.tif files in this dir: '+chunkDir)
 
   """
   # define the projection - get the first matched file and extract the crs from it
@@ -78,7 +78,7 @@ for runName in runNames:
   """
   
   # move and reproject the timesync files if there are any
-  tsAoi = glob(os.path.join(chunkDir,runName+'*TSaoi.shp'))
+  tsAoi = glob(os.path.join(chunkDir,'*'+runName+'*TSaoi.shp'))
   if len(tsAoi) != 0:
     outShpFile = os.path.join(ltcdb.dir_path(headDir, 'tsV'), runName+'-TSaoi.shp')
     if not os.path.exists(outShpFile): 
@@ -86,7 +86,7 @@ for runName in runNames:
       cmdFailed = subprocess.call(cmd, shell=True)
       ltcdb.is_success(cmdFailed)
   
-  tsData = glob(os.path.join(chunkDir,runName+'*TSdata*.tif'))
+  tsData = glob(os.path.join(chunkDir,'*'+runName+'*TSdata*.tif'))
   if len(tsData) != 0:
     for fromThis in tsData:
       toThis = os.path.join(ltcdb.dir_path(headDir, 'tsP'), os.path.basename(fromThis))
@@ -94,7 +94,7 @@ for runName in runNames:
         os.rename(fromThis, toThis)
 
   # deal with the LT shapefile - find it reproject it to the vector folder
-  ltAoi = glob(os.path.join(chunkDir,runName+'*LTaoi.shp'))
+  ltAoi = glob(os.path.join(chunkDir,'*'+runName+'*LTaoi.shp'))
   if len(ltAoi) != 0:
     outShpFile = os.path.join(ltcdb.dir_path(headDir, 'v'), runName+'-LTaoi.shp')
     if not os.path.exists(outShpFile):
@@ -105,7 +105,7 @@ for runName in runNames:
     sys.exit('ERROR: Can\'t find the shapefile that is suppose to be with the data downloaded from Google Drive')
 
   # format the metadata file
-  ltMeta = glob(os.path.join(chunkDir,runName+'*runInfo.csv'))
+  ltMeta = glob(os.path.join(chunkDir,'*'+runName+'*runInfo.csv'))
   if len(ltMeta) != 0:
     ltMetaOut = os.path.join(headDir, runName+'-runInfo.txt')
     if not os.path.exists(ltMetaOut):
@@ -218,7 +218,7 @@ for runName in runNames:
     os.remove(this)
 
   # unpack the clear pixel file
-  clearPixelData = glob(os.path.join(chunkDir,runName+'*ClearPixelCount*.tif'))
+  clearPixelData = glob(os.path.join(chunkDir,'*'+runName+'*ClearPixelCount*.tif'))
   if len(clearPixelData) != 0:
     outFile = os.path.normpath(os.path.join(thisOutDir, runName+'-clear_pixel_count.tif'))
     print('   Unpacking file: ')
