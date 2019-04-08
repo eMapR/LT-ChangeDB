@@ -354,6 +354,7 @@ def collapse_segs(vertYrs, npFitIDX, thresh):
         if np.sign(slope[i]) == np.sign(slope[i+1]):  # -1, 0, 1
           dif = abs(slope[i] - slope[i+1])/((slope[i] + slope[i+1])/2.0)
           if dif < thresh:
+            #print('        collapse')
             vertIndex = np.delete(vertIndex, i+1)
             break
       if i == checkLen-1:

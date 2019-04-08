@@ -65,9 +65,9 @@ for segDir in ltRunDirs:
   
   collapseGood = 0
   while collapseGood is 0:
-    collapse = raw_input('\nRegarding LT run: '+os.path.basename(segDir) + '\nMaximum segment slope difference to collapse (-1 to ignore): ')
+    collapse = raw_input('\nRegarding LT run: '+os.path.basename(segDir) + '\nConsecutive change segment collapse threshold (0 to ignore): ')
     try:
-      collapse = float(minMag)
+      collapse = float(collapse)
       collapseGood = 1
     except ValueError: 
       print('\n')
@@ -92,7 +92,7 @@ for i, segDir in enumerate(ltRunDirs):
   #TODO need to deal with multiple finds
   
   # make a change output dir for this run
-  bname = os.path.basename(segDir)+'-'+changeTypes[i]+'_'+str(abs(minMags[i]))
+  bname = os.path.basename(segDir)+'-'+changeTypes[i]+'_'+str(abs(minMags[i]))+'-col_'+str(collapseEm[i])
   outDir = os.path.join(changeDir, bname)
   if os.path.exists(outDir):
     sys.exit('\nERROR: Directory '+outDir+' already exits.\n       Please re-run with different change type and/or magnitude, if so desired.')
@@ -168,7 +168,7 @@ for i, segDir in enumerate(ltRunDirs):
   
   
   # make a summary stats file
-  summaryInfoFile = os.path.join(outDir, bname+'-change_attributes.csv') 
+  summaryInfoFile = '\\\?\\'+os.path.join(outDir, bname+'-change_attributes.csv') 
   summaryInfo = [
       [distInfoOutDur   , 'dur'   , 'con', 'annual', 'int', '0', '1'],  # con (continuous) or cat (categorical)
       [distInfoOutMagIDX, 'idxMag', 'con', 'annual', 'int', '0', '1'],
@@ -332,7 +332,7 @@ for i, segDir in enumerate(ltRunDirs):
   
           # get indices of the verts
           
-          if collapseEm[i] != -1:
+          if collapseEm[i] != 0:
             vertIndex = ltcdb.collapse_segs(vertYrs, npFitIDX[:, subY, subX], collapseEm[i])
           else:
             vertIndex = np.where(vertYrs != 0)[0]
