@@ -352,7 +352,7 @@ def collapse_segs(vertYrs, npFitIDX, thresh):
       checkLen = len(segMagIDXTemp)-1
       for i in range(checkLen):
         if np.sign(slope[i]) == np.sign(slope[i+1]):  # -1, 0, 1
-          dif = abs(slope[i] - slope[i+1])/((slope[i] + slope[i+1])/2.0)
+          dif = abs(abs(slope[i] - slope[i+1])/((slope[i] + slope[i+1])/2.0))
           if dif < thresh:
             #print('        collapse')
             vertIndex = np.delete(vertIndex, i+1)
