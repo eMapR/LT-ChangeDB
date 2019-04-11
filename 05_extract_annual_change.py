@@ -35,6 +35,7 @@ ltRunDirs = [os.path.join(segDir, thisRunDir) for thisRunDir in os.listdir(segDi
 changeTypes = []
 minMags = []
 collapseEm = []
+dsnrs = []
 for segDir in ltRunDirs:
   # get the min mag
   changeTypeGood = 0
@@ -54,7 +55,7 @@ for segDir in ltRunDirs:
   while minMagGood is 0:
     minMag = raw_input('\nRegarding LT run: '+os.path.basename(segDir) + '\nWhat is the desired minimum change magnitude: ')
     try:
-      minMag = int(minMag)
+      minMag = float(minMag)
       minMag = abs(minMag) * minMagAdj # -1 *
       minMagGood = 1
     except ValueError: 
@@ -62,6 +63,20 @@ for segDir in ltRunDirs:
       print('ERROR: The selected value cannot be converted to an integer.')
       print('       Please try again and make sure to enter a number.')
   minMags.append(minMag)
+
+  dsnrGood = 0
+  while dsnrGood is 0:
+    dsnr = raw_input('\nRegarding LT run: '+os.path.basename(segDir) + '\nIs the minimum change magnitude unit DSNR? (yes or no): ')
+    dsnr = str(dsnr).lower()
+    if dsnr in ['yes', 'no']:
+      dsnrGood = 1
+      dsnr = True if dsnr == 'yes' else False
+    else: 
+      print('\n')
+      print('ERROR: The input is not equal to either yes or no.')
+      print('       Please try again and make sure to enter only a single accepted option.')
+  dsnrs.append(dsnr)
+
   
   collapseGood = 0
   while collapseGood is 0:
@@ -80,8 +95,7 @@ for segDir in ltRunDirs:
 # iterate through each run
 for i, segDir in enumerate(ltRunDirs):
   #i=0
-  #segDir = ltRunDirs[0]
-
+  #segDir = ltRunDirs[0]  
   print('\n\nWorking on LT run: ' + os.path.basename(segDir))
   
   # get the vert_yrs.tif
@@ -92,7 +106,11 @@ for i, segDir in enumerate(ltRunDirs):
   #TODO need to deal with multiple finds
   
   # make a change output dir for this run
-  bname = os.path.basename(segDir)+'-'+changeTypes[i]+'_'+str(abs(minMags[i]))+'-col_'+str(collapseEm[i])
+  typeName = 'LOSSVEG' if changeTypes[i] == 'disturbance' else 'GAINVEG' 
+  if dsnrs[i]:
+    bname = os.path.basename(segDir)+'-'+typeName+'_DSNR_'+str(abs(minMags[i]))+'-col_'+str(collapseEm[i])
+  else:
+    bname = os.path.basename(segDir)+'-'+typeName+'_IDX_'+str(abs(minMags[i]))+'-col_'+str(collapseEm[i])
   outDir = os.path.join(changeDir, bname)
   if os.path.exists(outDir):
     sys.exit('\nERROR: Directory '+outDir+' already exits.\n       Please re-run with different change type and/or magnitude, if so desired.')
@@ -107,6 +125,8 @@ for i, segDir in enumerate(ltRunDirs):
   vertFitTCBFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcb.tif')
   vertFitTCGFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcg.tif')
   vertFitTCWFile = vertYrsFile.replace('vert_yrs.tif', 'vert_fit_tcw.tif')
+  segRMSEFile    = vertYrsFile.replace('vert_yrs.tif', 'seg_rmse.tif')
+
   
   #TODO need to error check for existence of all files that we just identified names for
   if not os.path.exists(vertFitTCBFile): #vertFitIDXFile
@@ -226,26 +246,26 @@ for i, segDir in enumerate(ltRunDirs):
   """
   ##############################################################################
   # open inputs
-  srcYrs = gdal.Open(vertYrsFile)
-  srcFitIDX = gdal.Open(vertFitIDXFile)
-  srcFitTCB = gdal.Open(vertFitTCBFile)
-  srcFitTCG = gdal.Open(vertFitTCGFile)
-  srcFitTCW = gdal.Open(vertFitTCWFile)
-  
+  srcYrs     = gdal.Open(vertYrsFile)
+  srcFitIDX  = gdal.Open(vertFitIDXFile)
+  srcFitTCB  = gdal.Open(vertFitTCBFile)
+  srcFitTCG  = gdal.Open(vertFitTCGFile)
+  srcFitTCW  = gdal.Open(vertFitTCWFile)
+  srcSegRMSE = gdal.Open(segRMSEFile)
   
   # open the output files
-  dstYrs = gdal.Open(distInfoOutYrs, gdal.GA_Update)
-  dstDur = gdal.Open(distInfoOutDur, gdal.GA_Update)
-  dstMagIDX = gdal.Open(distInfoOutMagIDX, gdal.GA_Update)
+  dstYrs     = gdal.Open(distInfoOutYrs, gdal.GA_Update)
+  dstDur     = gdal.Open(distInfoOutDur, gdal.GA_Update)
+  dstMagIDX  = gdal.Open(distInfoOutMagIDX, gdal.GA_Update)
   #dstPreIDX = gdal.Open(distInfoOutPreIDX, gdal.GA_Update)
-  dstMagTCB = gdal.Open(distInfoOutMagTCB, gdal.GA_Update)
-  dstPreTCB = gdal.Open(distInfoOutPreTCB, gdal.GA_Update)
+  dstMagTCB  = gdal.Open(distInfoOutMagTCB, gdal.GA_Update)
+  dstPreTCB  = gdal.Open(distInfoOutPreTCB, gdal.GA_Update)
   dstPostTCB = gdal.Open(distInfoOutPostTCB, gdal.GA_Update)
-  dstMagTCG = gdal.Open(distInfoOutMagTCG, gdal.GA_Update)
-  dstPreTCG = gdal.Open(distInfoOutPreTCG, gdal.GA_Update)
+  dstMagTCG  = gdal.Open(distInfoOutMagTCG, gdal.GA_Update)
+  dstPreTCG  = gdal.Open(distInfoOutPreTCG, gdal.GA_Update)
   dstPostTCG = gdal.Open(distInfoOutPostTCG, gdal.GA_Update)
-  dstMagTCW = gdal.Open(distInfoOutMagTCW, gdal.GA_Update)
-  dstPreTCW = gdal.Open(distInfoOutPreTCW, gdal.GA_Update)
+  dstMagTCW  = gdal.Open(distInfoOutMagTCW, gdal.GA_Update)
+  dstPreTCW  = gdal.Open(distInfoOutPreTCW, gdal.GA_Update)
   dstPostTCW = gdal.Open(distInfoOutPostTCW, gdal.GA_Update)
   
   
@@ -294,7 +314,9 @@ for i, segDir in enumerate(ltRunDirs):
       npFitTCB = srcFitTCB.ReadAsArray(x, y, cols, rows)
       npFitTCG = srcFitTCG.ReadAsArray(x, y, cols, rows)
       npFitTCW = srcFitTCW.ReadAsArray(x, y, cols, rows)
-  
+      if dsnrs[i]: npSegRMSE = np.add(srcSegRMSE.ReadAsArray(x, y, cols, rows), 0.1e-10) # avoid 0 division
+      
+      
       # load the annual IDX output chunk as an np array
       npOutYrs = dstYrs.ReadAsArray(x, y, cols, rows)
       npOutDur = dstDur.ReadAsArray(x, y, cols, rows)
@@ -331,7 +353,6 @@ for i, segDir in enumerate(ltRunDirs):
             continue
   
           # get indices of the verts
-          
           if collapseEm[i] != 0:
             vertIndex = ltcdb.collapse_segs(vertYrs, npFitIDX[:, subY, subX], collapseEm[i])
           else:
@@ -351,10 +372,15 @@ for i, segDir in enumerate(ltRunDirs):
   
           # extract this pixels vert fit - going to see if there are disturbances
           vertValsIDX = npFitIDX[vertIndex, subY, subX]
+          
   
           # get the fit value delta for each segment
           segMagIDX = ltcdb.get_delta(vertValsIDX)
-          
+
+          # use dsnr if requested
+          if dsnrs[i]:
+            segMagIDX = segMagIDX/npSegRMSE[subY, subX]
+
           # figure out which segs are disturbance
           if changeTypes[i] == 'disturbance':
             distIndex = np.where(segMagIDX > minMags[i])[0] # why have to index 0?
