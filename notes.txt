@@ -1,1 +1,0 @@
-Sometimes file paths can be too long for windows - adding this to paths can fix it - see script 05... around line 170: '\\\?\\'

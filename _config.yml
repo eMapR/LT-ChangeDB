@@ -1,0 +1,4 @@
+search_enabled: true
+aux_links:
+    "EE-LCB on GitHub":
+      - "https://github.com/jdbcode/EE-LCB"
