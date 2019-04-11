@@ -16,11 +16,10 @@ nav_order: 13
 
 ## Unpack Data from GEE
 
-Open **LandTrendrPyEnv Prompt** by double clicking on the **Start_LandTrendrPyEnv.bat file** in the **LT-ChangeDB****_ _****folder**.
+Open **LandTrendrPyEnv Prompt** by double clicking on the **Start_LandTrendrPyEnv.bat file** in the **LT-ChangeDB folder**.
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE\LT-ChangeDB
+```
+C:\LandTrendrGEE\LT-ChangeDB
     01_dependency_check.py
     02_project_setup.py
     03_vector_setup.py
@@ -33,45 +32,29 @@ Open **LandTrendrPyEnv Prompt** by double clicking on the **Start_LandTrendrPyEn
     ltcdb.pyc
     README.md
     Start_LandTrendrPyEnv.bat
-    tc_time_series.html</td>
-  </tr>
-</table>
-
+    tc_time_series.html
+```
 
 Type python in the prompt followed by a space and then drag in the **04_unpack_lt_ee_data.py ** file* *from the **LT-ChangeDB folder** or type: 04 followed by the tab key to autocomplete find the file. The command should look like this:
 
 Example of autocomplete:
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE\LT-ChangeDB>python 04_unpack_lt_ee_data.py
-</td>
-  </tr>
-</table>
+```
+C:\LandTrendrGEE\LT-ChangeDB>python 04_unpack_lt_ee_data.py
+```
 
 
 Example of script path drag and drop
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\04_unpack_lt_ee_data.py
-</td>
-  </tr>
-</table>
+```
+C:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\04_unpack_lt_ee_data.py
+```
 
 
 Hit enter and you’ll be asked to navigate to the project head folder select the folder **bolded**:
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE\LT-ChangeDB\projects\mora</td>
-  </tr>
-</table>
-
-
-<table>
-  <tr>
-    <td>Project Head (mora)
+```
+C:\LandTrendrGEE\LT-ChangeDB\projects\mora\Project Head
 ├───raster
 │   ├───landtrendr
 │   │   ├───change
@@ -84,18 +67,16 @@ Hit enter and you’ll be asked to navigate to the project head folder select th
 │   ├───raster
 │   └───vector
 ├───vector
-└───video</td>
-  </tr>
-</table>
+└───video
+```
 
 
 ![image alt text](image_54.png)
 
 After selecting a folder, the program will work to unpack all data downloaded from Google Drive. The command prompt will look like this:
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE\LT-ChangeDB>python 04_unpack_lt_ee_data.py
+```
+C:\LandTrendrGEE\LT-ChangeDB>python 04_unpack_lt_ee_data.py
 
 Working on LT run: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01
    Unpacking file:
@@ -115,50 +96,62 @@ Working on LT run: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01
       100% done
 Done!
 LT-GEE data unpacking took 4.8 minutes
-
-C:\LandTrendrGEE\LT-ChangeDB>
-</td>
-  </tr>
-</table>
+```
 
 
-The unpacked files will be placed in several subfolders of the project head folder. Files and some subfolders are named according to the file name given to the GEE output files ([File name description key](#heading=h.cikfk8fyn4aq)), excluding the projection. The major file types unpacked in the is step include: 
+The unpacked files will be placed in several subfolders of the project head folder. Files and 
+some subfolders are named according to the file name given to the GEE output files 
+([File name description key](#heading=h.cikfk8fyn4aq)), excluding the projection. The major 
+file types unpacked in the is step include: 
 
-* **Run info file**: this is a .txt file that is placed directly inside the project head folder. It describes the LandTrendr run and includes all of the parameters used, as well as a list of all the images used to build the annual surface reflectance composites.
+- **Run info file**: this is a .txt file that is placed directly inside the project head 
+folder. It describes the LandTrendr run and includes all of the parameters used, as well 
+as a list of all the images used to build the annual surface reflectance composites.
 
-* **Segmentation files**: this set of files is unpacked into a subfolder of the *<project head>\raster\landtrendr\segmentation folder. They are output files from LandTrendr. Please see the [Segmentation Raster File Names and Definitions](#heading=h.no6fp058un2h) section for detail about the files. 
+- **Segmentation files**: this set of files is unpacked into a subfolder of the 
+*<project head>\raster\landtrendr\segmentation folder. They are output files from LandTrendr. 
+Please see the [Segmentation Raster File Names and Definitions](#heading=h.no6fp058un2h) 
+section for detail about the files. 
 
-* **Vector file**: A shapefile that defines the boundary of the area run by LandTrendr is placed inside of the *<project head>\vector folder. If the shapefile you uploaded to GEE contained more than one feature, this shapefile will only include the feature defined by the key-value pair given in the LandTrendr parameters and will be buffered by 300m to account for changes that occur at the boundary. 
+- **Vector file**: A shapefile that defines the boundary of the area run by LandTrendr 
+is placed inside of the *<project head>\vector folder. If the shapefile you uploaded to 
+GEE contained more than one feature, this shapefile will only include the feature defined 
+by the key-value pair given in the LandTrendr parameters and will be buffered by 300m to 
+account for changes that occur at the boundary. 
 
-* **TimeSync files**: If you chose to export TimeSync files from GEE, then the unpacking script will move the TimeSync image files to the *<project head>\timesync\prep folder. It does not process them in this step, it simply moves them. It also places a shapefile in the *<project head>\timesync\vector folder. If the shapefile you uploaded to GEE contained more than one feature, this shapefile will only include the feature defined by the key-value pair given in the LandTrendr parameters. It represents the extent of the feature with a buffer 6300m to account the size of TimeSync image chip.
+- **TimeSync files**: If you chose to export TimeSync files from GEE, then the unpacking 
+script will move the TimeSync image files to the *<project head>\timesync\prep folder. 
+It does not process them in this step, it simply moves them. It also places a shapefile 
+in the *<project head>\timesync\vector folder. If the shapefile you uploaded to GEE contained 
+more than one feature, this shapefile will only include the feature defined by the key-value 
+pair given in the LandTrendr parameters. It represents the extent of the feature with a buffer 
+6300m to account the size of TimeSync image chip.
 
-What to do with the packaged LT-GEE files in the prep folder - the plan was to delete them after unpacking - do park folks want to archive them to an "~ltgeearchive" folder? 
+What to do with the packaged LT-GEE files in the prep folder - the plan was to delete them after 
+unpacking - do park folks want to archive them to an "~ltgeearchive" folder? 
 
 ## Extract Annual Change as Rasters
 
-Type python in the prompt followed by a space and then drag in the **05_extract_annual_change.py file*** *from the **LT-ChangeDB folder** or type: 05 followed by the tab key to autocomplete find the file. The command should look like this:
+Type python in the prompt followed by a space and then drag in the **05_extract_annual_change.py file** 
+from the **LT-ChangeDB folder** or type: `05` followed by the tab key to autocomplete find the file. 
+The command should look like this:
 
 Example of autocomplete:
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE\LT-ChangeDB>python 05_extract_annual_change.py
-</td>
-  </tr>
-</table>
+```console
+C:\LandTrendrGEE\LT-ChangeDB>python 05_extract_annual_change.py
+```
 
 
 Example of script path drag and drop
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\05_extract_annual_change.py
-</td>
-  </tr>
-</table>
+```console
+C:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\05_extract_annual_change.py
+```
 
-
-After hitting the enter key, a Windows Explorer popup will appear prompting you to "Select the project head folder". The prompt should default to the top of all open application windows. If it doesn’t, minimize other open windows until you see it.
+After hitting the enter key, a Windows Explorer popup will appear prompting you to "Select the 
+project head folder". The prompt should default to the top of all open application windows. 
+If it doesn’t, minimize other open windows until you see it.
 
 Generic example directory path to "project head folder"
 
