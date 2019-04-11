@@ -28,18 +28,14 @@ If you have write privilege to the C drive, create a folder at this location: **
 
 You now should have a **LandTrendrGEE **folder somewhere on your computer. In the next few steps we’ll add the three major directories to it, making it look something like this:
 
+```shell
 C:\LandTrendrGEE
-
-├───**LandTrendrPyEnv**
-
-├───**LT-ChangeDB**
-
-└───**projects**
-
-├───<*project head folder 1*>
-
-├───<*project head folder 2*>
-
-└───<*etc*>
+├───LandTrendrPyEnv
+├───LT-ChangeDB
+└───projects
+    ├───<project head folder 1>
+    ├───<project head folder 2>
+    └───<etc>
+```
 
 Throughout this demo I’ll be referring to this directory structure frequently. Blah blah blah
