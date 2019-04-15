@@ -380,7 +380,7 @@ you would like to add the attributes from the other bands to the polygons repeat
 
 10. Once your done adding information to the table **SAVE **your changes and close the excel file and continue on.
 
-## !!! Important !!!!!! Important !!!!!! Important !!!     For the meeting:
+## When Testing Do this section
 
 Open the file that is similar to this on you system/project:
 
