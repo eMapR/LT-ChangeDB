@@ -205,6 +205,7 @@ NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0
 
 These files are all related to the LandTrendr segmentation and fitting to vertex processes.
 
+```
 Project Head
 └───raster
     └───landtrendr
@@ -222,7 +223,8 @@ Project Head
 			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_tcw_post.tif
 			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_tcw_pre.tif
 			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_yrs.tif
-
+```
+			
 See the Appendix for definitions of the files
 
 ## Make Polygons from Annual Rasters
