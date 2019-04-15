@@ -55,7 +55,7 @@ C:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\04_unpack_lt_ee
 Hit enter and you’ll be asked to navigate to the project head folder select the folder **bolded**:
 
 ```
-C:\LandTrendrGEE\LT-ChangeDB\projects\mora\Project Head
+C:\LandTrendrGEE\LT-ChangeDB\projects\mora		*(project head folder)*
 ├───raster
 │   ├───landtrendr
 │   │   ├───change
@@ -156,24 +156,20 @@ If it doesn’t, minimize other open windows until you see it.
 
 Generic example directory path to "project head folder"
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE
+```
+C:\LandTrendrGEE
 ├───LandTrendrPyEnv
 ├───LT-ChangeDB
 └───projects
-    └───<project head folder></td>
-  </tr>
-</table>
+    └───<project head folder>
+```
 
 
 Example path following the "mora" demo
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE\LT-ChangeDB\projects\mora</td>
-  </tr>
-</table>
+```
+C:\LandTrendrGEE\LT-ChangeDB\projects\mora
+```
 
 
 After Selecting the project head folder the program will identify the LandTrendr run associated with the project, 
@@ -182,13 +178,10 @@ display its name and ask whether you would like to vegetation disturbance or gro
 
 Here is what is shown in the command prompt
 
-<table>
-  <tr>
-    <td>Regarding LT run: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01
+```
+Regarding LT run: NBRz-7-19852017-06010930-v01
 What change do you want to map (disturbance or growth)?:
-</td>
-  </tr>
-</table>
+```
 
 
 Next you’ll be asked to provide a minimum disturbance threshold. The value will be standard deviation times 1000. 
@@ -196,24 +189,18 @@ I’ve found that with the z-score indices (NBRz, Band5z, ENC) that 1.25 standar
 threshold for minimum disturbance to consider. *Band5z* could maybe be a little greater like: 1.35-1.45. So go with a 
 value of 1250 and see what happens.
 
-<table>
-  <tr>
-    <td>Regarding LT run: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01
+```
+Regarding LT run: NBRz-7-19852017-06010930-v01
 What is the desired minimum change magnitude:
-</td>
-  </tr>
-</table>
+```
 
 
 The progress will print to the console
 
-<table>
-  <tr>
-    <td>Working on LT run: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01
+```
+Working on LT run: NBRz-7-19852017-06010930-v01
    38% done
-</td>
-  </tr>
-</table>
+```
 
 
 The annual change rasters will be placed within a subfolder of the *<project_head>\raster\landtrendr\segmentation folder 
@@ -225,36 +212,21 @@ These files are all related to the LandTrendr segmentation and fitting to vertex
 Project Head
 
 ├───raster
-
     ├───landtrendr
-
         ├───change\<job>\
-
-PARK_CODE-MORA-NBRz-7-19842017-06010930-change_attributes.csv
-
-PARK_CODE-MORA-NBRz-7-19842017-06010930-change_dur.tif
-
-PARK_CODE-MORA-NBRz-7-19842017-06010930-change_idx_mag.tif
-
-PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcb_mag.tif
-
-PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcb_post.tif
-
-PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcb_pre.tif
-
-PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcg_mag.tif
-
-PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcg_post.tif
-
-PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcg_pre.tif
-
-PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcw_mag.tif
-
-PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcw_post.tif
-
-PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcw_pre.tif
-
-PARK_CODE-MORA-NBRz-7-19842017-06010930-change_yrs.tif
+            PARK_CODE-MORA-NBRz-7-19842017-06010930-change_attributes.csv
+            PARK_CODE-MORA-NBRz-7-19842017-06010930-change_dur.tif
+			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_idx_mag.tif
+			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcb_mag.tif
+			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcb_post.tif
+			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcb_pre.tif
+			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcg_mag.tif
+			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcg_post.tif
+			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcg_pre.tif
+			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcw_mag.tif
+			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcw_post.tif
+			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcw_pre.tif
+			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_yrs.tif
 
 See the [Appendix](#heading=h.1vdzlzn7ka5p) for definitions of the files
 
@@ -265,22 +237,16 @@ or type: 06 followed by the tab key to autocomplete find the file. The command s
 
 Example of autocomplete:
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE\LT-ChangeDB>python 06_make_polygons.py
-</td>
-  </tr>
-</table>
+```
+C:\LandTrendrGEE\LT-ChangeDB>python 06_make_polygons.py
+```
 
 
 Example of script path drag and drop
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\python 06_make_polygons.py
-</td>
-  </tr>
-</table>
+```
+C:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\python 06_make_polygons.py
+```
 
 
 After hitting the enter key, a Windows Explorer popup will appear prompting you to "Select the project head folder". 
@@ -288,71 +254,55 @@ The prompt should default to the top of all open application windows. If it does
 
 Generic example directory path to "project head folder"
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE
+```
+C:\LandTrendrGEE
 ├───LandTrendrPyEnv
 ├───LT-ChangeDB
 └───projects
-    └───<project head folder></td>
-  </tr>
-</table>
-
+    └───<project head folder>
+```
 
 Example path following the "mora" demo
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE\LT-ChangeDB\projects\mora</td>
-  </tr>
-</table>
+```
+C:\LandTrendrGEE\LT-ChangeDB\projects\mora</td>
+```
 
 
 After you select the project head folder you’ll be presented with a list of raster change definitions that were generated 
 in the previous step. You be asked to select which one to convert to polygons. Enter the number to the left of the change 
 definition you want to convert.
 
-<table>
-  <tr>
-    <td>Here is the list of raster change definitions:
-1: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01-disturbance_1250
-2: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01-growth_1250
+```
+Here is the list of raster change definitions:
+1: NBRz-7-19852017-06010930-v01-disturbance_1250
+2: NBRz-7-19852017-06010930-v01-growth_1250
 
 Which one would you like to convert to polygons (enter the number):
-</td>
-  </tr>
-</table>
-
+```
 
 Next you’ll be asked to provide a minimum mapping unit. The value is the minimum number of connected pixels that define a 
 patch (neighbor rule defined in next step). If you select 10, then patches with < 10 pixels will be ignored in conversion 
 from raster to vector. We recommend using a MMU between 5-10 (9 is one hectare). You’ll likely want to try a few sizes to 
 see what represents your landscape better and is a compromise between commission and omission error. 
 
-<table>
-  <tr>
-    <td>Regarding raster change definition: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01-disturbance_1250
+```
+Regarding raster change definition: NBRz-7-19852017-06010930-v01-disturbance_1250
 What is the desired minimum mapping unit in pixels per patch:
-</td>
-  </tr>
-</table>
-
+```
 
 Next you’ll be asked to define the connectivity rule - 8 neighbor or 4 neighbor. If you want 8 neighbor type yes - if not type no
 
-<table>
-  <tr>
-    <td>Regarding raster change definition: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01-disturbance_1250
+```
+Regarding raster change definition: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01-disturbance_1250
 Should diagonal adjacency warrant pixel inclusion in patches? - yes or no:
-</td>
-  </tr>
-</table>
+```
 
 
 Progress will be printed
 
 ```
-Working on raster change definition: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01-disturbance_1250
+Working on raster change definition: MORA-NBRz-7-19852017-06010930-v01-disturbance_1250
     sieving to minimum mapping unit...
     making polygons from disturbance pixel patches...
         working on year: 1/32 (1986)
@@ -374,7 +324,7 @@ with the name equal to the LT-GEE job name.
 C:\LandTrendrGEE\LandTrendrPyEnv\projects\<project head folder>
 └───vector
     └───change
-        └───PARK_CODE-MORA-NBRz-7-19852017-06010930-v01-disturbance_1250-11mmu_8con
+        └───NBRz-7-19852017-06010930-v01-disturbance_1250-11mmu_8con
                 _change_merged.dbf
                 _change_merged.prj
                 _change_merged.shp
@@ -474,14 +424,14 @@ The polygon files created in the previous step will be updated to include zonal 
 new files that are will be created, which are all of the individual year polygons merged into a single shapefile and a 
 single spatialite geodatabase file  
 
+```
 Project Head
 └───vector\change\<job>
-distall.dbf
-distall.prj
-distall.shp
-distall.shx
+		distall.dbf
+		distall.prj
+		distall.shp
+		distall.shx
 
 Project Head
 └───vector\change\<job>
-
-distall.sqlite
+	distall.sqlite
