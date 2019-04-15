@@ -28,23 +28,23 @@ Type python in the prompt followed by a space and then drag in the **04_unpack_l
 
 Example of autocomplete:
 
-```
+```console
 C:\LandTrendrGEE\LT-ChangeDB>python 04_unpack_lt_ee_data.py
 ```
 
 
 Example of script path drag and drop
 
-```
+```console
 C:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\04_unpack_lt_ee_data.py
 ```
 
 
 Hit enter and you’ll be asked to navigate to the project head folder select the folder:
 
-```
-C:\LandTrendrGEE\LT-ChangeDB\projects\mora		*(project head folder)*
-```
+
+> C:\LandTrendrGEE\LT-ChangeDB\projects\mora	*(project head folder)*
+
 
 
 ![image alt text](image_54.png)
