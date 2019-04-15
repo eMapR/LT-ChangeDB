@@ -16,38 +16,32 @@ nav_order: 3
 
 ## About 
 
-After data is generated in Earth Engine, it is downloaded and processed further with a series of Python scripts. 
-To ensure that you have the dependent libraries and that your current installation of Python for ArcGIS or other 
-uses, is not altered, we’ve developed an independent Python environment for LandTrendr processing called **LandTrendrPyEnv**
-
-LandTrendrPyEnv is an isolated, independent Python programming environment that does not disrupt any other 
+**LandTrendrPyEnv** is an isolated, independent Python programming environment that does not disrupt any other 
 Python installation on your system or set any environmental variables. It contains only the Python libraries 
 and dependencies that are required for running scripts for working with LandTrendr outputs from Google Earth Engine.
 
-LandTrendrPyEnv is distributed and installed as a windows 64-bit.exe. It basically unzips a bunch of folders 
-and files into the a directory of your choice.
+It is distributed and installed as a **Windows 64-bit.exe**, which unzips a series of folders 
+and files into a given directory.
 
-It is accessed via a special command prompt that is started by opening a Windows batchfile - 
-*Start_LandTrendrPyEnv.bat* This batchfile is included in the zipped directory that you’ll download in the following step.  
+The programming environment is accessed via a special command prompt that is started by opening a Windows batchfile - 
+**Start_LandTrendrPyEnv.bat**.  
 
 ## Install LandTrendrPyEnv
 
 ### Downloading
 
-The *LandTrendrPyEnv *installer can be downloaded using this FTP link:
+The **LandTrendrPyEnv installer** can be downloaded using this FTP link:
 
 [https://github.com/eMapR/LT-ChangeDB/releases/download/v1.0/LandTrendrPyEnv-0.4-Windows-x86_64.exe](https://github.com/eMapR/LT-ChangeDB/releases/download/v1.0/LandTrendrPyEnv-0.4-Windows-x86_64.exe)
 
-[ftp://islay.ceoas.oregonstate.edu/from_justin/LandTrendrPyEnv-0.4-Windows-x86_64.exe](ftp://islay.ceoas.oregonstate.edu/from_justin/LandTrendrPyEnv-0.4-Windows-x86_64.exe)
-
-Visiting the link will prompt a download of the file - it will download to your Downloads directory or wherever 
+Visiting the link will prompt a download of the file - it will download to your **Downloads directory** or wherever 
 you have set your browser to store downloaded files.
 
-### Installation walkthrough
+### Installation walk-through
 
-Find the file that you just downloaded (**LandTrendrPyEnv-0.4-Windows-x86_64.exe)** and double click on it to 
+Find the file that you just downloaded (**LandTrendrPyEnv-0.4-Windows-x86_64.exe**) and double click on it to 
 start the installation process. If you are concerned about the reversibility of this installation, don’t worry, 
-there is an uninstaller included with the installation and the program it will not change anything about your 
+there is an uninstaller included with the installation, and the program will not change anything about your 
 system’s registry or environmental variables. The uninstaller can be found by going to the install/uninstall 
 application on your system and searching for the Python installation of LandTrendrPyEnv.
 
@@ -59,33 +53,37 @@ You might be presented with a security warning. Allow the program to **Run**
 
 ![image alt text](image_7.png)
 
-Click "More info" to reveal a “Run anyway” button. 
+You could see difference messages depending on your system. If you do not see a "Run" button you might need to click 
+on a **"More info"** (or similar) link to access a the **"Run"** or **"Run anyway"** button. 
 
-1. **Start installation and agree to Conda terms**
+2. **Start installation and agree to Conda terms**
 
 ![image alt text](image_8.png)
 
 ![image alt text](image_9.png)
 
-2. **Who to install for**
+3. **Who to install for**
 
 Select: **"Just Me"**
 
 ![image alt text](image_10.png)
 
-1. **Where to install**
+4. **Where to install**
 
-As mentioned in the Directory Setup section, you can install this wherever you wish, but for the purpose of 
-the guide, we’ll install it in the C:\*LandTrendrGEE* folder we created in the previous step. We want the 
-program’s folder to be called *LandTrendrPyEnv. *So, putting putting the paths together we end up with an 
+As mentioned in the [Directory Setup](https://emapr.github.io/LT-ChangeDB/docs/directory_setup.html) section, 
+you can install this wherever you wish, but for the purpose of 
+the guide, we’ll install it in the **C:\LandTrendrGEE** folder we created in the previous step. We want the 
+program’s folder to be called **LandTrendrPyEnv**, so, putting the paths together we end up with a 
 destination folder:
 
-C:\*LandTrendrGEE\LandTrendrPyEnv*
+```
+C:\LandTrendrGEE\LandTrendrPyEnv
+```
 
 Note that you should have write privilege to this path and that there should be no spaces in the path (don’t 
-put it in "My Documents", for instance). Enter the desired path as the destination folder in the setup prompt. 
+put it in "My Documents", for instance). Enter the desired path as the **destination folder** in the **setup prompt**. 
 Additionally, note or save the path to a text file or in a open Notepad window, because we need to set it as a 
-variable in .bat file in a following step. Hit the **Next** button 
+variable in **.bat file** in a following step. Hit the **Next** button.
 
 ![image alt text](image_11.png)
 
@@ -103,97 +101,56 @@ Install completes
 
 ![image alt text](image_14.png)
 
-You should now have a "LandTrendrPyEnv*" *folder where ever you set the destination folder. Look for the folder 
-to verify its location. If you can’t find it, hit the Windows key and do a search for “LandTrendrPyEnv*”.* If 
-it is not at the location, then you’ll need to uninstall and reinstall the program and make sure to set the 
-Destination Folder correctly.
+You should now have a **LandTrendrPyEnv folder** wherever you set the **Destination Folder** in the prompt. Look for the folder 
+to verify its location. If you can’t find it, hit the **Windows key** and do a search for **LandTrendrPyEnv**. If 
+it is not at the location specified in the prompt, then you’ll need to uninstall and reinstall the program and make sure to set the 
+**Destination Folder** in the prompt correctly.
 
-> DON’T PUT ANY FILES IN THIS **LandTrendrPyEnv** FOLDER, IF YOU EVER NEED TO UNINSTALL IT, IT MIGHT THINK 
+> DON’T PUT ANY FILES IN THIS **LandTrendrPyEnv FOLDER**, IF YOU EVER NEED TO UNINSTALL IT, IT MIGHT THINK 
 > THAT THERE IS A VIRUS ASSOCIATED WITH THE PROGRAM BECAUSE THERE ARE FILES NOT RECOGNIZED AS BEING INSTALLED 
 > BY THE INSTALLER OR CONDA. IF THIS HAPPENS IT MAY QUARANTINE THE PROGRAM AND YOU’LL NEED TO FIND THE FILES 
 > THAT WERE ADDED AND DELETE THEM BEFORE TRYING TO UNINSTALL AGAIN.
 
 ## Uninstall LandTrendrPyEnv
 
-If you ever need to uninstall LandTrendrPyEnv you can use its uninstaller .exe within the LandTrendrPyEnv folder,
- or by going to the install/uninstall application on your system and searching for the Python installation of LandTrendrPyEnv. It will remove the LandTrendrPyEnv folder and all its contents from your system and remove it from the list of installed programs (it is recognized as a Python version)
+If you ever need to uninstall **LandTrendrPyEnv** you can use its **uninstaller .exe** within the **LandTrendrPyEnv folder**,
+or by going to the install/uninstall application on your system and searching for the Python installation of **LandTrendrPyEnv**. 
+It will remove the **LandTrendrPyEnv folder** and all its contents from your system and remove it from the list of 
+installed programs (it is recognized as a Python version)
 
 ## Mac or Linux system (Anaconda)
 
-If you are on a Mac or Linux system you won’t be able to install LandTrendrPyEnv because it os for Window OS 
+If you are on a Mac or Linux system you won’t be able to install **LandTrendrPyEnv** because it is for **Window OS** 
 only. However, you can replicate the environment through Anaconda instead. It is best to do everything through 
-Anaconda Prompt (search your applications for it). We’ll create a new virtual environment, so that we don’t 
-mess up any versioning in your base environment. We have a .yml file that contains a list of all the libraries 
-and versions that have been tested. Here is how to set up the conda environment (LandTrendrPyEnv) 
+**Anaconda Prompt** (search your applications for it). You'll want to create a new virtual environment, so that you don’t 
+mess up any versioning in your base environment. 
 
-1. Skip ahead to the [Scripts](https://docs.google.com/document/d/1MuYjttWOZvqWPAz2BQvr6IPE7N4r9dxW2PuKJoSpxe4/edit#heading=h.ptdudl3uwmm8) section and download the LT-ChangeDB program files. In the directory is a file called: LandTrendrPyEnv.yml.  
-
-    1. Once you have the file, note its full path and return here to step 2
-
-2. Open Anaconda Prompt and enter the following lines to add required channels to your conda configuration file.
+1. Make sure you have the **conda-forge channel** 
 
 ```
 conda config --append channels https://conda.anaconda.org/conda-forge/
-conda config --append channels http://repo.anaconda.com/pkgs/main/
-conda config --append channels https://conda.anaconda.org/IOOS/
-conda config --append channels https://conda.anaconda.org/conda-forge/label/broken
 ```
 
-3. Enter the following command to create LandTrendrPyEnv. Following the -f flag in the command is where 
-you’ll enter the full path to the LandTrendrPyEnv.yml  file
+2. Install the following libraries in a new Python 2.7 **LandTrendrPyEnv** environment:
 
-```
-conda env create -n LandTrendrPyEnv -f C:\path\to\file\LandTrendrPyEnv.yml
-```
-
-
-Hopefully this will work for you, if it doesn’t it will tell you that solving the environment failed. 
-I’ve only tested this on a Windows machine - it could be possible that some versions of libraries are 
-not available for all OS.
-
-1. Activate the LandTrendrPyEnv - run the following script. You can use the tab key to autocomplete 
-‘LandTrendrPyEnv’ after typing a few letters. Whenever you are going to be running scripts from the 
-LT-ChangeDB program, you need to start Anaconda Prompt and activate ‘LandTrendrPyEnv’  
-
-```
-conda activate LandTrendrPyEnv
-```
-
-1. To deactivate ‘LandTrendrPyEnv’, close Anaconda Prompt or type:
-
-```
-conda deactivate
-```
-
-1. You might need to add some environmental variables to your system - hopefully since you are running 
-through Anaconda Prompt that won’t be necessary.
-
-If setting up the environment using the LandTrendrPyEnv.yml  file failed, then at minimum you should 
-create your own environment starting with python 2.7 and making sure you have
-
-* pandas
-* rasterio
-* rasterstats
-* shapely
-* fiona
-* gdal
-
-NOTES:   REK attempted this on his Mac, and the .yml file caused all sorts of problems because it was 
-looking for specific versions of the libraries that were not available in the OSX.  So, an alternative:  
+- pandas
+- rasterio
+- rasterstats
+- shapely
+- fiona
+- gdal
 
 ```
 conda create -n LandTrendrPyEnv python=2.7 gdal=2.1 pandas rasterio rasterstats shapely=1.6.4 fiona=1.7.9 
 ```
 
-
 # Scripts
 
 ## About
 
-All of the local data processing (post-processing the raster change data obtained from Earth Engine) 
-is done using Python. There are a series of Python scripts that automate much of the workflow. You need 
-to download the scripts to your system. They are stored in a GitHub repository from which you can 
-download a zipped folder that contains all necessary files. 
+All of the local data processing (post-processing the Earth Engine raster change data) 
+is done using Python. There are a series of Python scripts that automate much of the work-flow. You need 
+to download the scripts to your system from a GitHub repository. 
 
 ## Get Scripts
 

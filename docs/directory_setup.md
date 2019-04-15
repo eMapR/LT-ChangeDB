@@ -7,20 +7,20 @@ nav_order: 2
 
 # Directory Setup
 
-There are three major directories that are required for the process of generating annual change polygons. 
+There are three major directories that are required for the process of generating annual change polygons: 
 
-* A programming environment directory
-* A script directory
-* A project directory
+- A programming environment directory
+- A script directory
+- A project directory
 
-All three directories could be created in a single parent folder or spread out among paths that make sense 
-for your system (more on this in the following steps). For the purpose of this guide we’ll put all three 
-directories in the same parent folder called **_LandTrendrGEE_**. We’ll put it directly under the C drive.
+The three directories could be created in a single parent folder or spread out among paths that make sense 
+for your system (more on this in the following steps). For the purpose of this guide, all three 
+directories will be under a parent folder called **LandTrendrGEE** directly on the C drive.
 
-If you have write privilege to the C drive, create a folder at this location: **_C:\LandTrendrGEE_**, if 
+If you have write privilege to the C drive, create a folder at this location: **C:\LandTrendrGEE**, if 
 you don’t have write permission to this directory, choose a different location.
 
-You now should have a **LandTrendrGEE** folder somewhere on your computer. In the next few steps we’ll 
+You should now have a **LandTrendrGEE folder** somewhere on your computer. In the next few steps we’ll 
 add the three major directories to it, making it look something like this:
 
 ```
@@ -28,9 +28,6 @@ C:\LandTrendrGEE
 ├───LandTrendrPyEnv
 ├───LT-ChangeDB
 └───projects
-    ├───<project head folder 1>
-    ├───<project head folder 2>
-    └───<etc>
 ```
 
-Throughout this demo I’ll be referring to this directory structure frequently.
+This directory will be referenced frequently throughout the guide.
