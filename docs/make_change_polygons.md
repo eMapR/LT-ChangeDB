@@ -209,19 +209,19 @@ Project Head
 └───raster
     └───landtrendr
         └───change\<job>\
-			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_attributes.csv
-			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_dur.tif
-			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_idx_mag.tif
-			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcb_mag.tif
-			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcb_post.tif
-			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcb_pre.tif
-			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcg_mag.tif
-			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcg_post.tif
-			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcg_pre.tif
-			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcw_mag.tif
-			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcw_post.tif
-			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcw_pre.tif
-			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_yrs.tif
+			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_attributes.csv
+			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_dur.tif
+			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_idx_mag.tif
+			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_tcb_mag.tif
+			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_tcb_post.tif
+			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_tcb_pre.tif
+			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_tcg_mag.tif
+			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_tcg_post.tif
+			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_tcg_pre.tif
+			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_tcw_mag.tif
+			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_tcw_post.tif
+			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_tcw_pre.tif
+			NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-change_yrs.tif
 
 See the Appendix for definitions of the files
 
@@ -232,14 +232,14 @@ or type: 06 followed by the tab key to autocomplete find the file. The command s
 
 Example of autocomplete:
 
-```
+```console
 C:\LandTrendrGEE\LT-ChangeDB>python 06_make_polygons.py
 ```
 
 
 Example of script path drag and drop
 
-```
+```console
 C:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\python 06_make_polygons.py
 ```
 
@@ -270,8 +270,7 @@ definition you want to convert.
 
 ```
 Here is the list of raster change definitions:
-1: NBRz-7-19852017-06010930-v01-disturbance_1250
-2: NBRz-7-19852017-06010930-v01-growth_1250
+1: NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0
 
 Which one would you like to convert to polygons (enter the number):
 ```
@@ -282,14 +281,14 @@ from raster to vector. We recommend using a MMU between 5-10 (9 is one hectare).
 see what represents your landscape better and is a compromise between commission and omission error. 
 
 ```
-Regarding raster change definition: NBRz-7-19852017-06010930-v01-disturbance_1250
+Regarding raster change definition: NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0
 What is the desired minimum mapping unit in pixels per patch:
 ```
 
 Next you’ll be asked to define the connectivity rule - 8 neighbor or 4 neighbor. If you want 8 neighbor type yes - if not type no
 
 ```
-Regarding raster change definition: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01-disturbance_1250
+Regarding raster change definition: NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0
 Should diagonal adjacency warrant pixel inclusion in patches? - yes or no:
 ```
 
@@ -297,7 +296,7 @@ Should diagonal adjacency warrant pixel inclusion in patches? - yes or no:
 Progress will be printed
 
 ```
-Working on raster change definition: MORA-NBRz-7-19852017-06010930-v01-disturbance_1250
+Working on raster change definition: NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0
     sieving to minimum mapping unit...
     making polygons from disturbance pixel patches...
         working on year: 1/32 (1986)
@@ -319,7 +318,7 @@ with the name equal to the LT-GEE job name.
 C:\LandTrendrGEE\LandTrendrPyEnv\projects\<project head folder>
 └───vector
     └───change
-        └───NBRz-7-19852017-06010930-v01-disturbance_1250-11mmu_8con
+        └───NBR-9-19842017-06010930-v01-vloss_dsnr_1.35-col_0.0-11mmu_8con
                 _change_merged.dbf
                 _change_merged.prj
                 _change_merged.shp
