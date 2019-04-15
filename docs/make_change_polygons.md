@@ -20,19 +20,7 @@ Open **LandTrendrPyEnv Prompt** by double clicking on the **Start_LandTrendrPyEn
 
 ```
 C:\LandTrendrGEE\LT-ChangeDB
-    01_dependency_check.py
-    02_project_setup.py
-    03_vector_setup.py
-    04_unpack_lt_ee_data.py
-    05_extract_annual_change.py
-    06_make_polygons.py
-    07_append_zonal_stats.py
-    08_make_tc_video.py
-    ltcdb.py
-    ltcdb.pyc
-    README.md
     Start_LandTrendrPyEnv.bat
-    tc_time_series.html
 ```
 
 Type python in the prompt followed by a space and then drag in the **04_unpack_lt_ee_data.py ** file* *from the 
@@ -52,23 +40,10 @@ C:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\04_unpack_lt_ee
 ```
 
 
-Hit enter and you’ll be asked to navigate to the project head folder select the folder **bolded**:
+Hit enter and you’ll be asked to navigate to the project head folder select the folder:
 
 ```
 C:\LandTrendrGEE\LT-ChangeDB\projects\mora		*(project head folder)*
-├───raster
-│   ├───landtrendr
-│   │   ├───change
-│   │   └───segmentation
-│   └───prep
-│       └───gee_chunks
-├───scripts
-├───timesync
-│   ├───prep
-│   ├───raster
-│   └───vector
-├───vector
-└───video
 ```
 
 
