@@ -384,7 +384,7 @@ you would like to add the attributes from the other bands to the polygons repeat
 
 Open the file that is similar to this on you system/project:
 
-<headFolder>\vector\change\PARK_CODE-MORA-NBRz-7-19842017-06010930-dist_info_11mmu_8con\PARK_CODE-MORA-NBRz-7-19842017-06010930-change_attributes.csv
+PROJECT HEAD FOLDER\vector\change\PARK_CODE-MORA-NBRz-7-19842017-06010930-dist_info_11mmu_8con\PARK_CODE-MORA-NBRz-7-19842017-06010930-change_attributes.csv
 
 You can open it in Excel or a programming-friendly text editor (Justin uses notepad++)
 
