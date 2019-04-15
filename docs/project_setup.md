@@ -24,7 +24,10 @@ that was described in the **[Directory Setup](https://emapr.github.io/LT-ChangeD
 
 ## Create Project Directory
 
-1. Make a new folder on your system to hold **LT-ChangeDB** post-processing files. In this example, I make a parent **projects** folder in the **LandTrendrGEE** folder that will hold a series of separate regions. I manually create a new folder called **projects **and a subfolder for a project called **mora** (Mount Rainier). The following diagram shows my current directory structure - the bolded folders were just created.
+1. Make a new folder on your system to hold **LT-ChangeDB** post-processing files. In this example, I make a parent 
+**projects** folder in the **LandTrendrGEE** folder that will hold a series of separate regions. I manually create a 
+new folder called **projects **and a subfolder for a project called **mora** (Mount Rainier). The following diagram 
+shows my current directory structure - the bolded folders were just created.
 
 ```
 C:\LandTrendrGEE
@@ -35,9 +38,12 @@ C:\LandTrendrGEE
 ```
 
 
-1. Create the project directory structure. Open **LandTrendrPyEnv Prompt** by double clicking on the **Start_LandTrendrPyEnv.bat** file in the **LT-ChangeDB*** *folder.
+1. Create the project directory structure. Open **LandTrendrPyEnv Prompt** by double clicking on the 
+**Start_LandTrendrPyEnv.bat** file in the **LT-ChangeDB*** *folder.
 
-Type python in the prompt followed by a space and then type 02 and hit the tab key to autocomplete the filename. If the file was not found by autocomplete, then drag in the **02_project_setup.py*** *file from the **LT-ChangeDB*** *folder. The command should look like this:
+Type python in the prompt followed by a space and then type `02` and hit the tab key to autocomplete the filename. 
+If the file was not found by autocomplete, then drag in the **02_project_setup.py file** from the **LT-ChangeDB folder**. 
+The command should look like this:
 
 Example of autocomplete:
 
@@ -52,7 +58,9 @@ C:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\02_preoject_set
 ```
 
 
-After hitting the enter key, a Windows Explorer popup will appear prompting you to "Select or create and select a project head folder" that will hold all the raster and vector data for a specific study area. The prompt should default to the top of all open applications windows. If it doesn’t, minimize other open windows until you see it.
+After hitting the enter key, a Windows Explorer popup will appear prompting you to "Select or create and select a 
+project head folder" that will hold all the raster and vector data for a specific study area. The prompt should default 
+to the top of all open applications windows. If it doesn’t, minimize other open windows until you see it.
 
 2. Navigate to the project folder, select it and press the OK button.
 

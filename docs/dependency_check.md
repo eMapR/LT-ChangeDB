@@ -68,8 +68,6 @@ If everything is okay with dependencies you should get a message like this:
 ![image alt text](image_22.png)
 
 Where it says that each library checked **is** installed. If there were any missing libraries, the message would 
-read **is not** installed. Since this **LandTrendrPyEnv** is pre-packaged, there should be no problems, but this 
-is just a good test of the system.
+read **is not** installed. Since this **LandTrendrPyEnv** is pre-packaged, there should be no problems.
 
-If it fails on any library, contact Justin Braaten ([jstnbraaten@gmail.com](mailto:jstnbraaten@gmail.com)) to 
-find out what to do.
+If it fails on any library, contact Justin Braaten ([jstnbraaten@gmail.com](mailto:jstnbraaten@gmail.com))

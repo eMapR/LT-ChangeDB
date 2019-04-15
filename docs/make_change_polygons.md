@@ -35,7 +35,8 @@ C:\LandTrendrGEE\LT-ChangeDB
     tc_time_series.html
 ```
 
-Type python in the prompt followed by a space and then drag in the **04_unpack_lt_ee_data.py ** file* *from the **LT-ChangeDB folder** or type: 04 followed by the tab key to autocomplete find the file. The command should look like this:
+Type python in the prompt followed by a space and then drag in the **04_unpack_lt_ee_data.py ** file* *from the 
+**LT-ChangeDB folder** or type: 04 followed by the tab key to autocomplete find the file. The command should look like this:
 
 Example of autocomplete:
 
@@ -175,7 +176,9 @@ Example path following the "mora" demo
 </table>
 
 
-After Selecting the project head folder the program will identify the LandTrendr run associated with the project, display its name and ask whether you would like to vegetation disturbance or growth. Type either **disturbance** or **growth** and hit enter.
+After Selecting the project head folder the program will identify the LandTrendr run associated with the project, 
+display its name and ask whether you would like to vegetation disturbance or growth. Type either **disturbance** or 
+**growth** and hit enter.
 
 Here is what is shown in the command prompt
 
@@ -188,7 +191,10 @@ What change do you want to map (disturbance or growth)?:
 </table>
 
 
-Next you’ll be asked to provide a minimum disturbance threshold. The value will be standard deviation times 1000. I’ve found that with the z-score indices (NBRz, Band5z, ENC) that 1.25 standard deviations seems like a pretty good threshold for minimum disturbance to consider. *Band5z* could maybe be a little greater like: 1.35-1.45. So go with a value of 1250 and see what happens.
+Next you’ll be asked to provide a minimum disturbance threshold. The value will be standard deviation times 1000. 
+I’ve found that with the z-score indices (NBRz, Band5z, ENC) that 1.25 standard deviations seems like a pretty good 
+threshold for minimum disturbance to consider. *Band5z* could maybe be a little greater like: 1.35-1.45. So go with a 
+value of 1250 and see what happens.
 
 <table>
   <tr>
@@ -210,7 +216,9 @@ The progress will print to the console
 </table>
 
 
-The annual change rasters will be placed within a subfolder of the *<project_head>\raster\landtrendr\segmentation folder with the name equal to the LT-GEE job name plus the change type and the minimum magnitude threshold value, for example: PARK_CODE-MORA-NBRz-7-19842017-06010930-v01-disturbance_1250 
+The annual change rasters will be placed within a subfolder of the *<project_head>\raster\landtrendr\segmentation folder 
+with the name equal to the LT-GEE job name plus the change type and the minimum magnitude threshold value, for example: 
+PARK_CODE-MORA-NBRz-7-19842017-06010930-v01-disturbance_1250 
 
 These files are all related to the LandTrendr segmentation and fitting to vertex processes.
 
@@ -252,7 +260,8 @@ See the [Appendix](#heading=h.1vdzlzn7ka5p) for definitions of the files
 
 ## Make Polygons from Annual Rasters
 
-Type python in the prompt followed by a space and then drag in the **06_make_polygons.py file*** *from the **LT-ChangeDB folder** or type: 06 followed by the tab key to autocomplete find the file. The command should look like this:
+Type python in the prompt followed by a space and then drag in the **06_make_polygons.py file*** *from the **LT-ChangeDB folder** 
+or type: 06 followed by the tab key to autocomplete find the file. The command should look like this:
 
 Example of autocomplete:
 
@@ -274,7 +283,8 @@ Example of script path drag and drop
 </table>
 
 
-After hitting the enter key, a Windows Explorer popup will appear prompting you to "Select the project head folder". The prompt should default to the top of all open application windows. If it doesn’t, minimize other open windows until you see it.
+After hitting the enter key, a Windows Explorer popup will appear prompting you to "Select the project head folder". 
+The prompt should default to the top of all open application windows. If it doesn’t, minimize other open windows until you see it.
 
 Generic example directory path to "project head folder"
 
@@ -298,7 +308,9 @@ Example path following the "mora" demo
 </table>
 
 
-After you select the project head folder you’ll be presented with a list of raster change definitions that were generated in the previous step. You be asked to select which one to convert to polygons. Enter the number to the left of the change definition you want to convert.
+After you select the project head folder you’ll be presented with a list of raster change definitions that were generated 
+in the previous step. You be asked to select which one to convert to polygons. Enter the number to the left of the change 
+definition you want to convert.
 
 <table>
   <tr>
@@ -312,7 +324,10 @@ Which one would you like to convert to polygons (enter the number):
 </table>
 
 
-Next you’ll be asked to provide a minimum mapping unit. The value is the minimum number of connected pixels that define a patch (neighbor rule defined in next step). If you select 10, then patches with < 10 pixels will be ignored in conversion from raster to vector. We recommend using a MMU between 5-10 (9 is one hectare). You’ll likely want to try a few sizes to see what represents your landscape better and is a compromise between commission and omission error. 
+Next you’ll be asked to provide a minimum mapping unit. The value is the minimum number of connected pixels that define a 
+patch (neighbor rule defined in next step). If you select 10, then patches with < 10 pixels will be ignored in conversion 
+from raster to vector. We recommend using a MMU between 5-10 (9 is one hectare). You’ll likely want to try a few sizes to 
+see what represents your landscape better and is a compromise between commission and omission error. 
 
 <table>
   <tr>
@@ -336,9 +351,8 @@ Should diagonal adjacency warrant pixel inclusion in patches? - yes or no:
 
 Progress will be printed
 
-<table>
-  <tr>
-    <td>Working on raster change definition: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01-disturbance_1250
+```
+Working on raster change definition: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01-disturbance_1250
     sieving to minimum mapping unit...
     making polygons from disturbance pixel patches...
         working on year: 1/32 (1986)
@@ -349,16 +363,15 @@ Progress will be printed
         working on year: 6/32 (1991)
         working on year: 7/32 (1992)
         working on year: 8/32 (1993)
-        working on year: 9/32 (1994)</td>
-  </tr>
-</table>
+        working on year: 9/32 (1994)
+```
 
 
-The annual disturbance polygons will be placed within a sub-folder of the project_head\vector\change folder with the name equal to the LT-GEE job name. 
+The annual disturbance polygons will be placed within a sub-folder of the project_head\vector\change folder 
+with the name equal to the LT-GEE job name. 
 
-<table>
-  <tr>
-    <td>C:\LandTrendrGEE\LandTrendrPyEnv\projects\<project head folder>
+```
+C:\LandTrendrGEE\LandTrendrPyEnv\projects\<project head folder>
 └───vector
     └───change
         └───PARK_CODE-MORA-NBRz-7-19852017-06010930-v01-disturbance_1250-11mmu_8con
@@ -376,14 +389,17 @@ The annual disturbance polygons will be placed within a sub-folder of the projec
                 change_1987.shp
                 change_1987.shx
                 ...remaining years
-                patches.tif</td>
-  </tr>
-</table>
+                patches.tif
+```
 
 
 ### Polygon Attributes
 
-In step 5 (script 05_extract_annual_change.py)  an *attributes.csv file was created and populated with a standard set of variables to summarize per polygon. This file was copied to the <head folder>\vector\<run name> dir. We can edit this file (either the source one or the one that was just copied) to either turn variable to be summarized off and on or add more variables to be summarized, like elevation, slope, ave precip, soil type, etc. More information about this file can be found in the [appendix](#heading=h.g06pygirthjs).
+In step 5 (script 05_extract_annual_change.py)  an *attributes.csv file was created and populated with a 
+standard set of variables to summarize per polygon. This file was copied to the <head folder>\vector\<run name> dir. 
+We can edit this file (either the source one or the one that was just copied) to either turn variable to be 
+summarized off and on or add more variables to be summarized, like elevation, slope, ave precip, soil type, etc. 
+More information about this file can be found in the [appendix](#heading=h.g06pygirthjs).
 
 ## Adding Attributes from other rasters
 
@@ -393,13 +409,15 @@ You can add other raster data (DEM, Slope, etc.) to the attributes of your polyg
 
 * You can download as dem from Google Earth Engine under reader as get DEM.
 
-2. Then go to <Project header>\raster\landtrendr\change\<job> where there is an Excel file. Open the excel file and it will look something like this.	
+2. Then go to <Project header>\raster\landtrendr\change\<job> where there is an Excel file. Open the excel 
+file and it will look something like this.	
 
 ![image alt text](image_55.png) 
 
 3. In column A add the file path to the TIF file you added in step 1
 
-4. In column B add the name that you want to represent that field. (for a DEM use Elev for elevation or IR for infrared reflectance.)
+4. In column B add the name that you want to represent that field. (for a DEM use Elev for elevation 
+or IR for infrared reflectance.)
 
 5. In column C add "con". 
 
@@ -407,7 +425,8 @@ You can add other raster data (DEM, Slope, etc.) to the attributes of your polyg
 
 7. In column E add "int"
 
-8. In column F add the band number for the raster being used. If the raster has more than one band and you would like to add the attributes from the other bands to the polygons repeat steps 1 through 9 for each band. (example below)
+8. In column F add the band number for the raster being used. If the raster has more than one band and 
+you would like to add the attributes from the other bands to the polygons repeat steps 1 through 9 for each band. (example below)
 
 ![image alt text](image_56.png)
 
@@ -425,11 +444,14 @@ You can open it in Excel or a programming-friendly text editor (Justin uses note
 
 ![image alt text](image_57.png)
 
-Change the red circled 1’s to 0s and save the file (keep format as csv). This file controls how what is summarized for polygons. This 7th column is an on/off switch, we’re going to turn off summarizing these three attributes because they take hours to complete.
+Change the red circled 1’s to 0s and save the file (keep format as csv). This file controls how what is summarized 
+for polygons. This 7th column is an on/off switch, we’re going to turn off summarizing these three attributes because 
+they take hours to complete.
 
 ## Append Zonal Statistics to Polygons
 
-Type python in the prompt followed by a space and then drag in the *07_append_zonal_stats.py*  file* *from the *LT-ChangeDB *folder or type: 07 followed by the tab key to autocomplete find the file. The command should look like this:
+Type python in the prompt followed by a space and then drag in the *07_append_zonal_stats.py*  file* *from the 
+*LT-ChangeDB *folder or type: 07 followed by the tab key to autocomplete find the file. The command should look like this:
 
 ![image alt text](image_58.png)
 
@@ -443,29 +465,23 @@ Hit enter and you’ll be asked to navigate to the project head folder.
 
 You will get an error that can be ignored - does not affect the outputs:
 
-<table>
-  <tr>
-    <td>*rasterstats\main.py:161: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated.</td>
-  </tr>
-</table>
+```
+*rasterstats\main.py:161: FutureWarning: Conversion of the second argument of issubdtype from `float` to `np.floating` is deprecated.
+```
 
 
-The polygon files created in the previous step will be updated to include zonal summary stats for various attributes and two new files that are will be created, which are all of the individual year polygons merged into a single shapefile and a single spatialite geodatabase file  
+The polygon files created in the previous step will be updated to include zonal summary stats for various attributes and two 
+new files that are will be created, which are all of the individual year polygons merged into a single shapefile and a 
+single spatialite geodatabase file  
 
 Project Head
-
 └───vector\change\<job>
-
 distall.dbf
-
 distall.prj
-
 distall.shp
-
 distall.shx
 
 Project Head
-
 └───vector\change\<job>
 
 distall.sqlite
