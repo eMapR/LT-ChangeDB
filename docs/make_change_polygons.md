@@ -167,7 +167,7 @@ C:\LandTrendrGEE
 
 Example path following the "mora" demo
 
-```
+```console
 C:\LandTrendrGEE\LT-ChangeDB\projects\mora
 ```
 
@@ -178,57 +178,77 @@ display its name and ask whether you would like to vegetation disturbance or gro
 
 Here is what is shown in the command prompt
 
-```
-Regarding LT run: NBRz-7-19852017-06010930-v01
+```console
+Regarding LT run: NBR-9-19842017-06010930-v01
 What change do you want to map (disturbance or growth)?:
 ```
 
 
-Next you’ll be asked to provide a minimum disturbance threshold. The value will be standard deviation times 1000. 
-I’ve found that with the z-score indices (NBRz, Band5z, ENC) that 1.25 standard deviations seems like a pretty good 
-threshold for minimum disturbance to consider. *Band5z* could maybe be a little greater like: 1.35-1.45. So go with a 
-value of 1250 and see what happens.
+Next you’ll be asked to provide a minimum disturbance threshold. The value will depend on what spectal index was used 
+in LandTrendr segmentation. If the index was a normalized band difference, like NBR or NDVI, where natural range is -1 to 1,
+then multiple a desired minimum delta by 1000 (ie 125 is generally good for NBR). If the index was a z-score index like NBRz
+the units are expressed as standard deviations from from mean of time series times 1000. In this case you'd want to set the minimum 
+magnitude threshold at least a little outside of 1 standard deviation (~1250 is good for NBRz).  
+You might also want to set a threshold relative to a given pixels average variability around the line of segmentation. This is
+considered a DSNR units and work work any index (1.25-1.35 is good for NBR)
+
+TODO: these still need more description and explanation
+
 
 ```
-Regarding LT run: NBRz-7-19852017-06010930-v01
+Regarding LT run: NBR-9-19842017-06010930-v01
 What is the desired minimum change magnitude:
 ```
 
+Next you'll be asked to specify the units - whether the previously provided magnitude threshold is *Change Signal to Noise Ration* or not: 
+
+```console
+Regarding LT run: NBR-9-19842017-06010930-v01
+Is the minimum change magnitude unit DSNR? (yes or no):
+```
+
+Next you'll specify whether you want to collapse consecutive change segment into one segment:
+
+TODO: needs more description and explanation - include the graphic somewhere about determining the value to use
+
+```console
+Regarding LT run: NBR-9-19842017-06010930-v01
+Consecutive change segment collapse threshold (0 to ignore):
+```
 
 The progress will print to the console
 
 ```
-Working on LT run: NBRz-7-19852017-06010930-v01
+Working on LT run: NBR-9-19842017-06010930-v01
    38% done
 ```
 
 
 The annual change rasters will be placed within a subfolder of the *<project_head>\raster\landtrendr\segmentation folder 
 with the name equal to the LT-GEE job name plus the change type and the minimum magnitude threshold value, for example: 
-PARK_CODE-MORA-NBRz-7-19842017-06010930-v01-disturbance_1250 
+NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0
 
 These files are all related to the LandTrendr segmentation and fitting to vertex processes.
 
 Project Head
+└───raster
+    └───landtrendr
+        └───change\<job>\
+			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_attributes.csv
+			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_dur.tif
+			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_idx_mag.tif
+			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcb_mag.tif
+			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcb_post.tif
+			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcb_pre.tif
+			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcg_mag.tif
+			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcg_post.tif
+			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcg_pre.tif
+			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcw_mag.tif
+			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcw_post.tif
+			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_tcw_pre.tif
+			NBR-9-19842017-06010930-v01-LOSSVEG_DSNR_1.35-col_0.0-change_yrs.tif
 
-├───raster
-    ├───landtrendr
-        ├───change\<job>\
-            PARK_CODE-MORA-NBRz-7-19842017-06010930-change_attributes.csv
-            PARK_CODE-MORA-NBRz-7-19842017-06010930-change_dur.tif
-			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_idx_mag.tif
-			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcb_mag.tif
-			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcb_post.tif
-			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcb_pre.tif
-			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcg_mag.tif
-			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcg_post.tif
-			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcg_pre.tif
-			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcw_mag.tif
-			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcw_post.tif
-			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_tcw_pre.tif
-			PARK_CODE-MORA-NBRz-7-19842017-06010930-change_yrs.tif
-
-See the [Appendix](#heading=h.1vdzlzn7ka5p) for definitions of the files
+See the Appendix for definitions of the files
 
 ## Make Polygons from Annual Rasters
 
