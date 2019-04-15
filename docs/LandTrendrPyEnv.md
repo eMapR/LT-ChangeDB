@@ -35,7 +35,7 @@ The **LandTrendrPyEnv installer** can be downloaded using this FTP link:
 [https://github.com/eMapR/LT-ChangeDB/releases/download/v1.0/LandTrendrPyEnv-0.4-Windows-x86_64.exe](https://github.com/eMapR/LT-ChangeDB/releases/download/v1.0/LandTrendrPyEnv-0.4-Windows-x86_64.exe)
 
 Visiting the link will prompt a download of the file - it will download to your **Downloads directory** or wherever 
-you have set your browser to store downloaded files.
+you have your browser set to store downloaded files.
 
 ### Installation walk-through
 
@@ -156,65 +156,59 @@ to download the scripts to your system from a GitHub repository.
 
 Visit the following URL:
 
-[https://github.com/eMapR/LT-ChangeDB   ](https://github.com/eMapR/LT-ChangeDB)
+[https://github.com/eMapR/LT-ChangeDB](https://github.com/eMapR/LT-ChangeDB)
 
-Download the reposility as a zip file 
+Download the repository as a zip file 
 
 ![image alt text](image_15.png)
 
 A file titled **LT-ChangeDB-master.zip** will be downloaded to your computer. Find the file in your 
-**Downloads** directory or wherever you have your browser set to stored downloaded files.
+**Downloads directory** or wherever you have your browser set to store downloaded files.
 
 The files in this zip archive can be thought of as program files - the program **LT-ChangeDB** stands 
-for LandTrendr Change Database. Unzip the **LT-ChangeDB-master.zip** file to the **LandTrendrGEE** folder 
-that was set up in the **[Directory Setu**p](#heading=h.7k7uc2kddhr9) section and rename the folder to 
-**LT-ChangeDB**. You now should have a directory that looks similar to this:
+for: LandTrendr Change Database. Unzip the **LT-ChangeDB-master.zip** file directly to the **LandTrendrGEE folder** 
+that was set up in the **[Directory Setup](https://emapr.github.io/LT-ChangeDB/docs/directory_setup.html)** section 
+and rename the folder to **LT-ChangeDB**. You now should have a directory that looks similar to this:
 
 ```
 C:\LandTrendrGEE
 ├───LandTrendrPyEnv
 └───LT-ChangeDB
-```
-
-The contents of the **LT-ChangeDB** should look like this:
-
-```
-C:\LandTrendrGEE\LT-ChangeDB
-│   01_dependency_check.py
-│   02_project_setup.py
-│   03_vector_setup.py
-│   04_unpack_lt_ee_data.py
-│   05_extract_annual_change.py
-│   06_make_polygons.py
-│   07_append_zonal_stats.py
-│   08_make_tc_video.py
-│   ltcdb.py
-│   ltcdb.pyc
-│   README.md
-│   Start_LandTrendrPyEnv.bat
-│   tc_time_series.html
-│
-└───LandTrendrPyEnv_setup
+	│   01_dependency_check.py
+	│   02_project_setup.py
+	│   03_vector_setup.py
+	│   04_unpack_lt_ee_data.py
+	│   05_extract_annual_change.py
+	│   06_make_polygons.py
+	│   07_append_zonal_stats.py
+	│   08_make_tc_video.py
+	│   ltcdb.py
+	│   ltcdb.pyc
+	│   README.md
+	│   Start_LandTrendrPyEnv.bat
+	│   tc_time_series.html
+	│
+	└───LandTrendrPyEnv_setup
 ```
 
 These files need to stay together. Nothing from this folder should be modified and nothing should be added 
-to this folder. When we run python commands to post-process LandTrendr data from GEE the command prompt 
-will look to this folder to find scripts to run. It should be noted that is directory can be placed 
-anywhere and be called anything, but for the purpose of standardizing this guide, it is being placed 
-in the **LandTrendrGEE **folder at the same level as the **LandTrendrPyEnv** folder.
+to this folder. When python commands to post-process LandTrendr data from GEE the **LandTrendrPyEnv command prompt** 
+will look to this folder to find scripts to run. Note that this **LT-ChangeDB directory** can be placed 
+anywhere and be called anything, but for the purpose of standardizing this guide, it will be a child of the 
+**LandTrendrGEE folder** at the same level as the **LandTrendrPyEnv folder**.
 
 ## Setting Up the LandTrendrPyEnv Prompt
 
-A special command prompt is included in the **LT-ChangeDB** folder. This special prompt is opened by 
-double clicking on the **Start_LandTrendrPyEnv.bat** file in the **LT-ChangeDB** folder from the 
-above step (don’t start it yet). It is how we will run all the scripts in the **LT-ChangeDB** folder. 
-It is special because it will only know about files in the **LandTrendrPyEnv*** *folder and **LT-ChangeDB** 
-folder, and it does not add anything to your system’s environmental variables or registry - 
-it is totally isolated from from other installs of python. However, for it to know about files 
-in the **LandTrendrPyEnv** folder, we have to tell it where the folder is located on your system.
+A special command prompt is included in the **LT-ChangeDB folder**. This special prompt is opened by 
+double clicking on the **Start_LandTrendrPyEnv.bat file** in the **LT-ChangeDB** folder** from the 
+above step (don’t start it yet). It is the console that will run all the scripts in the **LT-ChangeDB folder**. 
+It is special because it only know about files in the **LandTrendrPyEnv** and **LT-ChangeDB folders**, 
+and it does not add anything to your system’s environmental variables or registry - 
+it is totally isolated from from other installs of Python. However, for it to know about files 
+in the **LandTrendrPyEnv folder**, we have to tell it where the folder is located on your system.
 
-1. Open the **Start_LandTrendrPyEnv.bat** file from the **LT-ChangeDB** folder in Microsoft 
-WordPad for editing. You can try right clicking on the file and select WordPad as an option under 
+1. Open the **Start_LandTrendrPyEnv.bat file** from the **LT-ChangeDB folder** in Microsoft 
+**WordPad** or **Notepad++** for editing. You can try right clicking on the file and select WordPad as an option under 
 "open with", if given the option, or open the WordPad application and then open the file from within 
 WordPad (you may have to set the file search to “All Documents (*.*)” in order to see the .bat file). 
 Note that Notepad should not be used as a text editor in this case because it does not read the new 
