@@ -51,7 +51,7 @@ Hit enter and you’ll be asked to navigate to the project head folder select th
 
 After selecting a folder, the program will work to unpack all data downloaded from Google Drive. The command prompt will look like this:
 
-```
+```console
 C:\LandTrendrGEE\LT-ChangeDB>python 04_unpack_lt_ee_data.py
 
 Working on LT run: PARK_CODE-MORA-NBRz-7-19852017-06010930-v01
