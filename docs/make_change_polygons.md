@@ -262,7 +262,7 @@ C:\LandTrendrGEE
 Example path following the "mora" demo
 
 ```
-C:\LandTrendrGEE\LT-ChangeDB\projects\mora</td>
+C:\LandTrendrGEE\LT-ChangeDB\projects\mora
 ```
 
 
@@ -386,7 +386,7 @@ Open the file that is similar to this on you system/project:
 
 PROJECT HEAD FOLDER\vector\change\PARK_CODE-MORA-NBRz-7-19842017-06010930-dist_info_11mmu_8con\PARK_CODE-MORA-NBRz-7-19842017-06010930-change_attributes.csv
 
-You can open it in Excel or a programming-friendly text editor (Justin uses notepad++)
+You can open it in Excel or a programming-friendly text editor like Notepad++
 
 ![image alt text](image_57.png)
 
