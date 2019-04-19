@@ -205,8 +205,8 @@ for i, segDir in enumerate(ltRunDirs):
       [distInfoOutPostTCW, 'tcwPst', 'con', 'annual', 'int', '0', '1'],
       
       [tcbFtv, 'tcbPst', 'con', 'dynamic', 'int', '1|3|7|15', '1'],
-      [tcbFtv, 'tcgPst', 'con', 'dynamic', 'int', '1|3|7|15', '1'],
-      [tcbFtv, 'tcwPst', 'con', 'dynamic', 'int', '1|3|7|15', '1']
+      [tcgFtv, 'tcgPst', 'con', 'dynamic', 'int', '1|3|7|15', '1'],
+      [tcwFtv, 'tcwPst', 'con', 'dynamic', 'int', '1|3|7|15', '1']
   ]
   
   with open(summaryInfoFile, 'w') as f:
