@@ -106,11 +106,11 @@ for i, segDir in enumerate(ltRunDirs):
   #TODO need to deal with multiple finds
   
   # make a change output dir for this run
-  typeName = 'LOSSVEG' if changeTypes[i] == 'disturbance' else 'GAINVEG' 
+  typeName = 'vloss' if changeTypes[i] == 'disturbance' else 'vgain' 
   if dsnrs[i]:
-    bname = os.path.basename(segDir)+'-'+typeName+'_DSNR_'+str(abs(minMags[i]))+'-col_'+str(collapseEm[i])
+    bname = os.path.basename(segDir)+'-'+typeName+'_dsnr_'+str(abs(minMags[i]))+'-col_'+str(collapseEm[i])
   else:
-    bname = os.path.basename(segDir)+'-'+typeName+'_IDX_'+str(abs(minMags[i]))+'-col_'+str(collapseEm[i])
+    bname = os.path.basename(segDir)+'-'+typeName+'_idx_'+str(abs(minMags[i]))+'-col_'+str(collapseEm[i])
   outDir = os.path.join(changeDir, bname)
   if os.path.exists(outDir):
     sys.exit('\nERROR: Directory '+outDir+' already exits.\n       Please re-run with different change type and/or magnitude, if so desired.')
