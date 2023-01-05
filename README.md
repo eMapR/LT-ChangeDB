@@ -80,11 +80,37 @@ There are three major directories that are required for the process of generatin
 
 All three directories could be created in a single parent folder or spread out among paths that make sense for your system (more on this in the following steps). For the purpose of this guide we’ll put all three directories in the same parent folder called **LandTrendrGEE**. We’ll put it directly under the C drive.
 If you have write privilege to the C drive, create a folder at this location: **C:\LandTrendrGEE**, if you don’t have write permission to this directory, choose a different location.You now should have a **LandTrendrGEE** folder somewhere on your computer. In the next few steps we’ll add the three major directories to it, making it look something like this:
-C:\LandTrendrGEE├───**LandTrendrPyEnv**├───**LT-ChangeDB**└───**projects**├───<*project head folder 1*>├───<*project head folder 2*>└───<*etc*>Throughout this demo I’ll be referring to this directory structure frequently. Blah blah blah
-LandTrendrPyEnvAbout After data is generated in Earth Engine, it is downloaded and processed further with a series of Python scripts. To ensure that you have the dependent libraries and that your current installation of Python for ArcGIS or other uses, is not altered, we’ve developed an independent Python environment for LandTrendr processing called **LandTrendrPyEnv**
+
+```
+C:\LandTrendrGEE
+      ├───**LandTrendrPyEnv**
+      ├───**LT-ChangeDB**
+      └───**projects**
+              ├───<*project head folder 1*>
+              ├───<*project head folder 2*>
+              └───<*etc*>Throughout 
+```
+
+this demo I’ll be referring to this directory structure frequently. Blah blah blah
+
+## <a name="pyenv">LandTrendrPyEnv</a>
+
+### About
+
+After data is generated in Earth Engine, it is downloaded and processed further with a series of Python scripts. To ensure that you have the dependent libraries and that your current installation of Python for ArcGIS or other uses, is not altered, we’ve developed an independent Python environment for LandTrendr processing called **LandTrendrPyEnv**
+
 LandTrendrPyEnv is an isolated, independent Python programming environment that does not disrupt any other Python installation on your system or set any environmental variables. It contains only the Python libraries and dependencies that are required for running scripts for working with LandTrendr outputs from Google Earth Engine.
+
 LandTrendrPyEnv is distributed and installed as a windows 64-bit.exe. It basically unzips a bunch of folders and files into the a directory of your choice.
-It is accessed via a special command prompt that is started by opening a Windows batchfile - *Start_LandTrendrPyEnv.bat* This batchfile is included in the zipped directory that you’ll download in the following step.  Install LandTrendrPyEnvDownloadingThe *LandTrendrPyEnv* installer can be downloaded using this FTP link:https://github.com/eMapR/LT-ChangeDB/releases/download/v1.0/LandTrendrPyEnv-0.4-Windows-x86_64.exe
+
+It is accessed via a special command prompt that is started by opening a Windows batchfile - *Start_LandTrendrPyEnv.bat* This batchfile is included in the zipped directory that you’ll download in the following step.  
+
+## Install LandTrendrPyEnv
+
+### Downloading
+
+The *LandTrendrPyEnv* installer can be downloaded using this FTP link:https://github.com/eMapR/LT-ChangeDB/releases/download/v1.0/LandTrendrPyEnv-0.4-Windows-x86_64.exe
+
 [ftp://islay.ceoas.oregonstate.edu/from_justin/LandTrendrPyEnv-0.4-Windows-x86_64.exe](ftp://islay.ceoas.oregonstate.edu/from_justin/LandTrendrPyEnv-0.4-Windows-x86_64.exe)
 Visiting the link will prompt a download of the file - it will download to your Downloads directory or wherever you have set your browser to store downloaded files.Installation walkthroughFind the file that you just downloaded (**LandTrendrPyEnv-0.4-Windows-x86_64.exe)** and double click on it to start the installation process. If you are concerned about the reversibility of this installation, don’t worry, there is an uninstaller included with the installation and the program it will not change anything about your system’s registry or environmental variables. The uninstaller can be found by going to the install/uninstall application on your system and searching for the Python installation of LandTrendrPyEnv.
 **Run the executable**
