@@ -1,0 +1,18 @@
+var vector = ee.FeatureCollection("users/emaprlab/mora_aoi_ltgee").geometry();
+var dem = ee.Image("USGS/SRTMGL1_003");
+
+
+var vectorBuffer = vector.bounds().buffer(3000);
+var demClip = dem.clip(vectorBuffer).toShort();
+
+var fileNamePrefix = 'mora_30m_dem';
+Export.image.toDrive({
+  'image': demClip, 
+  'region': vectorBuffer, 
+  'description': fileNamePrefix, 
+  'folder': fileNamePrefix, 
+  'fileNamePrefix': fileNamePrefix,
+  'crs': 'EPSG:5070',
+  'crsTransform': [30.0, 0, 15.0, 0, -30.0, 15.0], 
+  'maxPixels': 1e13
+});
