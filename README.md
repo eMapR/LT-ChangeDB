@@ -113,21 +113,31 @@ The *LandTrendrPyEnv* installer can be downloaded using this [FTP](https://githu
 
 Visiting the link will prompt a download of the file - it will download to your Downloads directory or wherever you have set your browser to store downloaded files. 
 
-##Installation walkthrough
+### Installation walkthrough
 
-Find the file that you just downloaded (**LandTrendrPyEnv-0.4-Winddouble click on it to start the installation process. If you are concerned about the reversibility of this installation, don’t worry, there is an uninstaller included with the installation and the program it will not change anything about your system’s registry or environmental variables. The uninstaller can be found by going to the install/uninstall application on your system and searching for the Python installation of LandTrendrPyEnv.
-**Run the executable**
+Find the file that you just downloaded (**LandTrendrPyEnv-0.4-Winddouble**) and double click on it to start the installation process. If you are concerned about the reversibility of this installation, don’t worry, there is an uninstaller included with the installation and the program it will not change anything about your system’s registry or environmental variables. The uninstaller can be found by going to the install/uninstall application on your system and searching for the Python installation of LandTrendrPyEnv.
+
+1. **Run the executable**
 You might be presented with a security warning. Allow the program to **Run**
+
 ![img](https://lh6.googleusercontent.com/AmD2jcvj05Po7zLsY9LGQ7nTg-NwDxhHSvJHjz4mMPKaw2crGP0KEvjaGar_YcpyHiU3NK45appYAC3sJEFO6RKSzyDcBnKu6FXxAf7UyepuiYJG_wQHL3QW-jjTW75GCjKgJOfNKnRhGx5NuMZmDgeX5SfQxN-GHj133BgyoLX8FoTyvbdrOrerHaWx)
+
 ![img](https://lh6.googleusercontent.com/v_y6RzJii7CDyLVHd8mql1r_Ows64etlqIqXcFo4iy-jcrNOeGwCBZGcYbm5ZZdXftUPLLKvXXWSUZdpPKsNW9L9f86NpdfN8fubtr6B_zoRpELbcucC0BQqg_ACKb6MPPYUpWTL4pv5f1pnhWhXcOucblyHXzEG6VZhaR2iGiYTJTKUEtGM5ggHIynq)Click “More info” to reveal a “Run anyway” button. 
 
 **Start installation and agree to Conda terms**
+
 **![img](https://lh4.googleusercontent.com/JEEXMst1oSyyWotIpZK4jOfAK5xJ03Ta_d4UkskwSfLPnjkpXI_wRNFNj7_u3DySKWCP8w99767JLlWNJ8uz7TOeqqpDxe_-JelSoRHUk6mv8UozUJ_kHs6eI8ouRmRLcG2xhUxazKUCvOwFwAWW0TFpAwzzFnV32PYI76I0_bJ6gx52JYo5s1RfzMEa)**
+
 **![img](https://lh5.googleusercontent.com/ZQ1iFW19Z-NVt9q8rjGhAoB3uwFj91bACAmO9IinoPbSlDpiiS5twkQsgi6-JN-_Bxuzjz6noTEwcPVixMFu0mOKMUsb58oDdJ-38qAMhCKN7d0BX9bmLPHw8PfC8sDJdcBUxVFZNogaHB4f5utwKGJ8j4aoC33g9M6dcCQrcjEpfLA6Dy1rpcwwmtNO)**
+
 **Who to install for**
+
 Select: **“Just Me”**
+
 ![img](https://lh4.googleusercontent.com/KSSAsbDs3cTJVlUFedu4yhbIsbeinYUGOpdYp8VBmD9zuUL8OLTvE1fGq6K5UTQp9kGtMwIBV_ICUxptgLekdCKZm6p2piKc5Nuo-OAar3cuGHqeTSJe4rvcNg0T1ArM2_-LOFi-ponWiS9dpA_uwUQu3s2BZDTjyrCecjvMP0BcxJRyQ8XK5aEMJD7E)
+
 **Where to install**
+
 As mentioned in the Directory Setup section, you can install this wherever you wish, but for the purpose of the guide, we’ll install it in the C:\*LandTrendrGEE* folder we created in the previous step. We want the program’s folder to be called *LandTrendrPyEnv.* So, putting putting the paths together we end up with an destination folder:
 C:\*LandTrendrGEE\LandTrendrPyEnv*
 Note that you should have write privilege to this path and that there should be no spaces in the path (don’t put it in “My Documents”, for instance). Enter the desired path as the destination folder in the setup prompt. Additionally, note or save the path to a text file or in a open Notepad window, because we need to set it as a variable in .bat file in a following step. Hit the **Next** button 
