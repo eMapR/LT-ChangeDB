@@ -109,10 +109,13 @@ It is accessed via a special command prompt that is started by opening a Windows
 
 ### Downloading
 
-The *LandTrendrPyEnv* installer can be downloaded using this FTP link:https://github.com/eMapR/LT-ChangeDB/releases/download/v1.0/LandTrendrPyEnv-0.4-Windows-x86_64.exe
+The *LandTrendrPyEnv* installer can be downloaded using this [FTP](https://github.com/eMapR/LT-ChangeDB/releases/download/v1.0/LandTrendrPyEnv-0.4-Windows-x86_64.exe)
 
-[ftp://islay.ceoas.oregonstate.edu/from_justin/LandTrendrPyEnv-0.4-Windows-x86_64.exe](ftp://islay.ceoas.oregonstate.edu/from_justin/LandTrendrPyEnv-0.4-Windows-x86_64.exe)
-Visiting the link will prompt a download of the file - it will download to your Downloads directory or wherever you have set your browser to store downloaded files.Installation walkthroughFind the file that you just downloaded (**LandTrendrPyEnv-0.4-Windows-x86_64.exe)** and double click on it to start the installation process. If you are concerned about the reversibility of this installation, don’t worry, there is an uninstaller included with the installation and the program it will not change anything about your system’s registry or environmental variables. The uninstaller can be found by going to the install/uninstall application on your system and searching for the Python installation of LandTrendrPyEnv.
+Visiting the link will prompt a download of the file - it will download to your Downloads directory or wherever you have set your browser to store downloaded files. 
+
+##Installation walkthrough
+
+Find the file that you just downloaded (**LandTrendrPyEnv-0.4-Winddouble click on it to start the installation process. If you are concerned about the reversibility of this installation, don’t worry, there is an uninstaller included with the installation and the program it will not change anything about your system’s registry or environmental variables. The uninstaller can be found by going to the install/uninstall application on your system and searching for the Python installation of LandTrendrPyEnv.
 **Run the executable**
 You might be presented with a security warning. Allow the program to **Run**
 ![img](https://lh6.googleusercontent.com/AmD2jcvj05Po7zLsY9LGQ7nTg-NwDxhHSvJHjz4mMPKaw2crGP0KEvjaGar_YcpyHiU3NK45appYAC3sJEFO6RKSzyDcBnKu6FXxAf7UyepuiYJG_wQHL3QW-jjTW75GCjKgJOfNKnRhGx5NuMZmDgeX5SfQxN-GHj133BgyoLX8FoTyvbdrOrerHaWx)
