@@ -219,40 +219,113 @@ If setting up the environment using the LandTrendrPyEnv.yml file failed, then at
 - fiona
 - gdal
 
-NOTES:  REK attempted this on his Mac, and the .yml file caused all sorts of problems because it was looking for specific versions of the libraries that were not available in the OSX. So, an alternative: 
-      conda create -n LandTrendrPyEnv python=2.7 gdal=2.1 pandas rasterio rasterstats shapely=1.6.4 fiona=1.7.9 ScriptsAboutAll of the local data processing (post-processing the raster change data obtained from Earth Engine) is done using Python. There are a series of Python scripts that automate much of the workflow. You need to download the scripts to your system. They are stored in a GitHub repository from which you can download a zipped folder that contains all necessary files. Get ScriptsVisit the following URL:
-      [https://github.com/eMapR/LT-ChangeDB  ](https://github.com/eMapR/LT-ChangeDB)Download the reposility as a zip file 
-      ![save image](https://lh6.googleusercontent.com/fvRsk9ysROABhY64s7nphiCXfbLgKz_fiHc_lidKseCJivs8aggDPLO5XmWKLrzISiYFMt5DMw79M6OKk6IgKEzE6DQQ5YA_jl9wAQluyA-RYGXAYI30RC5dgSh0jg8ieQ5HwEkN7XsnY_mERKXR91uxW6piFiKMrV9kFjJ5CBzlRyuRRCYHvUEa79cU)
+NOTES:  REK attempted this on his Mac, and the .yml file caused all sorts of problems because it was looking for specific versions of the libraries that were not available in the OSX. So, an alternative:
+```
+conda create -n LandTrendrPyEnv python=2.7 gdal=2.1 pandas rasterio rasterstats shapely=1.6.4 fiona=1.7.9 
+```
+## Scripts
 
-   A file titled **LT-ChangeDB-master.zip** will be downloaded to your computer. Find the file in your **Downloads** directory or wherever you have your browser set to stored downloaded files.
-   The files in this zip archive can be thought of as program files - the program **LT-ChangeDB** stands for LandTrendr Change Database. Unzip the **LT-ChangeDB-master.zip** file to the **LandTrendrGEE** folder that was set up in the [**Directory Setup**](https://docs.google.com/document/d/1MuYjttWOZvqWPAz2BQvr6IPE7N4r9dxW2PuKJoSpxe4/edit#heading=h.7k7uc2kddhr9) section and rename the folder to **LT-ChangeDB**. You now should have a directory that looks similar to this:
-   C:\LandTrendrGEE├───LandTrendrPyEnv└───LT-ChangeDB
-   The contents of the **LT-ChangeDB** should look like this:
-   C:\LandTrendrGEE\LT-ChangeDB│  01_dependency_check.py│  02_project_setup.py│  03_vector_setup.py│  04_unpack_lt_ee_data.py│  05_extract_annual_change.py│  06_make_polygons.py│  07_append_zonal_stats.py│  08_make_tc_video.py│  ltcdb.py│  ltcdb.pyc│  README.md│  Start_LandTrendrPyEnv.bat│  tc_time_series.html│└───LandTrendrPyEnv_setup
-   These files need to stay together. Nothing from this folder should be modified and nothing should be added to this folder. When we run python commands to post-process LandTrendr data from GEE the command prompt will look to this folder to find scripts to run. It should be noted that is directory can be placed anywhere and be called anything, but for the purpose of standardizing this guide, it is being placed in the **LandTrendrGEE** folder at the same level as the **LandTrendrPyEnv** folder.Setting Up the LandTrendrPyEnv PromptA special command prompt is included in the **LT-ChangeDB** folder. This special prompt is opened by double clicking on the **Start_LandTrendrPyEnv.bat** file in the **LT-ChangeDB** folder from the above step (don’t start it yet). It is how we will run all the scripts in the **LT-ChangeDB** folder. It is special because it will only know about files in the **LandTrendrPyEnv** folder and **LT-ChangeDB** folder, and it does not add anything to your system’s environmental variables or registry - it is totally isolated from from other installs of python. However, for it to know about files in the **LandTrendrPyEnv** folder, we have to tell it where the folder is located on your system.
-   Open the **Start_LandTrendrPyEnv.bat** file from the **LT-ChangeDB** folder in Microsoft WordPad for editing. You can try right clicking on the file and select WordPad as an option under “open with”, if given the option, or open the WordPad application and then open the file from within WordPad (you may have to set the file search to “All Documents (*.*)” in order to see the .bat file). Note that Notepad should not be used as a text editor in this case because it does not read the new line returns correctly. Notepad++ is a good alternative general purpose text editor that could be used as well, though it needs to be downloaded and installed.Edit the text area highlighted in blue in the figure below so that it is the path of the **LandTrendrPyEnv** installation folder. If there are any spaces in the path to the **LandTrendrPyEnv** installation folder, you should be able to enclose the path with double quotes (there seems to be some inconsistencies in success with using quotes among systems - it is best if the path has no spaces). Leave no space between the “=” sign and the path.
-   **Start_LandTrendrPyEnv.bat** before editing:![img](https://lh6.googleusercontent.com/TJT9AzKN-CdKEFg_Gzi6IPWxdlQwCjHRG5nYn3hyJ9BkcsuhpuZZ8x-mFEPvX4K0Adyhpqv9ufaCSRgzOe5FUDJoy-9iX2AcwRJNCjUzHnug3MxF4Lw9sVbCdmJriC916Sn0mhJQ1KXcqArTD0g025TYKus4JUMsUdAzA6aBz6xx0lhx3Z9OhKfkT0k0)
-   Reminder of the directory that we want the path to bolded:
-   C:\LandTrendrGEE├───**LandTrendrPyEnv**└───LT-ChangeDB
-   **Start_LandTrendrPyEnv.bat** after editing:![img](https://lh4.googleusercontent.com/tzXVFVknRm7iC7IhLLRJdUiGepleD-6krqf6t5iS2bRL_OVyZb44BT1wO9uMuTi8uosV4wuBuJbTZZST8hVosQwB9Naljjx271PJP0eX9sbjJdVNbby4bzpVZn299OhseOZCwpCvst0qdllw2lZ1f4azz87itFFJIbZFZnEnNSEJWU1OGk8wVHrg10o6)
-   \3) Save the file to it original location and name - overwrite the original.
-   Double click on the **Start_LandTrendrPyEnv.bat** file to start the **LandTrendrPyEnv Prompt**. You should get a window like the one below showing the current working directory. We’ll interact with it by typing python followed by the path to a script we want to execute.
-   Here is what the **LandTrendrPyEnv Prompt** should look like once opened.![img](https://lh4.googleusercontent.com/sEyDnksPAxEeG1QzYwU8oGZpmgQ7wiyWXsLeyOCjk4UVakBKDfVyJVHNGK30vLEv0k7QBu5V7-9PrvUy3-6xIFfD59QiKtfI6RKtLexzPmiYhhE4dZteJCWNWQD1gIeUnrmFQs3eHI8vmS8scjNwt13SPEA3mv6M6OuYaJ6gct4bOkXoXXVsvrC8Q5d4)
-   \4) Type python into the **LandTrendrPyEnv Prompt** to see if it can find the **LandTrendrPyEnv** Python install. If it worked, you’ll get a python command line:
-   ![img](https://lh6.googleusercontent.com/_QAvew3Vb8eGGJDScnVDtNzIlk1itxD4qF49OHgGqIecquuyFnmtSuBCY2d67lOpFrfhbzkpeW9uRf6ZHQenrHwVGKVUYcWaqviZVnoCBKSwl4-eNkcsmb5JNo5MQnh6WlNwMdLhyBs7hVA9jbX9slprkmzqCvWx5AtU3qyCt0R-riL4M2WTAOLBPNsY)
-   If something failed you’ll get a window that looks like this:
-   ![img](https://lh6.googleusercontent.com/OyALw0sYv611AGU0H8rltguWXEn_rIecIgkPweLIx9ZbOGPIO-H3m9wp8VKyiTyLnGDuc3_sBJ2bKz0pPFIqgRF3lfJtei_zPAbGRYTGtO2359_liHxnwyhmBDuGUNK80GNxXWLv-p2ezQQElhtGllvFENlkH88LlE9jbU2rkxdGjpUXkwyCjEF6bdLX)
-   If it did fail check all your paths - relocate the **LandTrendrPyEnv** install older and make sure that it matches exactly what you set as the LT_PY_ENV variable when editing the **Start_LandTrendrPyEnv.bat** file.Dependency CheckAboutTo ensure that **LandTrendrPyEnv** was installed correctly and contains the Python libraries required by **LT-ChangeDB** scripts, we can run a test to check.Check for required librariesWe check for libraries by running a script from the **LandTrendrPyEnv Prompt***.* We’ll run a script to test for dependencies. If the python command line is still open from the previous step (designated as: >>>), then type: exit() into the prompt and hit enter to close the python interpreter. Alternatively, close the **LandTrendrPyEnv Prompt** and open a new one by double-clicking the **Start_LandTrendrPyEnv.bat** file in the **LT-ChangeDB** folder.
-   The script to test dependencies is called **01_dependency_check.py**. It is found in the **LT-ChangeDB** program files folder. To run it type python followed by a space in the command line of the **LandTrendrPyEnv Prompt** and then type 01 and hit the tab key to autocomplete the filename. If the file was not found by autocomplete, then drag the **01_dependency_check.py** file into the command line, which will append the file’s path to the current command. The command line should look similar to this now:
-   **![img](https://lh3.googleusercontent.com/1tYd_BzaS4tH9tDb81kFQ-CzHRk29iTxZFDgzyG6P7URlj_9JQFvuBWNNn5Yhpb2hygyGGum9zatLsG33pUv7FImTMIaMC8kJk91XoW2ZY-nWnaEojjZemoEeBfxuRXeL0UI_aL4dyaNQMfEpLHQJg9YSvlv42YRUysiXOC0C1RFz7L8cEqwesIFWCsT)**
-   Example: python 01_dependency_check.py (if autocomplete worked)...orExample: python C:\LandTrendrGEE\LT-ChangeDB\01_dependency_check.py
-   Note that if your path has any spaces in it, the path in the command line should be enclosed by quotations, so that it is interpreted as a single string of text - this is only relevant if you manually type the script file name. Using either autocomplete or drag and drop will automatically add quotes if needed. See the following example where one of the folders is called “misc programs”, in which case quotations are needed around the entire file path
-   Example: python "C:\misc programs\LT-ChangeDB\01_dependency_check.py"
-   Before you hit enter, make sure that the prompt is the active application, if you drag in a file to the prompt, generally Windows Explorer is the active application, so just click on the top bar of the **LandTrendrPyEnv Prompt**, then hit the enter key to start the program.
-   If everything is okay with dependencies you should get a message like this:
-   ![img](https://lh5.googleusercontent.com/N7lHq1FbFxVLVwslB6MkBMNHjeS7W1yie-nsli0y1WQPOu72yutNJQzBjpVSpm3EOCKKcLUH05WG6qn_CH14oMwRRdvb_WJhAkZJZJxboEbzK-iPVTE_SMAUofrEZVKYrq7gmt4iQ5yhZiI-maGYVUeOjckUFzgONlxdgXx2dExPTN7sMQXsXwiGc3RR)
-   Where it says that each library checked **is** installed. If there were any missing libraries, the message would read **is not** installed. Since this **LandTrendrPyEnv** is pre-packaged, there should be no problems, but this is just a good test of the system.
-   If it fails on any library, contact Justin Braaten ([jstnbraaten@gmail.com](mailto:jstnbraaten@gmail.com)) to find out what to do.Project SetupAboutFor each discrete geographic region you want to assemble change data for, you need to create a new project directory. This project region folder will hold a series of subfolders that are created by a python script where all of the data from Earth Engine will go, as well as all the data generated from post-processing scripts. You can create this project folder anywhere on your system. For consistency in this guide, I’m going to put it inside the **LandTrendrGEE** folder that was described in the [**Directory Setup**](https://docs.google.com/document/d/1MuYjttWOZvqWPAz2BQvr6IPE7N4r9dxW2PuKJoSpxe4/edit#heading=h.7k7uc2kddhr9) section.Create Project DirectoryMake a new folder on your system to hold **LT-ChangeDB** post-processing files. In this example, I make a parent **projects** folder in the **LandTrendrGEE** folder that will hold a series of separate regions. I manually create a new folder called **projects** and a subfolder for a project called **mora** (Mount Rainier). The following diagram shows my current directory structure - the bolded folders were just created.
+###About
+
+All of the local data processing (post-processing the raster change data obtained from Earth Engine) is done using Python. There are a series of Python scripts that automate much of the workflow. You need to download the scripts to your system. They are stored in a GitHub repository from which you can download a zipped folder that contains all necessary files. 
+
+### Get Scripts
+
+Visit the following URL:
+[https://github.com/eMapR/LT-ChangeDB  ](https://github.com/eMapR/LT-ChangeDB)Download the reposility as a zip file 
+      
+![save image](https://lh6.googleusercontent.com/fvRsk9ysROABhY64s7nphiCXfbLgKz_fiHc_lidKseCJivs8aggDPLO5XmWKLrzISiYFMt5DMw79M6OKk6IgKEzE6DQQ5YA_jl9wAQluyA-RYGXAYI30RC5dgSh0jg8ieQ5HwEkN7XsnY_mERKXR91uxW6piFiKMrV9kFjJ5CBzlRyuRRCYHvUEa79cU)
+
+A file titled **LT-ChangeDB-master.zip** will be downloaded to your computer. Find the file in your **Downloads** directory or wherever you have your browser set to stored downloaded files.
+
+The files in this zip archive can be thought of as program files - the program **LT-ChangeDB** stands for LandTrendr Change Database. Unzip the **LT-ChangeDB-master.zip** file to the **LandTrendrGEE** folder that was set up in the [**Directory Setup**]() section and rename the folder to **LT-ChangeDB**. You now should have a directory that looks similar to this:
+```
+C:\LandTrendrGEE
+├───LandTrendrPyEnv
+└───LT-ChangeDB
+```
+The contents of the **LT-ChangeDB** should look like this:
+```   
+C:\LandTrendrGEE\LT-ChangeDB
+│  01_dependency_check.py
+│  02_project_setup.py
+│  03_vector_setup.py
+│  04_unpack_lt_ee_data.py
+│  05_extract_annual_change.py
+│  06_make_polygons.py
+│  07_append_zonal_stats.py
+│  08_make_tc_video.py
+│  ltcdb.py
+│  ltcdb.pyc
+│  README.md
+│  Start_LandTrendrPyEnv.bat
+│  tc_time_series.html
+│
+└───LandTrendrPyEnv_setup
+```
+These files need to stay together. Nothing from this folder should be modified and nothing should be added to this folder. When we run python commands to post-process LandTrendr data from GEE the command prompt will look to this folder to find scripts to run. It should be noted that is directory can be placed anywhere and be called anything, but for the purpose of standardizing this guide, it is being placed in the **LandTrendrGEE** folder at the same level as the **LandTrendrPyEnv** folder.Setting Up the LandTrendrPyEnv PromptA special command prompt is included in the **LT-ChangeDB** folder. This special prompt is opened by double clicking on the **Start_LandTrendrPyEnv.bat** file in the **LT-ChangeDB** folder from the above step (don’t start it yet). It is how we will run all the scripts in the **LT-ChangeDB** folder. It is special because it will only know about files in the **LandTrendrPyEnv** folder and **LT-ChangeDB** folder, and it does not add anything to your system’s environmental variables or registry - it is totally isolated from other installs of python. However, for it to know about files in the **LandTrendrPyEnv** folder, we have to tell it where the folder is located on your system.
+
+1. Open the **Start_LandTrendrPyEnv.bat** file from the **LT-ChangeDB** folder in Microsoft WordPad for editing. You can try right clicking on the file and select WordPad as an option under “open with”, if given the option, or open the WordPad application and then open the file from within WordPad (you may have to set the file search to “All Documents (*.*)” in order to see the .bat file). Note that Notepad should not be used as a text editor in this case because it does not read the new line returns correctly. Notepad++ is a good alternative general purpose text editor that could be used as well, though it needs to be downloaded and installed.
+
+2. Edit the text area highlighted in blue in the figure below so that it is the path of the **LandTrendrPyEnv** installation folder. If there are any spaces in the path to the **LandTrendrPyEnv** installation folder, you should be able to enclose the path with double quotes (there seems to be some inconsistencies in success with using quotes among systems - it is best if the path has no spaces). Leave no space between the “=” sign and the path.
+
+**Start_LandTrendrPyEnv.bat** before editing:
+
+![img](https://lh6.googleusercontent.com/TJT9AzKN-CdKEFg_Gzi6IPWxdlQwCjHRG5nYn3hyJ9BkcsuhpuZZ8x-mFEPvX4K0Adyhpqv9ufaCSRgzOe5FUDJoy-9iX2AcwRJNCjUzHnug3MxF4Lw9sVbCdmJriC916Sn0mhJQ1KXcqArTD0g025TYKus4JUMsUdAzA6aBz6xx0lhx3Z9OhKfkT0k0)
+
+Reminder of the directory that we want the path to bolded:
+```
+C:\LandTrendrGEE
+├───**LandTrendrPyEnv**
+└───LT-ChangeDB
+```
+**Start_LandTrendrPyEnv.bat** after editing:
+
+![img](https://lh4.googleusercontent.com/tzXVFVknRm7iC7IhLLRJdUiGepleD-6krqf6t5iS2bRL_OVyZb44BT1wO9uMuTi8uosV4wuBuJbTZZST8hVosQwB9Naljjx271PJP0eX9sbjJdVNbby4bzpVZn299OhseOZCwpCvst0qdllw2lZ1f4azz87itFFJIbZFZnEnNSEJWU1OGk8wVHrg10o6)
+
+3. Save the file to it original location and name - overwrite the original.
+
+Double click on the **Start_LandTrendrPyEnv.bat** file to start the **LandTrendrPyEnv Prompt**. You should get a window like the one below showing the current working directory. We’ll interact with it by typing python followed by the path to a script we want to execute.
+
+Here is what the **LandTrendrPyEnv Prompt** should look like once opened.
+
+![img](https://lh4.googleusercontent.com/sEyDnksPAxEeG1QzYwU8oGZpmgQ7wiyWXsLeyOCjk4UVakBKDfVyJVHNGK30vLEv0k7QBu5V7-9PrvUy3-6xIFfD59QiKtfI6RKtLexzPmiYhhE4dZteJCWNWQD1gIeUnrmFQs3eHI8vmS8scjNwt13SPEA3mv6M6OuYaJ6gct4bOkXoXXVsvrC8Q5d4)
+
+4. Type python into the **LandTrendrPyEnv Prompt** to see if it can find the **LandTrendrPyEnv** Python install. If it worked, you’ll get a python command line:
+
+![img](https://lh6.googleusercontent.com/_QAvew3Vb8eGGJDScnVDtNzIlk1itxD4qF49OHgGqIecquuyFnmtSuBCY2d67lOpFrfhbzkpeW9uRf6ZHQenrHwVGKVUYcWaqviZVnoCBKSwl4-eNkcsmb5JNo5MQnh6WlNwMdLhyBs7hVA9jbX9slprkmzqCvWx5AtU3qyCt0R-riL4M2WTAOLBPNsY)
+
+If something failed you’ll get a window that looks like this:
+
+![img](https://lh6.googleusercontent.com/OyALw0sYv611AGU0H8rltguWXEn_rIecIgkPweLIx9ZbOGPIO-H3m9wp8VKyiTyLnGDuc3_sBJ2bKz0pPFIqgRF3lfJtei_zPAbGRYTGtO2359_liHxnwyhmBDuGUNK80GNxXWLv-p2ezQQElhtGllvFENlkH88LlE9jbU2rkxdGjpUXkwyCjEF6bdLX)
+
+If it did fail check all your paths - relocate the **LandTrendrPyEnv** install older and make sure that it matches exactly what you set as the `LT_PY_ENV` variable when editing the **Start_LandTrendrPyEnv.bat** file.
+
+### Dependency Check
+
+#### About
+
+To ensure that **LandTrendrPyEnv** was installed correctly and contains the Python libraries required by **LT-ChangeDB** scripts, we can run a test to check.Check for required librariesWe check for libraries by running a script from the **LandTrendrPyEnv Prompt***.* We’ll run a script to test for dependencies. If the python command line is still open from the previous step (designated as: >>>), then type: exit() into the prompt and hit enter to close the python interpreter. Alternatively, close the **LandTrendrPyEnv Prompt** and open a new one by double-clicking the **Start_LandTrendrPyEnv.bat** file in the **LT-ChangeDB** folder.
+
+The script to test dependencies is called **01_dependency_check.py**. It is found in the **LT-ChangeDB** program files folder. To run it type python followed by a space in the command line of the **LandTrendrPyEnv Prompt** and then type 01 and hit the tab key to autocomplete the filename. If the file was not found by autocomplete, then drag the **01_dependency_check.py** file into the command line, which will append the file’s path to the current command. The command line should look similar to this now:
+
+**![img](https://lh3.googleusercontent.com/1tYd_BzaS4tH9tDb81kFQ-CzHRk29iTxZFDgzyG6P7URlj_9JQFvuBWNNn5Yhpb2hygyGGum9zatLsG33pUv7FImTMIaMC8kJk91XoW2ZY-nWnaEojjZemoEeBfxuRXeL0UI_aL4dyaNQMfEpLHQJg9YSvlv42YRUysiXOC0C1RFz7L8cEqwesIFWCsT)**
+
+Example: python 01_dependency_check.py (if autocomplete worked)...orExample: python C:\LandTrendrGEE\LT-ChangeDB\01_dependency_check.py
+
+Note that if your path has any spaces in it, the path in the command line should be enclosed by quotations, so that it is interpreted as a single string of text - this is only relevant if you manually type the script file name. Using either autocomplete or drag and drop will automatically add quotes if needed. See the following example where one of the folders is called “misc programs”, in which case quotations are needed around the entire file path
+
+Example: python "C:\misc programs\LT-ChangeDB\01_dependency_check.py"
+
+Before you hit enter, make sure that the prompt is the active application, if you drag in a file to the prompt, generally Windows Explorer is the active application, so just click on the top bar of the **LandTrendrPyEnv Prompt**, then hit the enter key to start the program.
+
+If everything is okay with dependencies you should get a message like this:
+
+![img](https://lh5.googleusercontent.com/N7lHq1FbFxVLVwslB6MkBMNHjeS7W1yie-nsli0y1WQPOu72yutNJQzBjpVSpm3EOCKKcLUH05WG6qn_CH14oMwRRdvb_WJhAkZJZJxboEbzK-iPVTE_SMAUofrEZVKYrq7gmt4iQ5yhZiI-maGYVUeOjckUFzgONlxdgXx2dExPTN7sMQXsXwiGc3RR)
+
+Where it says that each library checked **is** installed. If there were any missing libraries, the message would read **is not** installed. Since this **LandTrendrPyEnv** is pre-packaged, there should be no problems, but this is just a good test of the system.
+
+Project SetupAboutFor each discrete geographic region you want to assemble change data for, you need to create a new project directory. This project region folder will hold a series of subfolders that are created by a python script where all of the data from Earth Engine will go, as well as all the data generated from post-processing scripts. You can create this project folder anywhere on your system. For consistency in this guide, I’m going to put it inside the **LandTrendrGEE** folder that was described in the [**Directory Setup**](https://docs.google.com/document/d/1MuYjttWOZvqWPAz2BQvr6IPE7N4r9dxW2PuKJoSpxe4/edit#heading=h.7k7uc2kddhr9) section.Create Project DirectoryMake a new folder on your system to hold **LT-ChangeDB** post-processing files. In this example, I make a parent **projects** folder in the **LandTrendrGEE** folder that will hold a series of separate regions. I manually create a new folder called **projects** and a subfolder for a project called **mora** (Mount Rainier). The following diagram shows my current directory structure - the bolded folders were just created.
    C:\LandTrendrGEE
    ├───LandTrendrPyEnv
    ├───LT-ChangeDB
