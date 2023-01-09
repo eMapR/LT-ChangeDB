@@ -325,22 +325,38 @@ If everything is okay with dependencies you should get a message like this:
 
 Where it says that each library checked **is** installed. If there were any missing libraries, the message would read **is not** installed. Since this **LandTrendrPyEnv** is pre-packaged, there should be no problems, but this is just a good test of the system.
 
-Project SetupAboutFor each discrete geographic region you want to assemble change data for, you need to create a new project directory. This project region folder will hold a series of subfolders that are created by a python script where all of the data from Earth Engine will go, as well as all the data generated from post-processing scripts. You can create this project folder anywhere on your system. For consistency in this guide, I’m going to put it inside the **LandTrendrGEE** folder that was described in the [**Directory Setup**](https://docs.google.com/document/d/1MuYjttWOZvqWPAz2BQvr6IPE7N4r9dxW2PuKJoSpxe4/edit#heading=h.7k7uc2kddhr9) section.Create Project DirectoryMake a new folder on your system to hold **LT-ChangeDB** post-processing files. In this example, I make a parent **projects** folder in the **LandTrendrGEE** folder that will hold a series of separate regions. I manually create a new folder called **projects** and a subfolder for a project called **mora** (Mount Rainier). The following diagram shows my current directory structure - the bolded folders were just created.
-   C:\LandTrendrGEE
-   ├───LandTrendrPyEnv
-   ├───LT-ChangeDB
-   └───**projects**
-     └───**mora**
-   Create the project directory structure. Open **LandTrendrPyEnv Prompt** by double clicking on the **Start_LandTrendrPyEnv.bat** file in the **LT-ChangeDB** folder.
-   Type python in the prompt followed by a space and then type 02 and hit the tab key to autocomplete the filename. If the file was not found by autocomplete, then drag in the **02_project_setup.py** file from the **LT-ChangeDB** folder. The command should look like this:
-   Example of autocomplete:C:\LandTrendrGEE\LT-ChangeDB>python 02_preoject_setup.py
-   Example of script path drag and dropC:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\02_preoject_setup.py
-   After hitting the enter key, a Windows Explorer popup will appear prompting you to “Select or create and select a project head folder” that will hold all the raster and vector data for a specific study area. The prompt should default to the top of all open applications windows. If it doesn’t, minimize other open windows until you see it.
-   Navigate to the project folder, select it and press the OK button.
-   ![img](https://lh5.googleusercontent.com/6dcycTO1Qe5UeI0HrgMRhEm8om28MG2Yctec5Kj6884FqyVl7P4Vl73cYkoGAx0oDEkNduBjLDf5FLYef_5JIbnfoGLVL-MpQeBWvQXCcAHkaww3-L3wZg9fEQbckNHuRbLOMMq5daNqUQSiZJH7t5dhuEsfzxdHBSjcOd5sFx2PLqR2KvxFDIww5AtT)
+Project Setup
 
-   The program will then generate a directory structure in the head project folder you selected that looks like this:
-   Project Head (mora)
+About
+
+For each discrete geographic region you want to assemble change data for, you need to create a new project directory. This project region folder will hold a series of subfolders that are created by a python script where all of the data from Earth Engine will go, as well as all the data generated from post-processing scripts. You can create this project folder anywhere on your system. For consistency in this guide, I’m going to put it inside the **LandTrendrGEE** folder that was described in the [**Directory Setup**](https://docs.google.com/document/d/1MuYjttWOZvqWPAz2BQvr6IPE7N4r9dxW2PuKJoSpxe4/edit#heading=h.7k7uc2kddhr9) section.
+Create Project Directory
+
+1. Make a new folder on your system to hold **LT-ChangeDB** post-processing files. In this example, I make a parent **projects** folder in the **LandTrendrGEE** folder that will hold a series of separate regions. I manually create a new folder called **projects** and a subfolder for a project called **mora** (Mount Rainier). The following diagram shows my current directory structure - the bolded folders were just created.
+```
+C:\LandTrendrGEE
+├───LandTrendrPyEnv
+├───LT-ChangeDB
+└───**projects**
+      └───**mora**
+```
+
+2. Create the project directory structure. Open **LandTrendrPyEnv Prompt** by double clicking on the **Start_LandTrendrPyEnv.bat** file in the **LT-ChangeDB** folder. Type python in the prompt followed by a space and then type 02 and hit the tab key to autocomplete the filename. If the file was not found by autocomplete, then drag in the **02_project_setup.py** file from the **LT-ChangeDB** folder. The command should look like this:
+
+Example of autocomplete:C:\LandTrendrGEE\LT-ChangeDB>python 02_preoject_setup.py
+
+Example of script path drag and dropC:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\02_preoject_setup.py
+
+After hitting the enter key, a Windows Explorer popup will appear prompting you to “Select or create and select a project head folder” that will hold all the raster and vector data for a specific study area. The prompt should default to the top of all open applications windows. If it doesn’t, minimize other open windows until you see it.
+
+Navigate to the project folder, select it and press the OK button.
+
+![img](https://lh5.googleusercontent.com/6dcycTO1Qe5UeI0HrgMRhEm8om28MG2Yctec5Kj6884FqyVl7P4Vl73cYkoGAx0oDEkNduBjLDf5FLYef_5JIbnfoGLVL-MpQeBWvQXCcAHkaww3-L3wZg9fEQbckNHuRbLOMMq5daNqUQSiZJH7t5dhuEsfzxdHBSjcOd5sFx2PLqR2KvxFDIww5AtT)
+
+
+The program will then generate a directory structure in the head project folder you selected that looks like this:
+```
+Project Head (mora)
    ├───raster
    │  ├───landtrendr
    │  │  ├───change
@@ -354,9 +370,17 @@ Project SetupAboutFor each discrete geographic region you want to assemble chang
    │  └───vector
    ├───vector
    └───video
-   In the following steps these folders will be filled with files manually and automatically from Python scripts. Vector SetupAboutIn this step you’ll run a script to standardize an existing vector file that defines the boundary of your study area. The script will automatically create a new ESRI Shapefile projected to EPSG:4326 (WGS84 Lat Long) and zips it up with all the .shp sidecar files (.dbf, .prj, .shx). This zipped shapefile will be uploaded to Google Earth Engine and define the region that LandTrendr is run on.
-   The vector file that you use can have a single feature (like a single park boundary) or multiple features (all park boundaries for a given network). In any case, each study region needs to be identifiable by a unique ID for a given attribute (we’ll refer to this as a key-value pair). In the vector file that I’m using for the demo, I have a single boundary for Mount Rainier. The **Key** attribute is “PARK_CODE” and the **Value** for the feature of interest is “MORA” ![img](https://lh3.googleusercontent.com/2-T7LJt5iV-eN22bagOR295ce2yybQUUe7FtDN_l7jZY7uQAvtgGtT1U0I5XY1NW10nvK9uxHiKEzFpEPuLQkl0h6_8fa0S5onD7HOwOZopSr5qOcD7z6xSXfQ5H_u-atkUMJKoMsA4Ba1YfSySeR4OZT5s442ybQ7GKscWgjlXqzSWK6aX0fYNCqG6X)Google Earth Engine will want a “key-value” pair to know what feature in the vector should be analyzed by LandTrendr. It is important that both the Key and the Value not have hyphens (-), underscores are fine. Hyphens are a reserved character for use in filename parsing in LT-ChangeDB scripts. The key and value of the feature in this project will appear in file names, so if there is a hyphen in either the Key or the Value, then the system will break. Before moving on make sure that you have an area of interest file that meets the requirements described here. Once you have a shapefile with a unique ID defined by a Key (attribute field name) and Value (attribute value for a given feature) then move to creating a version for use in Google Earth Engine.Create a Google Earth Engine AOI FileMove the area of interest (AOI) shapefile (described previously) and all of its associated files to the “**vector**” folder within your project head folder created in the previous [Project Setup](https://docs.google.com/document/d/1MuYjttWOZvqWPAz2BQvr6IPE7N4r9dxW2PuKJoSpxe4/edit#heading=h.qtiyguaspsr0) section. 
-   Project Head (mora)
+```
+
+In the following steps these folders will be filled with files manually and automatically from Python scripts. Vector SetupAboutIn this step you’ll run a script to standardize an existing vector file that defines the boundary of your study area. The script will automatically create a new ESRI Shapefile projected to EPSG:4326 (WGS84 Lat Long) and zips it up with all the .shp sidecar files (.dbf, .prj, .shx). This zipped shapefile will be uploaded to Google Earth Engine and define the region that LandTrendr is run on.
+   
+The vector file that you use can have a single feature (like a single park boundary) or multiple features (all park boundaries for a given network). In any case, each study region needs to be identifiable by a unique ID for a given attribute (we’ll refer to this as a key-value pair). In the vector file that I’m using for the demo, I have a single boundary for Mount Rainier. The **Key** attribute is “PARK_CODE” and the **Value** for the feature of interest is “MORA” 
+
+![img](https://lh3.googleusercontent.com/2-T7LJt5iV-eN22bagOR295ce2yybQUUe7FtDN_l7jZY7uQAvtgGtT1U0I5XY1NW10nvK9uxHiKEzFpEPuLQkl0h6_8fa0S5onD7HOwOZopSr5qOcD7z6xSXfQ5H_u-atkUMJKoMsA4Ba1YfSySeR4OZT5s442ybQ7GKscWgjlXqzSWK6aX0fYNCqG6X)
+
+Google Earth Engine will want a “key-value” pair to know what feature in the vector should be analyzed by LandTrendr. It is important that both the Key and the Value not have hyphens (-), underscores are fine. Hyphens are a reserved character for use in filename parsing in LT-ChangeDB scripts. The key and value of the feature in this project will appear in file names, so if there is a hyphen in either the Key or the Value, then the system will break. Before moving on make sure that you have an area of interest file that meets the requirements described here. Once you have a shapefile with a unique ID defined by a Key (attribute field name) and Value (attribute value for a given feature) then move to creating a version for use in Google Earth Engine.Create a Google Earth Engine AOI FileMove the area of interest (AOI) shapefile (described previously) and all of its associated files to the “**vector**” folder within your project head folder created in the previous [Project Setup](https://docs.google.com/document/d/1MuYjttWOZvqWPAz2BQvr6IPE7N4r9dxW2PuKJoSpxe4/edit#heading=h.qtiyguaspsr0) section. 
+```   
+Project Head (mora)
    ├───raster
    │  ├───landtrendr
    │  │  ├───change
@@ -370,15 +394,27 @@ Project SetupAboutFor each discrete geographic region you want to assemble chang
    │  └───**vector**
    ├───vector
    └───video
-   Open **LandtrendrPyEnv prompt** and type python then leave a space and then drag in the file **03_vector_setup.py** or autocomplete on 03 and hit enter to run the script
-   Example of autocomplete:C:\LandTrendrGEE\LT-ChangeDB>python 03_vector_setup.py
-   Example of script path drag and dropC:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\03_vector_setup.py
-   A Windows Explorer prompt will appear requesting that you select the project head folder![img](https://lh4.googleusercontent.com/X7HKK3iIf5ixgqzaU73CEc8nAcXm8I5j8wa0t-1yxEifpM3rNXj0D-65VlZXoivMc3rpKMczNtsGZBlHh6ybBPJTtJo2FmvrOLwQWCdp5rqaW48_4ppAxXQxwKD9KUs4_n1pLJNtS0OPwtZcT02_DD-BHtCmvmdeFjPZgUV5Wbi08qjFEm8iY_ttDS0J)
-   Navigate to the head project directory, select it and hit the OK button
-   A second prompt will appear listing available *.shp files in the vector directory and requests that you select a *.shp file to prepare for GEE. Select the *.shp file that you want to represent the area of interest for this project.
-   ![img](https://lh6.googleusercontent.com/tWdhbjmgptTMzj1FTIF530HT5zYttwQQ1yN_4jMTChLl0QmHi2pBTARi_N8pONAVTuA9y-pNpurNpTEugiLx_nrEQJTalQNIwEEFQFkU0EuQpLDCOwH23_bhQASBWpBGow1geuihLqW78b6aR1KEk2QacYylGePm11TXF3jF7ILywATHrK1rwtFIzuOM)
-   The program will create a new shapefile that appends some information to the end of the original file name and then zips a copy for upload to Google Earth Engine. See the bolded files below. The zipped file (*.zip) will be uploaded to Google Earth Engine in a following step.
-   Project Head (mora)
+```
+   
+Open **LandtrendrPyEnv prompt** and type python then leave a space and then drag in the file **03_vector_setup.py** or autocomplete on 03 and hit enter to run the script
+
+Example of autocomplete:C:\LandTrendrGEE\LT-ChangeDB>python 03_vector_setup.py
+
+Example of script path drag and dropC:\LandTrendrGEE\LT-ChangeDB>python C:\LandTrendrGEE\LT-ChangeDB\03_vector_setup.py
+   
+A Windows Explorer prompt will appear requesting that you select the project head folder
+
+![img](https://lh4.googleusercontent.com/X7HKK3iIf5ixgqzaU73CEc8nAcXm8I5j8wa0t-1yxEifpM3rNXj0D-65VlZXoivMc3rpKMczNtsGZBlHh6ybBPJTtJo2FmvrOLwQWCdp5rqaW48_4ppAxXQxwKD9KUs4_n1pLJNtS0OPwtZcT02_DD-BHtCmvmdeFjPZgUV5Wbi08qjFEm8iY_ttDS0J)
+   
+Navigate to the head project directory, select it and hit the OK button
+   
+A second prompt will appear listing available *.shp files in the vector directory and requests that you select a *.shp file to prepare for GEE. Select the *.shp file that you want to represent the area of interest for this project.
+   
+![img](https://lh6.googleusercontent.com/tWdhbjmgptTMzj1FTIF530HT5zYttwQQ1yN_4jMTChLl0QmHi2pBTARi_N8pONAVTuA9y-pNpurNpTEugiLx_nrEQJTalQNIwEEFQFkU0EuQpLDCOwH23_bhQASBWpBGow1geuihLqW78b6aR1KEk2QacYylGePm11TXF3jF7ILywATHrK1rwtFIzuOM)
+
+The program will create a new shapefile that appends some information to the end of the original file name and then zips a copy for upload to Google Earth Engine. See the bolded files below. The zipped file (*.zip) will be uploaded to Google Earth Engine in a following step.
+```
+Project Head (mora)
    ├───raster
    ├───scripts
    ├───timesync
@@ -393,20 +429,64 @@ Project SetupAboutFor each discrete geographic region you want to assemble chang
    │    **mora_aoi_ltgee_epsg4326.shp**
    │    **mora_aoi_ltgee_epsg4326.shx**
    │
-   └───videoGoogle Earth Engine SetupAccessWe’ll be using [Google Earth Engine](https://earthengine.google.com/) (GEE) to run LandTrendr ([LT-GEE](https://github.com/eMapR/LT-GEE)). GEE requires that a Google-associated email account be granted access. If you don’t have GEE access you can request it here: https://signup.earthengine.google.com/#!/
-   If you need to sign up, you’ll be asked what you intend to do with Earth Engine. I’ve not heard of anyone being denied access, but make your response compelling.
+   └───video
+```
+Google Earth Engine Setup
+
+Access
+
+We’ll be using [Google Earth Engine](https://earthengine.google.com/) (GEE) to run LandTrendr ([LT-GEE](https://github.com/eMapR/LT-GEE)). GEE requires that a Google-associated email account be granted access. If you don’t have GEE access you can request it here: https://signup.earthengine.google.com/#!/
+
+If you need to sign up, you’ll be asked what you intend to do with Earth Engine. I’ve not heard of anyone being denied access, but make your response compelling.
    We’ll be using the GEE JavaScript API. Here is a link to the API User Guide for reference: https://developers.google.com/earth-engine/
    The JavaScript GEE code editor (IDE) can be accessed here:https://code.earthengine.google.com/
    The first time you access the code editor, you will probably be prompted to setup a default user code repository. The eMapR lab default code repository, for instance, is *users/***emaprlab***/default*. The default code repository might be suggested from your email, however, you may need to, or optionally define it. If you are required or choose to define it, make it short and reasonably representative/descriptive of you as a user or organization - it likely has to be unique.
-   ![img](https://lh5.googleusercontent.com/CWo9ZCs-8T1yTH2nnAS01jaFO5syjxFEKyAimgJjuChKp03p3BMqRsJmV_cuP4RM8P44_-uu70fAUhawcXiYkpspqU9NrWHQEKo3rSRsCklRj3zNfdq_gMCNlEels23cgt_-AliMv0FyLyQG8CM0bW2BWoNxya9hjZzhOeyxzLvPixumptwpSYCd-NZ1)ExplorationGet comfortable with the JavaScript GEE IDE, move panel sliders, click on tabs, expand script libraries and documentation. Within the **Script Manager** tab, expand the **Examples** repository and run through some of the example for Images, Image Collection, and Feature Collection.When working on examples, zoom, pan, and click (view the Inspector tab), and watch for things printed to the consoleAdd required repositoriesWe have a series of scripts and applications that you need to add to your GEE account. Visit these URL links to add required scripts to your GEE account:
-   The following link adds generic scripts and functions for using LandTrendr to your script library. It will show up under your **Reader** repository under the **Scripts** tab in the left panel of the GEE IDEhttps://code.earthengine.google.com/?accept_repo=users/emaprlab/public
-   The following link adds scripts and applications specific to NPS annual change mapping to your GEE script library. It will show up under either your **Reader** repository under the **Scripts** tab in the left panel of the GEE IDE.https://code.earthengine.google.com/?accept_repo=users/emaprlab/NPS-LT-ChangeDBVector Upload to Google Earth EngineIn the previous [Vector Setup](https://docs.google.com/document/d/1MuYjttWOZvqWPAz2BQvr6IPE7N4r9dxW2PuKJoSpxe4/edit#heading=h.7ncjbx4zupdj) step we generated a zipped directory of a shapefile that defines the region of this project. Now we’ll upload that file as an asset to your GEE account so it can be used to define the area that LandTrendr should be run on. 
-   GEE User Guide reference for importing vectors:https://developers.google.com/earth-engine/importingInstructionsIf not already open, open the GEE IDE: https://code.earthengine.google.com/. If not already signed in, you’ll be prompted to log in to your GEE account. 
-   Once the IDE opens click on the **Assets** tab in the left panel to open the **Assets Manager**. If you’ve not uploaded assets previously, then you’ll be prompted to **Create Home Folder**
-   ![img](https://lh4.googleusercontent.com/CTLsUtr1hNb3has4FJ1fkJ2PBeL_EIBiETlprUXpQxRG_wGGy-Q7LymCybw6ZIQBde0LYJn5ntJfBQtXjkDZEwhvMQLWw92XuUNMK9RYF91rtW417di4-8qDC1vaGknUoDASA34CC-Y1D-RfIAqpQ3WMLQbBZpK2UYfa8NLF6qN2TrjdLXD7dHy35H34)Click the button and you’ll be presented with a new window where you are to define the name of the home folder. I would provide the same name as your user name in the **Scripts** library. For instance the eMapR user name is “emaprlab” (from: *users/***emaprlab***/default)* so I entered “emaprlab” as my asset home folder. This is just for consistency - it doesn’t matter that much. Here is an example from Al Kirschbaum: ![img](https://lh5.googleusercontent.com/8KY4c7mW7MKFqIkjbURj1rAi2UKENP4MVi47Vr7O-lflsBx3fSi-M4u4h9Ee8pcITeO0pykrEt4yiWkHxm48TRKkJRFvWGpvk-t5UhDvv3uG9el0Dyk6uD-jnR8X2qBuGtLNmB24SchGNB6mJ3O5s3piwhy_nqEstNv5xCYIH1_Z5CDhcun9Mh5sxqKh)
-   If you’ve just set up your GEE **Assets** folder, or it already exists, you should be able to Click the **New** button to release a drop down menu and then select **Table upload**
-   ![save image](https://lh5.googleusercontent.com/BnF4ZaxKGF-b1gJbyCoo2a9flMfVKv42WL2MrUsIpF5ijXr0Qd_1d3RS4kYbIBGWK5euWjHbyk_EUSPJ_ohuDA0p4VKaKMtEmhGICPmn_LHLS0uXMaopimDmUDbch_u_jJAo6QAjhn5SmAAudey4iiUHxFNN6b2mVSuP5pOD5MfybcB39f1uhkZnQMZL)![save image](https://lh5.googleusercontent.com/TOYaziKaoSNV1kCW3APYGi8OD_6dhaH5GJ99IHDcYx_k00fL43sKSefBx42nzWL9fVo7iSfHcfInZba4wtnMlK55Oi91puPMpM4KHFzCStEuk-IkfMYvJlvjhwNIozKO03_2SywG_rHTOkWg6FmBc2Y48yRMm_s4AvHlb07tiXsiPTPnjZ7iN6VJXqNT)Select the .zip file from vector subfolder of the head project directory
-   ![img](https://lh6.googleusercontent.com/GABr08RKNMpWXVuwykA6q4E-F3glfPZt32YfaRtjixJi2Vyjx9rFHBzYnItqvBVsJv38GbqXiD9_Yfu6AN0AN6koaTicecCfjK1rjVeiIRVNQ0GRHE7L2IxfYk95KIr-qQqi3aL22Lhvf-NuiFGc2l_GJdxtb3OajmK2lX3dCbcMNfSarTQY1uTucyqP)
+
+![img](https://lh5.googleusercontent.com/CWo9ZCs-8T1yTH2nnAS01jaFO5syjxFEKyAimgJjuChKp03p3BMqRsJmV_cuP4RM8P44_-uu70fAUhawcXiYkpspqU9NrWHQEKo3rSRsCklRj3zNfdq_gMCNlEels23cgt_-AliMv0FyLyQG8CM0bW2BWoNxya9hjZzhOeyxzLvPixumptwpSYCd-NZ1)
+
+Exploration
+
+Get comfortable with the JavaScript GEE IDE, move panel sliders, click on tabs, expand script libraries and documentation. 
+
+Within the **Script Manager** tab, expand the **Examples** repository and run through some of the example for Images, Image Collection, and Feature Collection.
+
+When working on examples, zoom, pan, and click (view the Inspector tab), and watch for things printed to the console
+
+#### Add required repositories
+
+We have a series of scripts and applications that you need to add to your GEE account. Visit these URL links to add required scripts to your GEE account:
+
+The following link adds generic scripts and functions for using LandTrendr to your script library. It will show up under your **Reader** repository under the **Scripts** tab in the left panel of the GEE IDEhttps://code.earthengine.google.com/?accept_repo=users/emaprlab/public
+
+The following link adds scripts and applications specific to NPS annual change mapping to your GEE script library. It will show up under either your **Reader** repository under the **Scripts** tab in the left panel of the GEE IDE.https://code.earthengine.google.com/?accept_repo=users/emaprlab/NPS-LT-ChangeDB
+
+Vector Upload to Google Earth Engine
+
+In the previous [Vector Setup](https://docs.google.com/document/d/1MuYjttWOZvqWPAz2BQvr6IPE7N4r9dxW2PuKJoSpxe4/edit#heading=h.7ncjbx4zupdj) step we generated a zipped directory of a shapefile that defines the region of this project. Now we’ll upload that file as an asset to your GEE account so it can be used to define the area that LandTrendr should be run on. 
+
+GEE User Guide reference for importing vectors:https://developers.google.com/earth-engine/importing
+
+Instructions
+
+1. If not already open, open the GEE IDE: https://code.earthengine.google.com/. If not already signed in, you’ll be prompted to log in to your GEE account. 
+
+2. Once the IDE opens click on the **Assets** tab in the left panel to open the **Assets Manager**. If you’ve not uploaded assets previously, then you’ll be prompted to **Create Home Folder**
+
+![img](https://lh4.googleusercontent.com/CTLsUtr1hNb3has4FJ1fkJ2PBeL_EIBiETlprUXpQxRG_wGGy-Q7LymCybw6ZIQBde0LYJn5ntJfBQtXjkDZEwhvMQLWw92XuUNMK9RYF91rtW417di4-8qDC1vaGknUoDASA34CC-Y1D-RfIAqpQ3WMLQbBZpK2UYfa8NLF6qN2TrjdLXD7dHy35H34)
+
+Click the button and you’ll be presented with a new window where you are to define the name of the home folder. I would provide the same name as your user name in the **Scripts** library. For instance the eMapR user name is “emaprlab” (from: *users/***emaprlab***/default)* so I entered “emaprlab” as my asset home folder. This is just for consistency - it doesn’t matter that much. Here is an example from Al Kirschbaum: 
+
+![img](https://lh5.googleusercontent.com/8KY4c7mW7MKFqIkjbURj1rAi2UKENP4MVi47Vr7O-lflsBx3fSi-M4u4h9Ee8pcITeO0pykrEt4yiWkHxm48TRKkJRFvWGpvk-t5UhDvv3uG9el0Dyk6uD-jnR8X2qBuGtLNmB24SchGNB6mJ3O5s3piwhy_nqEstNv5xCYIH1_Z5CDhcun9Mh5sxqKh)
+
+3. If you’ve just set up your GEE **Assets** folder, or it already exists, you should be able to Click the **New** button to release a drop down menu and then select **Table upload**
+
+![save image](https://lh5.googleusercontent.com/BnF4ZaxKGF-b1gJbyCoo2a9flMfVKv42WL2MrUsIpF5ijXr0Qd_1d3RS4kYbIBGWK5euWjHbyk_EUSPJ_ohuDA0p4VKaKMtEmhGICPmn_LHLS0uXMaopimDmUDbch_u_jJAo6QAjhn5SmAAudey4iiUHxFNN6b2mVSuP5pOD5MfybcB39f1uhkZnQMZL)
+
+![save image](https://lh5.googleusercontent.com/TOYaziKaoSNV1kCW3APYGi8OD_6dhaH5GJ99IHDcYx_k00fL43sKSefBx42nzWL9fVo7iSfHcfInZba4wtnMlK55Oi91puPMpM4KHFzCStEuk-IkfMYvJlvjhwNIozKO03_2SywG_rHTOkWg6FmBc2Y48yRMm_s4AvHlb07tiXsiPTPnjZ7iN6VJXqNT)
+
+4. Select the .zip file from vector subfolder of the head project directory
+
+![img](https://lh6.googleusercontent.com/GABr08RKNMpWXVuwykA6q4E-F3glfPZt32YfaRtjixJi2Vyjx9rFHBzYnItqvBVsJv38GbqXiD9_Yfu6AN0AN6koaTicecCfjK1rjVeiIRVNQ0GRHE7L2IxfYk95KIr-qQqi3aL22Lhvf-NuiFGc2l_GJdxtb3OajmK2lX3dCbcMNfSarTQY1uTucyqP)
    Optionally rename the file and hit OK
    ![save image](https://lh6.googleusercontent.com/BglRHBcKCbu7S5UN5HxST5vAda3wveQsT6cblw38EyugsH8fXY5mKHeKg8dQGKHGglL8EuWW5-YMgfWl36qGSUqWG2-hCabBvQrpuemSNhPztDONuRcnqfqqsr6ZKLB6krBCsEBgVgoR3BmjshaQLsagsosTuUYDzgTJesiz0ny8WcR2JagYMUXESjIe)
    An **Asset Ingestion** job, which can be monitored in the **Task Manager** found under the **Tasks** tab in the right panel of the GEE IDE, will start. If you don’t see the job, you may have to refresh the browser. In a few minutes the process should complete and you will see your region in the **Asset Manager** panel - if you don’t see it after the job completes, then refresh the assets and/or the browser.
