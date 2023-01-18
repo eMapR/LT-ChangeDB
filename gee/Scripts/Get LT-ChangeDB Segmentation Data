@@ -45,9 +45,10 @@ var options = {                            // options to exclude images
 // buffer the aoi 10 pixels to give consideration to mmu filter
 var aoiBuffer = 300;
 
-// load the LandTrendr library
-var ltgee = require('users/emaprlab/NPS-LT-ChangeDB:Modules/LandTrendr.js'); 
-
+// load the LandTrendr library collection 1
+//var ltgee = require('users/emaprlab/NPS-LT-ChangeDB:Modules/LandTrendr.js'); 
+//LandTrendr module collection 2
+var ltgee = require('users/emaprlab/public:Modules/LandTrendr.js');
 
 // get geometry stuff
 var aoi = ee.FeatureCollection(featureCol)
