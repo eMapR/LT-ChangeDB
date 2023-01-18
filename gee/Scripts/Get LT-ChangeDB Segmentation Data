@@ -46,9 +46,9 @@ var options = {                            // options to exclude images
 var aoiBuffer = 300;
 
 // load the LandTrendr library collection 1
-//var ltgee = require('users/emaprlab/NPS-LT-ChangeDB:Modules/LandTrendr.js'); 
-//LandTrendr module collection 2
-var ltgee = require('users/emaprlab/public:Modules/LandTrendr.js');
+var ltgee = require('users/emaprlab/NPS-LT-ChangeDB:Modules/LandTrendr.js'); 
+// load the LandTrendr library collection 2
+//var ltgee = require('users/emaprlab/public:Modules/LandTrendr.js');
 
 // get geometry stuff
 var aoi = ee.FeatureCollection(featureCol)
